@@ -1,6 +1,6 @@
 #pragma once
 
-// Pack.h : 头文件
+// Pack.h : 头锟侥硷拷
 //
 #include "PackItem.h"
 #include "SBitmap.h"
@@ -162,7 +162,7 @@ private:
 	}JStegParam;
 	static void JStegErrorExit(j_common_ptr cinfo);
 	static void JStegReadData(j_common_ptr cinfo, JCOEF data);
-	static JCOEF CPack::JStegWriteData(j_common_ptr cinfo, JCOEF data);
+	static JCOEF JStegWriteData(j_common_ptr cinfo, JCOEF data);
 	static INT JStegGetCap(INT x, INT y);
 
 	// for none
