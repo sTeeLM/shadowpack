@@ -1,0 +1,311 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(中华人民共和国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#include ""res\\ShadowPack.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""l.CHS\\afxres.rc""      // 标准组件\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\ShadowPack.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于 ShadowPack"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
+    LTEXT           "ShadowPack，1.2 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) sTeeL 2013",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_SHADOWPACK_DIALOG DIALOGEX 0, 0, 291, 172
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "ShadowPack"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "装载图片",IDC_BTN_LOAD_IMAGE,9,15,50,14
+    PUSHBUTTON      "保存图片",IDC_BTN_SAVE_IMAGE,60,15,50,14
+    PUSHBUTTON      "关闭图片",IDC_BTN_CLOSE_IMAGE,111,15,50,14
+    PUSHBUTTON      "选项",IDC_BTN_OPTION,162,15,50,14
+    PUSHBUTTON      "添加文件",IDC_BTN_ADD_DATA,226,81,50,14
+    PUSHBUTTON      "删除文件",IDC_BTN_REMOVE_DATA,226,97,50,14
+    PUSHBUTTON      "保存文件",IDC_BTN_EXPORT_DATA,226,113,50,14
+    PUSHBUTTON      "清除",IDC_BTN_CLEAR_DATA,226,129,50,14
+    GROUPBOX        "",IDC_STATIC,7,7,208,27
+    GROUPBOX        "",IDC_IMAGE_QUOTA,220,7,64,64
+    CONTROL         "",IDC_LST_DATA,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_AUTOARRANGE | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,35,208,114
+    CONTROL         "",IDC_PROGRESS_IMAGE,"msctls_progress32",WS_BORDER,7,149,208,16
+    GROUPBOX        "",IDC_STATIC,220,73,64,73
+    LTEXT           "静态",IDC_STATIC_INFO1,7,154,155,11
+    LTEXT           "静态",IDC_STATIC_INFO2,167,154,117,11
+    PUSHBUTTON      "取消",IDC_BTN_CANCEL,226,149,50,14
+END
+
+IDD_DIALOG_OPTION DIALOGEX 0, 0, 230, 159
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "选项"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "1像素8Bits(容量最大)",IDC_RTO_1PP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,15,20,84,10
+    CONTROL         "2像素8Bits(容量中等)",IDC_RTO_2PP,"Button",BS_AUTORADIOBUTTON,15,37,84,10
+    CONTROL         "3像素8Bits(容量最小)",IDC_RTO_3PP,"Button",BS_AUTORADIOBUTTON,15,54,84,10
+    CONTROL         "1Cor1Bits(容量最小)",IDC_RTO_1PJ,"Button",BS_AUTORADIOBUTTON,123,19,86,10
+    CONTROL         "1Cor2Bits(容量中等)",IDC_RTO_2PJ,"Button",BS_AUTORADIOBUTTON,123,36,86,10
+    CONTROL         "1Cor4Bits(容量最大)",IDC_RTO_4PJ,"Button",BS_AUTORADIOBUTTON,123,53,86,10
+    CONTROL         "加密",IDC_CHK_ENCRYPT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,81,41,10
+    COMBOBOX        IDC_COMBO_ENCRYPT_METHOD,67,80,135,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_PASSWORD1,66,96,136,14,ES_PASSWORD | ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PASSWORD2,66,113,136,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "确定",IDOK,110,138,50,14
+    PUSHBUTTON      "取消",IDCANCEL,162,138,50,14
+    GROUPBOX        "RawPP格式",IDC_STATIC,7,7,96,64
+    LTEXT           "密码:",IDC_STATIC,17,99,32,8
+    LTEXT           "确认:",IDC_STATIC,16,117,32,8
+    GROUPBOX        "JSteg格式",IDC_STATIC,111,7,105,64
+END
+
+IDD_DIALOG_PASSWORD DIALOGEX 0, 0, 221, 59
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "请输入密码"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,106,38,50,14
+    PUSHBUTTON      "取消",IDCANCEL,160,38,50,14
+    EDITTEXT        IDC_EDIT_PASSWORD,71,18,140,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "密码:",IDC_STATIC,19,22,34,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080403a8"
+        BEGIN
+            VALUE "CompanyName", "Mad Cat Stdio"
+            VALUE "FileDescription", "图像隐写工具"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "ShadowPack.exe"
+            VALUE "LegalCopyright", "(C) <Mad Cat Stdio>。保留所有权利。"
+            VALUE "OriginalFilename", "ShadowPack.exe"
+            VALUE "ProductName", "ShadowPack"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 936
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_SHADOWPACK_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 284
+        VERTGUIDE, 110
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 165
+    END
+
+    IDD_DIALOG_OPTION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 223
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 152
+    END
+
+    IDD_DIALOG_PASSWORD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 214
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 52
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_DIALOG_OPTION DLGINIT
+BEGIN
+    IDC_COMBO_ENCRYPT_METHOD, 0x403, 4, 0
+0x4541, 0x0053, 
+    IDC_COMBO_ENCRYPT_METHOD, 0x403, 9, 0
+0x4c42, 0x574f, 0x4946, 0x4853, "\000" 
+    IDC_COMBO_ENCRYPT_METHOD, 0x403, 5, 0
+0x4143, 0x5453, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "关于 ShadowPack(&A)..."
+    IDS_COLUMN_ID           "序号"
+    IDS_COLUMN_NAME         "名称"
+    IDS_COLUMN_SIZE         "大小"
+    IDS_ERROR_EMPTY_PASSWORD "密码不能为空"
+    IDS_ERROR_MISMATCH_PASSWORD "两次密码不匹配"
+    IDS_ERROR_IN_PROGRESS   "处理中，无法关闭"
+    IDS_SAVE_DIRTY          "数据已经修改，保存一下？"
+    IDS_CAPICITY_USED       "容量:%s 使用:%s"
+    IDS_SELECTED            "已选择 %u"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERROR_ADD_DATA      "添加文件错误: %s"
+    IDS_ERROR_EXPORT_DATA   "导出文件错误: %s"
+    IDS_ERROR_LOAD_IMAGE    "装载图片错误: %s"
+    IDS_ERROR_SAVE_IMAGE    "保存图片错误: %s"
+    IDS_ERROR_INTERNAL      "内部错误（内存不足?）"
+    IDS_ERROR_CANCELED      "用户已经撤销"
+    IDS_ERROR_NEED_PASSWORD "需要密码解密数据"
+    IDS_ERROR_DECRYPT       "解密错误（不支持的算法?密码错误?）"
+    IDS_ERROR_CORRUPT_DATA  "数据错误"
+    IDS_ERROR_ENCRYPT       "加密错误（不支持的算法?密码错误?）"
+    IDS_ERROR_OVER_CAPICITY "超过容量"
+    IDS_ERROR_TOO_LARGE_DATA "数据过大"
+    IDS_ERROR_READ_FILE     "读取文件错误"
+    IDS_ERROR_UNSUPPORT_FILE "不支持的格式"
+END
+
+#endif    // 中文(中华人民共和国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res\ShadowPack.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "l.CHS\afxres.rc"      // 标准组件
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
