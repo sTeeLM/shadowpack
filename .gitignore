@@ -3,3 +3,6 @@
 *.old
 *.ncb
 *.suo
+*.exp
+*.bak
+*.lib

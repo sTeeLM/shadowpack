@@ -19,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="..\bin"
-			IntermediateDirectory="..\$(ConfigurationName)"
+			IntermediateDirectory="..\Debug\ShadowPack"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="1"
@@ -68,9 +68,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libeay32.lib libcrypto.lib libssl.lib libssl32.lib CORE_DB_bzlib_.lib CORE_DB_coders_.lib CORE_DB_filters_.lib CORE_DB_jbig_.lib CORE_DB_jp2_.lib CORE_DB_jpeg_.lib CORE_DB_lcms_.lib CORE_DB_libxml_.lib CORE_DB_magick_.lib CORE_DB_Magick++_.lib CORE_DB_png_.lib CORE_DB_tiff_.lib CORE_DB_ttf_.lib CORE_DB_wand_.lib CORE_DB_wmf_.lib CORE_DB_xlib_.lib CORE_DB_zlib_.lib kernel32.lib user32.lib gdi32.lib odbc32.lib odbccp32.lib ole32.lib oleaut32.lib winmm.lib wsock32.lib advapi32.lib"
+				AdditionalDependencies="openssl.lib CORE_DB_bzlib_.lib CORE_DB_coders_.lib CORE_DB_filters_.lib CORE_DB_jbig_.lib CORE_DB_jp2_.lib CORE_DB_jpeg_.lib CORE_DB_lcms_.lib CORE_DB_libxml_.lib CORE_DB_magick_.lib CORE_DB_Magick++_.lib CORE_DB_png_.lib CORE_DB_tiff_.lib CORE_DB_ttf_.lib CORE_DB_wand_.lib CORE_DB_wmf_.lib CORE_DB_xlib_.lib CORE_DB_zlib_.lib kernel32.lib user32.lib gdi32.lib odbc32.lib odbccp32.lib ole32.lib oleaut32.lib winmm.lib wsock32.lib advapi32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\openssl\lib;..\lib"
+				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -100,7 +100,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="..\bin"
-			IntermediateDirectory="..\$(ConfigurationName)"
+			IntermediateDirectory="..\Release\ShadowPack"
 			ConfigurationType="1"
 			UseOfMFC="1"
 			UseOfATL="1"
@@ -152,9 +152,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libeay32.lib libcrypto.lib libssl.lib libssl32.lib CORE_RL_Magick++_.lib CORE_RL_bzlib_.lib CORE_RL_coders_.lib CORE_RL_filters_.lib CORE_RL_jbig_.lib CORE_RL_jp2_.lib CORE_RL_jpeg_.lib CORE_RL_lcms_.lib CORE_RL_libxml_.lib CORE_RL_magick_.lib CORE_RL_png_.lib CORE_RL_tiff_.lib CORE_RL_ttf_.lib CORE_RL_wand_.lib CORE_RL_wmf_.lib CORE_RL_xlib_.lib CORE_RL_zlib_.lib"
+				AdditionalDependencies="openssl.lib CORE_RL_Magick++_.lib CORE_RL_bzlib_.lib CORE_RL_coders_.lib CORE_RL_filters_.lib CORE_RL_jbig_.lib CORE_RL_jp2_.lib CORE_RL_jpeg_.lib CORE_RL_lcms_.lib CORE_RL_libxml_.lib CORE_RL_magick_.lib CORE_RL_png_.lib CORE_RL_tiff_.lib CORE_RL_ttf_.lib CORE_RL_wand_.lib CORE_RL_wmf_.lib CORE_RL_xlib_.lib CORE_RL_zlib_.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\openssl\lib;..\lib"
+				AdditionalLibraryDirectories="..\lib"
 				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				SubSystem="2"
