@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\openssl\include;&quot;..\ImageMagick-6.8.5&quot;;&quot;..\ImageMagick-6.8.5\xlib&quot;;&quot;..\ImageMagick-6.8.5\Magick++\lib&quot;;&quot;..\ImageMagick-6.8.5\zlib&quot;;&quot;..\ImageMagick-6.8.5\bzlib&quot;;&quot;..\ImageMagick-6.8.5\jpeg&quot;;&quot;..\ImageMagick-6.8.5\lcms\src&quot;;&quot;..\ImageMagick-6.8.5\lcms\include&quot;;&quot;..\ImageMagick-6.8.5\tiff\libtiff&quot;;&quot;..\ImageMagick-6.8.5\ttf\include&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\cache&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\config&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\internal&quot;;&quot;..\ImageMagick-6.8.5\libxml\include&quot;;&quot;..\ImageMagick-6.8.5\libxml\include\libxml&quot;;&quot;..\ImageMagick-6.8.5\Magick++&quot;;&quot;..\ImageMagick-6.8.5\Magick++\demo&quot;;&quot;..\ImageMagick-6.8.5\Magick++\lib\Magick++&quot;;&quot;..\ImageMagick-6.8.5\Magick++\tests&quot;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_VISUALC_;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ssleay32.lib libeay32.lib CORE_DB_Magick++_.lib CORE_DB_magick_.lib CORE_DB_wand_.lib CORE_DB_xlib_.lib CORE_DB_jpeg_.lib kernel32.lib user32.lib gdi32.lib odbc32.lib odbccp32.lib ole32.lib oleaut32.lib winmm.lib wsock32.lib advapi32.lib"
+				AdditionalDependencies="libeay32.lib libcrypto.lib libssl.lib libssl32.lib CORE_DB_bzlib_.lib CORE_DB_coders_.lib CORE_DB_filters_.lib CORE_DB_jbig_.lib CORE_DB_jp2_.lib CORE_DB_jpeg_.lib CORE_DB_lcms_.lib CORE_DB_libxml_.lib CORE_DB_magick_.lib CORE_DB_Magick++_.lib CORE_DB_png_.lib CORE_DB_tiff_.lib CORE_DB_ttf_.lib CORE_DB_wand_.lib CORE_DB_wmf_.lib CORE_DB_xlib_.lib CORE_DB_zlib_.lib kernel32.lib user32.lib gdi32.lib odbc32.lib odbccp32.lib ole32.lib oleaut32.lib winmm.lib wsock32.lib advapi32.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\openssl\lib;..\lib"
 				GenerateDebugInformation="true"
@@ -130,7 +130,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\openssl\include;&quot;..\ImageMagick-6.8.5&quot;;&quot;..\ImageMagick-6.8.5\xlib&quot;;&quot;..\ImageMagick-6.8.5\Magick++\lib&quot;;&quot;..\ImageMagick-6.8.5\zlib&quot;;&quot;..\ImageMagick-6.8.5\bzlib&quot;;&quot;..\ImageMagick-6.8.5\jpeg&quot;;&quot;..\ImageMagick-6.8.5\lcms\src&quot;;&quot;..\ImageMagick-6.8.5\lcms\include&quot;;&quot;..\ImageMagick-6.8.5\tiff\libtiff&quot;;&quot;..\ImageMagick-6.8.5\ttf\include&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\cache&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\config&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\internal&quot;;&quot;..\ImageMagick-6.8.5\libxml\include&quot;;&quot;..\ImageMagick-6.8.5\libxml\include\libxml&quot;;&quot;..\ImageMagick-6.8.5\Magick++&quot;;&quot;..\ImageMagick-6.8.5\Magick++\demo&quot;;&quot;..\ImageMagick-6.8.5\Magick++\lib\Magick++&quot;;&quot;..\ImageMagick-6.8.5\Magick++\tests&quot;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_VISUALC_;_LIB"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -152,9 +152,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ssleay32.lib libeay32.lib CORE_RL_magick++_.lib CORE_RL_magick_.lib CORE_RL_wand_.lib CORE_RL_xlib_.lib CORE_RL_jpeg_.lib kernel32.lib user32.lib gdi32.lib odbc32.lib odbccp32.lib ole32.lib oleaut32.lib winmm.lib wsock32.lib advapi32.lib"
+				AdditionalDependencies="libeay32.lib libcrypto.lib libssl.lib libssl32.lib CORE_RL_Magick++_.lib CORE_RL_bzlib_.lib CORE_RL_coders_.lib CORE_RL_filters_.lib CORE_RL_jbig_.lib CORE_RL_jp2_.lib CORE_RL_jpeg_.lib CORE_RL_lcms_.lib CORE_RL_libxml_.lib CORE_RL_magick_.lib CORE_RL_png_.lib CORE_RL_tiff_.lib CORE_RL_ttf_.lib CORE_RL_wand_.lib CORE_RL_wmf_.lib CORE_RL_xlib_.lib CORE_RL_zlib_.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\openssl\lib;..\lib"
+				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

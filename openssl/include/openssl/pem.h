@@ -125,7 +125,6 @@ extern "C" {
 #define PEM_STRING_DSA		"DSA PRIVATE KEY"
 #define PEM_STRING_DSA_PUBLIC	"DSA PUBLIC KEY"
 #define PEM_STRING_PKCS7	"PKCS7"
-#define PEM_STRING_PKCS7_SIGNED	"PKCS #7 SIGNED DATA"
 #define PEM_STRING_PKCS8	"ENCRYPTED PRIVATE KEY"
 #define PEM_STRING_PKCS8INF	"PRIVATE KEY"
 #define PEM_STRING_DHPARAMS	"DH PARAMETERS"
@@ -215,9 +214,7 @@ typedef struct pem_ctx_st
 
 #define IMPLEMENT_PEM_read_fp(name, type, str, asn1) /**/
 #define IMPLEMENT_PEM_write_fp(name, type, str, asn1) /**/
-#define IMPLEMENT_PEM_write_fp_const(name, type, str, asn1) /**/
 #define IMPLEMENT_PEM_write_cb_fp(name, type, str, asn1) /**/
-#define IMPLEMENT_PEM_write_cb_fp_const(name, type, str, asn1) /**/
 
 #else
 
@@ -357,7 +354,6 @@ int PEM_write_bio_##name(BIO *bp, type *x, const EVP_CIPHER *enc, \
 
 #define DECLARE_PEM_read_fp(name, type) /**/
 #define DECLARE_PEM_write_fp(name, type) /**/
-#define DECLARE_PEM_write_fp_const(name, type) /**/
 #define DECLARE_PEM_write_cb_fp(name, type) /**/
 
 #else
@@ -395,7 +391,6 @@ int PEM_write_bio_##name(BIO *bp, type *x, const EVP_CIPHER *enc, \
 
 #define DECLARE_PEM_read_bio(name, type) /**/
 #define DECLARE_PEM_write_bio(name, type) /**/
-#define DECLARE_PEM_write_bio_const(name, type) /**/
 #define DECLARE_PEM_write_cb_bio(name, type) /**/
 
 #endif

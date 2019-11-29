@@ -57,9 +57,6 @@
  *
  */
 
-#ifndef HEADER_PQ_COMPAT_H
-#define HEADER_PQ_COMPAT_H
-
 #include <openssl/opensslconf.h>
 #include <openssl/bn.h>
 
@@ -148,5 +145,3 @@
                                               *(x) |= mask; \
                                           } while(0)
 #endif /* OPENSSL_SYS_VMS */
-
-#endif

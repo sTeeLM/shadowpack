@@ -32,7 +32,7 @@
 // A value of 8 uses half the memory than 16 and typically runs 30% faster,
 // but provides 256 times less color resolution than a value of 16.
 //
-#define MAGICKCORE_QUANTUM_DEPTH 8
+#define MAGICKCORE_QUANTUM_DEPTH 16
 
 // Define to build a ImageMagick which uses registry settings or
 // hard-coded paths to locate installed components.  This supports
