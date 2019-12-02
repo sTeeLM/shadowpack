@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "CorBuffer.h"
+#include "PackErrors.h"
 
 CCorBuffer::CCorBuffer(void)
 	:m_nSize(0)
@@ -48,7 +49,7 @@ BOOL CCorBuffer::WriteCor(BYTE Cor)
 	return TRUE;
 }
 
-BOOL CCorBuffer::SetData(const LPBYTE pData, INT Bytes, CorFormat eFormat,
+BOOL CCorBuffer::SetData(const LPBYTE pData, INT Bytes, CorFormat eFormat, CPackErrors & Error,
 						 BOOL * bCancel/* = NULL */, CB_SET_PROGRESS fnSetProgress /* = NULL */)
 {
 	INT size = 0;
@@ -70,6 +71,7 @@ BOOL CCorBuffer::SetData(const LPBYTE pData, INT Bytes, CorFormat eFormat,
 
 	m_pBuffer = (LPBYTE)malloc(size);
 	if(NULL == m_pBuffer) {
+		Error.SetError(CPackErrors::PE_INTERNAL);
 		return FALSE;
 	}
 	m_nIndex = 0;
@@ -80,6 +82,7 @@ BOOL CCorBuffer::SetData(const LPBYTE pData, INT Bytes, CorFormat eFormat,
 
 	for(i = 0 ; i < Bytes; i ++) {
 		if(bCancel && *bCancel) {
+			Error.SetError(CPackErrors::PE_CANCELED);
 			return FALSE;
 		}
 		if(fnSetProgress) {
@@ -112,7 +115,7 @@ BOOL CCorBuffer::SetData(const LPBYTE pData, INT Bytes, CorFormat eFormat,
 	return TRUE;
 }
 
-BOOL CCorBuffer::GetData(LPBYTE pData, INT Bytes, CorFormat eFormat,
+BOOL CCorBuffer::GetData(LPBYTE pData, INT Bytes, CorFormat eFormat, CPackErrors & Error,
 						 BOOL * bCancel/* = NULL */, CB_SET_PROGRESS fnSetProgress /* = NULL */)
 {
 	INT size, i;
@@ -132,6 +135,7 @@ BOOL CCorBuffer::GetData(LPBYTE pData, INT Bytes, CorFormat eFormat,
 
 	for(i = 0 ; i < Bytes; i ++) {
 		if(bCancel && *bCancel) {
+			Error.SetError(CPackErrors::PE_CANCELED);
 			return FALSE;
 		}
 		if(fnSetProgress) {

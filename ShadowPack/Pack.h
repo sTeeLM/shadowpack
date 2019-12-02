@@ -2,6 +2,7 @@
 
 // Pack.h : ͷ�ļ�
 //
+#include "PackErrors.h"
 #include "PackItem.h"
 #include "SBitmap.h"
 #include "jpeglib.h"
@@ -37,7 +38,7 @@ public:
 		EM_CAST = 3, // CAST
 	};
 private:
-		typedef struct {
+	typedef struct {
 		DWORD dwSignature; 
 		DWORD dwEncryptType;
 		DWORD dwFormat;
@@ -47,10 +48,10 @@ private:
 		DWORD dwCapicity;
 	}PackHeader;
 
-	typedef PackHeader *(*HANDLER_READ_IMAGE)(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CString & szError, 
+	typedef PackHeader *(*HANDLER_READ_IMAGE)(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
 	typedef BOOL (*HANDLER_WRITE_IMAGE)(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szDst, LPCTSTR szExt, 
-		CString & szError, BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
+		CPackErrors & Error, BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
 	typedef BOOL (*HANDLER_CAN_SET_FORMAT)(DWORD dwParam, const PackHeader * data, const CSBitmap & bmp);
 	typedef BOOL (*HANDLER_SET_FORMAT)(DWORD dwParam, PackHeader * data, const CSBitmap & bmp);
 	typedef void (*HANDLE_GET_SAVE_FILTER)(CString & szFilter);
@@ -70,7 +71,7 @@ private:
 	}PackHandler;
 
 	
-	static CPack * LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt,PackHandler * handle, CString & szError, BOOL * bCancel,
+	static CPack * LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt,PackHandler * handle, CPackErrors & eErrorCode, BOOL * bCancel,
 							 CB_GET_PASSWORD fnGetPass, CB_SET_PROGRESS fnSetProgress);
 
 public:
@@ -82,7 +83,7 @@ public:
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
 	DWORD GetPackItemCount() const;
 	CPackItem * GetPackItem(UINT nIndex);
-	BOOL AddPackItem(CPackItem * pItem, UINT & nIndex, CString & Error);
+	BOOL AddPackItem(CPackItem * pItem, UINT & nIndex, CPackErrors & Error);
 	BOOL RemovePackItem(UINT nIndex, UINT nCount = 1);
 	BOOL IsDirty();
 	BOOL IsEmpty();
@@ -131,9 +132,9 @@ private:
 	static PackHandler m_Handler[3];
 
 	// for  PF_RAWPP
-	static PackHeader * RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CString & szError, 
+	static PackHeader * RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	static BOOL RawPPWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szSrc, LPCTSTR szExt, CString & szError, 
+	static BOOL RawPPWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szSrc, LPCTSTR szExt, CPackErrors & Error,
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
 	static BOOL RawPPCanSetFormat(DWORD dwParam, const PackHeader * data, const CSBitmap & bmp);
 	static BOOL RawPPSetFormat( DWORD dwParam, PackHeader * data, const CSBitmap & bmp);
@@ -141,20 +142,20 @@ private:
 	static void RawPPSaveDefaultExt(CString & szExt);
 
 	static BOOL RawPPWriteImageInternal(CSBitmap & bmp, const LPBYTE pBuffer, size_t offset, size_t size, 
-						  DWORD dwFormaParamt,  BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
+						  DWORD dwFormaParamt, CPackErrors & Error, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
 	static BOOL RawPPReadImageInternal(CSBitmap & bmp, LPBYTE pBuffer, size_t offset, size_t size, 
-						 DWORD dwFormaParamt,  BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
+						 DWORD dwFormaParamt, CPackErrors & Error, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
 	// for  PF_JSTEG
-	static PackHeader * JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CString & szError, 
+	static PackHeader * JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	static BOOL JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szSrc, LPCTSTR szExt,CString & szError, 
+	static BOOL JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szSrc, LPCTSTR szExt, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
 	static BOOL JStegCanSetFormat( DWORD dwParam, const PackHeader * data, const CSBitmap & bmp);
 	static BOOL JStegSetFormat(DWORD dwParam, PackHeader * data, const CSBitmap & bmp);
 	static void JStegGetSaveFilter(CString & szFilter);
 	static void JStegSaveDefaultExt(CString & szExt);
 	static BOOL RawPJReadDataInternal(CCorBuffer & sbuf, LPBYTE pRet , size_t size,
-			DWORD dwFormatParam, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
+			DWORD dwFormatParam, CPackErrors & Error, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
 	typedef struct {
 		CCorBuffer * buffer;
 		BOOL bError;
@@ -166,7 +167,7 @@ private:
 	static INT JStegGetCap(INT x, INT y);
 
 	// for none
-	static PackHeader * DefaultReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CString & szError, 
+	static PackHeader * DefaultReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
 
 

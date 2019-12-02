@@ -207,7 +207,7 @@ BOOL  CPack::SetPackFormat(PackFormat eFormat, DWORD dwParam)
 	return bRet;
 }
 
-CPack * CPack::LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt, PackHandler * handle, CString & szError, BOOL * bCancel,
+CPack * CPack::LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt, PackHandler * handle, CPackErrors & Error, BOOL * bCancel,
 							 CB_GET_PASSWORD fnGetPass, CB_SET_PROGRESS fnSetProgress)
 {
 	CPack * pPack = NULL;
@@ -215,17 +215,16 @@ CPack * CPack::LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt, PackHandler *
 	size_t offset = 0;
 	size_t itemSize = 0;
 	UINT nIndex;
+
 	pPack = new CPack();
-	pBuffer = handle->fnReadImage(szSrc, szExt, pPack->m_Bmp, szError, bCancel, fnSetProgress);
+	pBuffer = handle->fnReadImage(szSrc, szExt, pPack->m_Bmp, Error, bCancel, fnSetProgress);
 	if(NULL == pBuffer) {
+		/*
 		if(bCancel && *bCancel) {
-			//szError = _T("load image canceled!");
-			szError.LoadString(IDS_ERROR_CANCELED);
-		} else {
-			if(szError.IsEmpty()) {
-				szError.LoadString(IDS_ERROR_INTERNAL);
-			}
+			eErrorCode = CPackErrors::PE_CANCELED;
+			Error.SetError( CPackErrors::PE_CANCELED);
 		}
+		*/
 		goto load_image_error;
 	}
 
@@ -235,16 +234,14 @@ CPack * CPack::LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt, PackHandler *
 	}
 
 	if(pPack->m_szPassword.IsEmpty() && pPack->m_Header.dwEncryptType != EM_NONE) {
-		//szError = _T("load pack error!");
-		szError.LoadString(IDS_ERROR_NEED_PASSWORD);
+		Error.SetError(CPackErrors::PE_NEED_PASSWORD);
 		goto load_pack_error;
 	}
 	if(pPack->m_Header.dwCount != 0 && pPack->m_Header.dwDataSize != 0) {
 		if(!DecryptData(((PBYTE)pBuffer) + sizeof(pPack->m_Header), 
 			pPack->m_Header.dwDataSize, 
 			(EncryptMethod)pPack->m_Header.dwEncryptType, (LPCTSTR)pPack->m_szPassword)) {
-			//szError = _T("decrypt pack error!");
-			szError.LoadString(IDS_ERROR_DECRYPT);
+			Error.SetError(CPackErrors::PE_DECRYPT);
 			goto decrypt_pack_error;
 		}
 	}
@@ -252,7 +249,7 @@ CPack * CPack::LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt, PackHandler *
 		CPackItem * pItem = CPackItem::CreatePackItemFromMemory(
 			(const CPackItem::PackItemHeader *)(((PBYTE)pBuffer) + sizeof(pPack->m_Header) + offset), 
 			pPack->m_Header.dwDataSize - itemSize,
-			szError);
+			Error);
 		if(NULL == pItem) {
 			goto load_pack_item_error;
 		}
@@ -260,14 +257,12 @@ CPack * CPack::LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt, PackHandler *
 		offset += pItem->GetTotalSize();
 		itemSize += pItem->GetTotalSize();
 		if(itemSize > pPack->m_Header.dwDataSize) {
-			//szError = _T("load_pack_item_error");
-			szError.LoadString(IDS_ERROR_CORRUPT_DATA);
+			Error.SetError(CPackErrors::PE_CORRUPT_DATA);
 			goto load_pack_item_error;
 		}
 	}
 	if(itemSize != pPack->m_Header.dwDataSize) {
-		//szError = _T("load_pack_item_error");
-		szError.LoadString(IDS_ERROR_CORRUPT_DATA);
+		Error.SetError(CPackErrors::PE_CORRUPT_DATA);
 		goto load_pack_item_error;
 	}
 
@@ -299,20 +294,24 @@ CPack * CPack::LoadFromImage(LPCTSTR szSrc, LPCTSTR szExt, CString & szError, BO
 	std::list<PackHandler *> handles;
 	std::list<PackHandler *>::iterator it;
 	CPack * ret = NULL;
+	CPackErrors Error;
 
 	handles = GetHandlersByExt(szExt);
+
 	for(it = handles.begin(); it!= handles.end(); it++) {
 		TRACE(_T("load image try handler %s\n"), (*it)->szName);
-		ret = LoadFromImageByHandle(szSrc, szExt, *it, szError, bCancel,
+		ret = LoadFromImageByHandle(szSrc, szExt, *it, Error, bCancel,
 							 fnGetPass, fnSetProgress);
-		if(NULL != ret)
-			return ret;
+		if(NULL != ret) {// OK!
+			break;
+		}
 
-		if(NULL == ret && NULL != bCancel && *bCancel) { // user canceled!
+		if(Error.GetError() != CPackErrors::PE_UNSUPPORT_PACK) { // some thing wrong, do not continue
 			break;
 		}
 	}
 
+	szError = Error.ToString();
 	return ret;
 }
 
@@ -322,13 +321,14 @@ BOOL CPack::SaveToImage(LPCTSTR szDst, LPCTSTR szExt, CString & szError, BOOL * 
 	DWORD offset = 0;
 	UINT nIndex;
 	PackHandler * handle = NULL;
+	CPackErrors Error;
 
 	handle = GetHandlerByFormat((PackFormat)m_Header.dwFormat);
 
 	pBuffer = (PackHeader *)malloc(sizeof(PackHeader) + m_Header.dwDataSize);
 
 	if(NULL == pBuffer) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+		Error.SetError(CPackErrors::PE_INTERNAL);
 		goto malloc_error;
 	}
 
@@ -336,7 +336,7 @@ BOOL CPack::SaveToImage(LPCTSTR szDst, LPCTSTR szExt, CString & szError, BOOL * 
 
 	for(nIndex = 0 ; nIndex < m_PackItemList.GetCount() ; nIndex ++) {
 		CPackItem * pItem = m_PackItemList[nIndex];
-		if(!pItem->ExportDataToMemory((PBYTE)pBuffer + sizeof(m_Header) + offset,m_Header.dwDataSize - offset ,szError)) {
+		if(!pItem->ExportDataToMemory((PBYTE)pBuffer + sizeof(m_Header) + offset,m_Header.dwDataSize - offset ,Error)) {
 			goto save_pack_item_error;
 		}
 		offset += pItem->GetTotalSize();
@@ -344,19 +344,19 @@ BOOL CPack::SaveToImage(LPCTSTR szDst, LPCTSTR szExt, CString & szError, BOOL * 
 
 	// encrypt it;
 	if(!EncryptData((PBYTE)pBuffer + sizeof(m_Header), m_Header.dwDataSize, (EncryptMethod)m_Header.dwEncryptType, (LPCTSTR)m_szPassword)) {
-		//szError = _T("encrypt error!");
-		szError.LoadString(IDS_ERROR_INTERNAL);
+		Error.SetError(CPackErrors::PE_ENCRYPT);
 		goto encrypt_error;
 	}
 
-	if(!handle->fnWriteImage(pBuffer, m_Bmp, szDst, szExt, szError, bCancel, fnSetProgress)) {
+	if(!handle->fnWriteImage(pBuffer, m_Bmp, szDst, szExt, Error, bCancel, fnSetProgress)) {
+		/*
 			if(bCancel && *bCancel) {
-				//szError = _T("pack data canceled!");
-				szError.LoadString(IDS_ERROR_CANCELED);
+				Error.SetError(CPackErrors::PE_CANCELED);
 			} else {
 				//szError = _T("pack data error!");
 				szError.LoadString(IDS_ERROR_INTERNAL);
 			}
+		*/
 			goto pack_data_error;
 	}
 
@@ -366,7 +366,7 @@ BOOL CPack::SaveToImage(LPCTSTR szDst, LPCTSTR szExt, CString & szError, BOOL * 
 	}
 
 	m_bIsDirty = FALSE;
-
+	szError = Error.ToString();
 	return TRUE;
 
 pack_data_error:
@@ -377,6 +377,7 @@ malloc_error:
 		free(pBuffer);
 		pBuffer = NULL;
 	}
+	szError = Error.ToString();
 	return FALSE;
 }
 
@@ -396,11 +397,10 @@ CPackItem * CPack::GetPackItem(UINT nIndex)
 }
 
 
-BOOL CPack::AddPackItem(CPackItem * pItem, 	UINT & nIndex, CString & szError)
+BOOL CPack::AddPackItem(CPackItem * pItem, 	UINT & nIndex, CPackErrors & Error)
 {
 	if(m_Header.dwDataSize + pItem->GetTotalSize() > m_Header.dwCapicity) {
-		//szError = _T("over capicity!");
-		szError.LoadString(IDS_ERROR_OVER_CAPICITY);
+		Error.SetError(CPackErrors::PE_OVER_CAPICITY);
 		return FALSE;
 	}
 	nIndex = m_PackItemList.Add(pItem);

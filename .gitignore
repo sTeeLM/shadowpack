@@ -6,3 +6,5 @@
 *.exp
 *.bak
 *.lib
+*.ilk
+*.pdb

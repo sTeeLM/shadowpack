@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PackErrors.h"
 
 class CPackItem
 {
@@ -16,10 +17,10 @@ public:
 	virtual ~CPackItem(void);
 	DWORD GetTotalSize() const;
 	const CString & GetName() const;
-	static CPackItem * CreatePackItemFromFile(const CString & szItemName, const CString & szFilePath, CString & szError);
-	static CPackItem * CreatePackItemFromMemory(const PackItemHeader * pData, size_t size, CString & szError);
-	BOOL ExportDataToFile(const CString & szItemName, const CString & szFilePath, CString & szError);
-	BOOL ExportDataToMemory(PBYTE pBuffer, size_t size, CString & szError);
+	static CPackItem * CreatePackItemFromFile(const CString & szItemName, const CString & szFilePath,CPackErrors & Error);
+	static CPackItem * CreatePackItemFromMemory(const PackItemHeader * pData, size_t size, CPackErrors & Error);
+	BOOL ExportDataToFile(const CString & szItemName, const CString & szFilePath, CPackErrors & Error);
+	BOOL ExportDataToMemory(PBYTE pBuffer, size_t size, CPackErrors & Error);
 private:
 	static BOOL IsValidHeader(const PackItemHeader & header);
 private:

@@ -2,7 +2,7 @@
 #include "Pack.h"
 #include "Resource.h"
 
-CPack::PackHeader * CPack::DefaultReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CString & szError, 
+CPack::PackHeader * CPack::DefaultReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
 {
 
@@ -22,14 +22,12 @@ CPack::PackHeader * CPack::DefaultReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitm
 		bmp.FromImage(image);
 	}
 	catch (const Magick::Error & err ) {
-		 
-		CA2CT strErr(err.what(), CP_UTF8);
-		szError = strErr;
+		 Error.SetError(err);
 		goto error;
     }
 
 	if(image.columns() * image.rows() < sizeof(PackHeader)) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
 
@@ -44,6 +42,7 @@ CPack::PackHeader * CPack::DefaultReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitm
 		ret->dwFormat    = PF_RAWPP;
 		ret->dwFormatParam = 1;
 	} else {
+		Error.SetError(CPackErrors::PE_INTERNAL);
 		return NULL;
 	}
 

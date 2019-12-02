@@ -494,17 +494,17 @@ void CShadowPackDlg::OnBnClickedBtnAddData()
 	static TCHAR BASED_CODE szFilter[] = 
 		_T("All Files (*.*)|*.*||");
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, NULL, 0, TRUE);
-	CString strError;
+	CPackErrors Error;
 	if(NULL != m_pPack) {
 		if(dlg.DoModal() == IDOK) {
 			CString szError;
-			CPackItem * pPackItem = CPackItem::CreatePackItemFromFile(dlg.GetFileName(), dlg.GetPathName(), szError);
+			CPackItem * pPackItem = CPackItem::CreatePackItemFromFile(dlg.GetFileName(), dlg.GetPathName(), Error);
 			if(NULL == pPackItem) {
-				strError.Format(IDS_ERROR_ADD_DATA, szError);
-				AfxMessageBox(strError);
-			} else if(!m_pPack->AddPackItem(pPackItem, nIndex, szError)) {
-				strError.Format(IDS_ERROR_ADD_DATA, szError);
-				AfxMessageBox(strError);
+				szError.Format(IDS_ERROR_ADD_DATA, Error.ToString());
+				AfxMessageBox(szError);
+			} else if(!m_pPack->AddPackItem(pPackItem, nIndex, Error)) {
+				szError.Format(IDS_ERROR_ADD_DATA, Error.ToString());
+				AfxMessageBox(szError);
 			} else {
 				AddListItem(nIndex, pPackItem->GetName(), pPackItem->GetTotalSize());
 				m_ctlImageQuota.SetFreePercent((m_pPack->GetCapicity() - m_pPack->GetDataSize()) * 100 / m_pPack->GetCapicity());
@@ -674,7 +674,7 @@ void CShadowPackDlg::OnLvnItemchangedLstData(NMHDR *pNMHDR, LRESULT *pResult)
 void CShadowPackDlg::OnBnClickedBtnExportData()
 {
 	CString strError;
-	CString szError;
+	CPackErrors Error;
 	INT nCount = m_ctlPackItemList.GetSelectedCount();
 	if( nCount == 1 ) {
 		INT nItem = m_ctlPackItemList.GetNextItem(-1, LVNI_SELECTED);
@@ -684,8 +684,8 @@ void CShadowPackDlg::OnBnClickedBtnExportData()
 				if(NULL != pItem) {
 					CFileDialog dlg(FALSE, NULL,pItem->GetName() , OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, NULL, 0, TRUE);
 					if(dlg.DoModal() == IDOK) {
-						if(!pItem->ExportDataToFile(pItem->GetName(), dlg.GetPathName(),szError)) {
-							strError.Format(IDS_ERROR_EXPORT_DATA, szError);
+						if(!pItem->ExportDataToFile(pItem->GetName(), dlg.GetPathName(),Error)) {
+							strError.Format(IDS_ERROR_EXPORT_DATA, Error.GetError());
 							AfxMessageBox(strError);
 						}
 					}

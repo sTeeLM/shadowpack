@@ -19,8 +19,8 @@ public:
 	INT Index();
 	void Rewind();
 	BOOL Eof();
-	BOOL SetData(const LPBYTE pData, INT Bytes, CorFormat eFormat, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
-	BOOL GetData(LPBYTE pData, INT Bytes, CorFormat eFormat, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
+	BOOL SetData(const LPBYTE pData, INT Bytes, CorFormat eFormat, CPackErrors & Error, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
+	BOOL GetData(LPBYTE pData, INT Bytes, CorFormat eFormat, CPackErrors & Error, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
 private:
 	INT m_nSize;
 	INT m_nIndex;

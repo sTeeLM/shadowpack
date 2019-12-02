@@ -43,13 +43,12 @@ BOOL CPackItem::IsValidHeader(const PackItemHeader & header)
 	return TRUE;
 }
 
-CPackItem * CPackItem::CreatePackItemFromFile(const CString & szItemName, const CString & szFilePath, CString & szError)
+CPackItem * CPackItem::CreatePackItemFromFile(const CString & szItemName, const CString & szFilePath, CPackErrors & Error)
 {
 	CPackItem * pRet = NULL;
 	CFile fIn;
 	ULONGLONG uLength = 0;
 	BOOL bRet = FALSE;
-	TCHAR szMessage[1024];
 
 	pRet = new CPackItem();
 
@@ -65,22 +64,19 @@ CPackItem * CPackItem::CreatePackItemFromFile(const CString & szItemName, const 
 		fIn.Open(szFilePath,CFile::modeRead);
 		uLength = fIn.GetLength();
 		if(uLength > MAX_PACK_FILE_LENGTH) {
-			//szError = _T("too large to pack!");
-			szError.LoadString(IDS_ERROR_TOO_LARGE_DATA);
+			Error.SetError (CPackErrors::PE_TOO_LARGE_DATA);
 		} else {
 			if(uLength > 0) {
 				pRet->m_pData = (PBYTE)malloc((size_t)uLength);
 				if(NULL != pRet->m_pData) {
-					if(uLength == fIn.Read(pRet->m_pData, uLength)) {
-						pRet->m_Header.dwDataSize = uLength;
+					if(uLength == fIn.Read(pRet->m_pData, (UINT)uLength)) {
+						pRet->m_Header.dwDataSize = (DWORD)uLength;
 						bRet = TRUE;
 					} else {
-						//szError = _T("read file error!");
-						szError.LoadString(IDS_ERROR_READ_FILE);
+						Error.SetError (CPackErrors::PE_IO);
 					}
 				} else {
-					//szError = _T("no memory!");
-					szError.LoadString(IDS_ERROR_INTERNAL);
+					Error.SetError (CPackErrors::PE_INTERNAL);
 				}
 			} else {
 				bRet = TRUE;
@@ -88,8 +84,7 @@ CPackItem * CPackItem::CreatePackItemFromFile(const CString & szItemName, const 
 		}
 		fIn.Close();
 	} CATCH (CFileException, pex) {
-		pex->GetErrorMessage(szMessage, 1024);
-		szError = szMessage;
+		Error.SetError (CPackErrors::PE_IO);
 		fIn.Close();
 	} END_CATCH
 
@@ -102,31 +97,27 @@ CPackItem * CPackItem::CreatePackItemFromFile(const CString & szItemName, const 
 	return pRet;
 }
 
-CPackItem * CPackItem::CreatePackItemFromMemory(const PackItemHeader * pData, size_t size, CString & szError)
+CPackItem * CPackItem::CreatePackItemFromMemory(const PackItemHeader * pData, size_t size, CPackErrors & Error)
 {
 	CPackItem * pRet = NULL;
 	size_t name_len = 0;
 	if(size < sizeof(PackItemHeader) + 1 || NULL == pData) {
-		//szError = _T("invalid header!");
-		szError.LoadString(IDS_ERROR_CORRUPT_DATA);
+		Error.SetError (CPackErrors::PE_CORRUPT_DATA);
 		goto err_invalid_header;
 	}
 
 	if(!IsValidHeader(*pData)) {
-		//szError = _T("invalid header!");
-		szError.LoadString(IDS_ERROR_CORRUPT_DATA);
+		Error.SetError (CPackErrors::PE_CORRUPT_DATA);
 		goto err_invalid_header;
 	}
 
 	if(pData->dwDataSize + pData->dwNameSize + 1 > size) {
-		//szError = _T("invalid header!");
-		szError.LoadString(IDS_ERROR_CORRUPT_DATA);
+		Error.SetError (CPackErrors::PE_CORRUPT_DATA);
 		goto err_invalid_header;
 	}
 
 	if(*((PBYTE)pData + sizeof(PackItemHeader) + pData->dwNameSize) != '\0') {
-		//szError = _T("invalid header!");
-		szError.LoadString(IDS_ERROR_CORRUPT_DATA);
+		Error.SetError (CPackErrors::PE_CORRUPT_DATA);
 		goto err_invalid_header;
 	}
 
@@ -143,16 +134,14 @@ CPackItem * CPackItem::CreatePackItemFromMemory(const PackItemHeader * pData, si
 	}
 
 	if(name_len != pData->dwNameSize) {
-		//szError = _T("invalid data!");
-		szError.LoadString(IDS_ERROR_CORRUPT_DATA);
+		Error.SetError (CPackErrors::PE_CORRUPT_DATA);
 		goto err_invalid_data;
 	}
 
 	if(pData->dwNameSize != 0) {
 		pRet->m_pData = (PBYTE)malloc(pData->dwDataSize);
 		if(pRet->m_pData == 0) {
-			//szError = _T("out of memory!");
-			szError.LoadString(IDS_ERROR_INTERNAL);
+			Error.SetError (CPackErrors::PE_INTERNAL);
 			goto err_out_mem;
 		}
 		memcpy(pRet->m_pData, (PBYTE)pData + sizeof(PackItemHeader) + pData->dwNameSize + 1, pData->dwDataSize);
@@ -170,10 +159,9 @@ err_invalid_header:
 	return pRet;
 }
 
-BOOL CPackItem::ExportDataToFile(const CString & szItemName, const CString & szFilePath, CString & szError)
+BOOL CPackItem::ExportDataToFile(const CString & szItemName, const CString & szFilePath, CPackErrors & Error)
 {
 	CFile fOut;
-	TCHAR szMessage[1024];
 	BOOL bRet = FALSE;
 	TRY {
 		fOut.Open(szFilePath,CFile::modeWrite|CFile::modeCreate);
@@ -183,20 +171,18 @@ BOOL CPackItem::ExportDataToFile(const CString & szItemName, const CString & szF
 		fOut.Close();
 		bRet = TRUE;
 	} CATCH (CFileException, pex) {
-		pex->GetErrorMessage(szMessage, 1024);
-		szError = szMessage;
+		Error.SetError (CPackErrors::PE_IO);
 		fOut.Close();
 	} END_CATCH
 
 	return bRet;
 }
 
-BOOL CPackItem::ExportDataToMemory(PBYTE pBuffer, size_t size, CString & szError)
+BOOL CPackItem::ExportDataToMemory(PBYTE pBuffer, size_t size, CPackErrors & Error)
 {
 	
 	if(size < sizeof(PackItemHeader) + m_Header.dwDataSize + m_Header.dwNameSize + 1 || NULL == pBuffer) {
-		//szError = _T("invalid header!");
-		szError.LoadString(IDS_ERROR_CORRUPT_DATA);
+		Error.SetError (CPackErrors::PE_CORRUPT_DATA);
 		goto err_invalid_header;
 	}
 

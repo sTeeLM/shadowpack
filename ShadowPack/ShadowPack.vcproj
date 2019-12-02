@@ -218,6 +218,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PackErrors.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PackItem.cpp"
 				>
 			</File>
@@ -281,6 +285,10 @@
 			</File>
 			<File
 				RelativePath=".\PackChart.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PackErrors.h"
 				>
 			</File>
 			<File

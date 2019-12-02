@@ -2,6 +2,8 @@
 #include "Pack.h"
 #include "Resource.h"
 
+#include "PackErrors.h"
+
 // PF_1PP:
 // r:3bits g:2bits b:3bits
 
@@ -12,7 +14,7 @@
 // r:1bits g 1bits b:1bits  |  r:1bits g 1bits b:1bits  |  r:1bits g 0bits b:1bits
 
 BOOL CPack::RawPPWriteImageInternal(CSBitmap & bmp, const LPBYTE pBuffer, size_t offset, size_t size, 
-						  DWORD dwFormaParamt,  BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
+						  DWORD dwFormaParamt,  CPackErrors & Error, BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
 {
 	size_t TotalSize = 0;
 	BYTE r0,g0,b0; // r g b
@@ -37,6 +39,7 @@ BOOL CPack::RawPPWriteImageInternal(CSBitmap & bmp, const LPBYTE pBuffer, size_t
 
 	for(size_t i = offset * ratio; i < (offset + size) * ratio ; i += ratio) {
 		if(bCancel && *bCancel) {
+			Error.SetError(CPackErrors::PE_CANCELED);
 			return FALSE;
 		}
 		if(NULL != fnSetProgress) {
@@ -145,7 +148,7 @@ BOOL CPack::RawPPWriteImageInternal(CSBitmap & bmp, const LPBYTE pBuffer, size_t
 }
 
 BOOL CPack::RawPPReadImageInternal(CSBitmap & bmp, LPBYTE pBuffer, size_t offset, size_t size, 
-						 DWORD dwFormaParamt,  BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
+						 DWORD dwFormaParamt, CPackErrors & Error, BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
 {
 	size_t TotalSize = 0;
 	BYTE r0,g0,b0; // r g b
@@ -171,6 +174,7 @@ BOOL CPack::RawPPReadImageInternal(CSBitmap & bmp, LPBYTE pBuffer, size_t offset
 	for(size_t i = offset * ratio; i < (offset + size) * ratio ; i += ratio) {
 		
 		if(bCancel && *bCancel) {
+			Error.SetError(CPackErrors::PE_CANCELED);
 			return FALSE;
 		}
 
@@ -265,7 +269,7 @@ BOOL CPack::RawPPReadImageInternal(CSBitmap & bmp, LPBYTE pBuffer, size_t offset
 	return TRUE;
 }
 
-CPack::PackHeader * CPack::RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CString & szError, 
+CPack::PackHeader * CPack::RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
 {
 	Magick::Image image;
@@ -288,21 +292,18 @@ CPack::PackHeader * CPack::RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 		size = bmp.Rows() * bmp.Columns();
 	}
 	catch (const Magick::Error & err ) {
-		 
-		CA2CT strErr(err.what(), CP_UTF8);
-		szError = strErr;
+		Error.SetError(err);
 		goto error;
     }
 
 	// test format
 //	try PF_1PP, size >= sizeof(PackHeader)
 	if(size < sizeof(PackHeader)) {
-		szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
 
-	if(!RawPPReadImageInternal(bmp, (LPBYTE)&header, 0, sizeof(header), PFP_1PP)) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+	if(!RawPPReadImageInternal(bmp, (LPBYTE)&header, 0, sizeof(header), PFP_1PP, Error)) {
 		goto error;
 	}
 
@@ -311,10 +312,13 @@ CPack::PackHeader * CPack::RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 			free(pRet);
 			pRet = NULL;
 		}
-		pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize);
-		if(NULL == pRet || !RawPPReadImageInternal(bmp, (LPBYTE)pRet , 0, sizeof(header) + header.dwDataSize,
-			PFP_1PP, bCancel, fnSetProgress)) {
-			szError.LoadString(IDS_ERROR_INTERNAL);
+		if((pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize)) == NULL) {
+			Error.SetError(CPackErrors::PE_INTERNAL);
+			goto error;
+		}
+		
+		if(!RawPPReadImageInternal(bmp, (LPBYTE)pRet , 0, sizeof(header) + header.dwDataSize,
+			PFP_1PP, Error, bCancel, fnSetProgress)) {
 			goto error;
 		}
 		return pRet;
@@ -322,12 +326,11 @@ CPack::PackHeader * CPack::RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 
 //	try PF_2PP, size >= sizeof(PackHeader)	* 2
 	if(size < sizeof(PackHeader) * 2) {
-		szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
 
-	if(!RawPPReadImageInternal(bmp, (LPBYTE)&header, 0, sizeof(header), PFP_2PP)) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+	if(!RawPPReadImageInternal(bmp, (LPBYTE)&header, 0, sizeof(header), PFP_2PP, Error)) {
 		goto error;
 	}
 
@@ -336,10 +339,12 @@ CPack::PackHeader * CPack::RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 			free(pRet);
 			pRet = NULL;
 		}
-		pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize);
-		if(NULL == pRet || !RawPPReadImageInternal(bmp, (LPBYTE)pRet , 0, sizeof(header) + header.dwDataSize, 
-			PFP_2PP, bCancel, fnSetProgress)) {
-			szError.LoadString(IDS_ERROR_INTERNAL);
+		if((pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize)) == NULL) {
+			Error.SetError(CPackErrors::PE_INTERNAL);
+			goto error;
+		}
+		if(!RawPPReadImageInternal(bmp, (LPBYTE)pRet , 0, sizeof(header) + header.dwDataSize, 
+			PFP_2PP, Error, bCancel, fnSetProgress)) {
 			goto error;
 		}
 		return pRet;
@@ -347,12 +352,11 @@ CPack::PackHeader * CPack::RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 
 //	try PF_3PP, size >= sizeof(PackHeader)	* 3
 	if(size < sizeof(PackHeader) * 3) {
-		szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
 
-	if(!RawPPReadImageInternal(bmp, (PBYTE)&header, 0, sizeof(header), PFP_3PP)) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+	if(!RawPPReadImageInternal(bmp, (PBYTE)&header, 0, sizeof(header), PFP_3PP, Error)) {
 		goto error;
 	}
 
@@ -361,14 +365,18 @@ CPack::PackHeader * CPack::RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 			free(pRet);
 			pRet = NULL;
 		}
-		pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize);
-		if(NULL == pRet || !RawPPReadImageInternal(bmp, (PBYTE)pRet , 0, sizeof(header) + header.dwDataSize, 
-			PFP_3PP, bCancel, fnSetProgress)) {
-			szError.LoadString(IDS_ERROR_INTERNAL);
+		if((pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize)) == NULL) {
+			Error.SetError(CPackErrors::PE_INTERNAL);
+			goto error;
+		}
+		if(!RawPPReadImageInternal(bmp, (PBYTE)pRet , 0, sizeof(header) + header.dwDataSize, 
+			PFP_3PP, Error, bCancel, fnSetProgress)) {
 			goto error;
 		}
 		return pRet;
 	}
+
+	Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 
 error:
 	if(NULL != pRet) {
@@ -379,7 +387,7 @@ error:
 }
 
 BOOL CPack::RawPPWriteImage(const PackHeader * pBuffer, const CSBitmap & bmp,
-		LPCTSTR szDst, LPCTSTR szExt, CString & szError, 
+		LPCTSTR szDst, LPCTSTR szExt, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
 {
 	Magick::Image image;
@@ -388,7 +396,7 @@ BOOL CPack::RawPPWriteImage(const PackHeader * pBuffer, const CSBitmap & bmp,
 	CSBitmap new_bmp(bmp);
 
 	if((pBufOut =(LPBYTE) malloc(sizeof(PackHeader) + pBuffer->dwCapicity)) == NULL) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+		Error.SetError(CPackErrors::PE_INTERNAL);
 		goto error;
 	}
 
@@ -398,14 +406,7 @@ BOOL CPack::RawPPWriteImage(const PackHeader * pBuffer, const CSBitmap & bmp,
 	}
 
 	if(!RawPPWriteImageInternal(new_bmp, (LPBYTE)pBufOut, 0, sizeof(PackHeader) + pBuffer->dwCapicity, 
-		(PackFormat)pBuffer->dwFormat, bCancel, fnSetProgress)) {
-			if(bCancel && *bCancel) {
-				//szError = _T("pack data canceled!");
-				szError.LoadString(IDS_ERROR_CANCELED);
-			} else {
-				//szError = _T("pack data error!");
-				szError.LoadString(IDS_ERROR_INTERNAL);
-			}
+		(PackFormat)pBuffer->dwFormat, Error, bCancel, fnSetProgress)) {
 			goto error;
 	}
 
@@ -431,9 +432,7 @@ BOOL CPack::RawPPWriteImage(const PackHeader * pBuffer, const CSBitmap & bmp,
 		image.write(strStdDst);
 	}
 	catch (const Magick::Error & err ) {
-		 
-		CA2CT strErr(err.what(), CP_UTF8);
-		szError = strErr;
+		Error.SetError(err);
 		goto error;
 		
     }

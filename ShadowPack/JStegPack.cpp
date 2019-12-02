@@ -72,12 +72,12 @@ JCOEF CPack::JStegWriteData(j_common_ptr cinfo, JCOEF data)
 }
 
 BOOL CPack::RawPJReadDataInternal(CCorBuffer & sbuf, LPBYTE pRet ,size_t size,
-			DWORD dwFormatParam, BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
+			DWORD dwFormatParam, CPackErrors & Error, BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
 {
-	return sbuf.GetData(pRet, size, (CCorBuffer::CorFormat)dwFormatParam);
+	return sbuf.GetData(pRet, size, (CCorBuffer::CorFormat)dwFormatParam, Error);
 }
 
-CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CString & szError, 
+CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
 {
 	struct jpeg_decompress_struct cinfo;
@@ -103,8 +103,7 @@ CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 	cinfo.client_data = &param;
 
 	if((infile = _tfopen(szSrc, _T("rb"))) == NULL ) {
-		INT err = ferror(infile);
-		szError.LoadString(IDS_ERROR_READ_FILE);
+		Error.SetError(CPackErrors::PE_IO);
 		goto error;
 	}
 
@@ -122,19 +121,19 @@ CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 	(void) jpeg_read_header(&cinfo, TRUE);
 
 	if(param.bError) {
-		szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
 
 	(void) jpeg_start_decompress(&cinfo);
 
 	if(cinfo.output_components != 3) {
-		szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
 
 	if(!bmp.ReAllocBuffer(cinfo.output_width, cinfo.output_height)) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+		Error.SetError(CPackErrors::PE_INTERNAL);
 		goto error;
 	}
 
@@ -165,6 +164,7 @@ CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 		}
 
 		if(NULL != bCancel && *bCancel) {
+			Error.SetError(CPackErrors::PE_CANCELED);
 			param.bError = TRUE;
 			break;
 		}
@@ -180,9 +180,9 @@ CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 
 	if(param.bError || (NULL != bCancel && *bCancel)) {
 		if(NULL != bCancel && *bCancel) {
-			szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+			Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		} else {
-			szError.LoadString(IDS_ERROR_CANCELED);
+			Error.SetError(CPackErrors::PE_CANCELED);
 		}
 		goto error;
 	}
@@ -195,12 +195,11 @@ CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 	// test proper format from sbuf
 	// is PFP_1PJ??
 	if(sbuf.Size() / 8 < sizeof(PackHeader)) {
-		szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
 
-	if(!RawPJReadDataInternal(sbuf, (LPBYTE)&header, sizeof(header), PFP_1PJ)) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+	if(!RawPJReadDataInternal(sbuf, (LPBYTE)&header, sizeof(header), PFP_1PJ, Error)) {
 		goto error;
 	}
 
@@ -209,10 +208,13 @@ CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 			free(pRet);
 			pRet = NULL;
 		}
-		pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize);
-		if(NULL == pRet || !RawPJReadDataInternal(sbuf, (LPBYTE)pRet , sizeof(header) + header.dwDataSize,
-			PFP_1PJ, bCancel, fnSetProgress)) {
-			szError.LoadString(IDS_ERROR_INTERNAL);
+		if((pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize)) == NULL) {
+			Error.SetError(CPackErrors::PE_INTERNAL);
+			goto error;
+		}
+
+		if(!RawPJReadDataInternal(sbuf, (LPBYTE)pRet , sizeof(header) + header.dwDataSize,
+			PFP_1PJ, Error, bCancel, fnSetProgress)) {
 			goto error;
 		}
 		return pRet;
@@ -220,19 +222,20 @@ CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 
 	// is PFP_2PJ??
 	if(sbuf.Size() * 2 / 8 < sizeof(PackHeader)) {
-		szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
-	if(!RawPJReadDataInternal(sbuf, (LPBYTE)&header, sizeof(header), PFP_2PJ)) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+	if(!RawPJReadDataInternal(sbuf, (LPBYTE)&header, sizeof(header), PFP_2PJ, Error)) {
 		goto error;
 	}
 
 	if(IsValidHeader(header)) {
-		pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize);
-		if(NULL == pRet || !RawPJReadDataInternal(sbuf, (LPBYTE)pRet , sizeof(header) + header.dwDataSize,
-			PFP_2PJ, bCancel, fnSetProgress)) {
-			szError.LoadString(IDS_ERROR_INTERNAL);
+		if((pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize)) == NULL) {
+			Error.SetError(CPackErrors::PE_INTERNAL);
+			goto error;
+		}
+		if(!RawPJReadDataInternal(sbuf, (LPBYTE)pRet , sizeof(header) + header.dwDataSize,
+			PFP_2PJ, Error,bCancel, fnSetProgress)) {
 			goto error;
 		}
 		return pRet;
@@ -240,24 +243,24 @@ CPack::PackHeader * CPack::JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap
 
 	// is PFP_4PJ??
 	if(sbuf.Size() * 4 / 8 < sizeof(PackHeader)) {
-		szError.LoadString(IDS_ERROR_UNSUPPORT_FILE);
+		Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 		goto error;
 	}
 
-	if(!RawPJReadDataInternal(sbuf, (LPBYTE)&header, sizeof(header), PFP_4PJ)) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+	if(!RawPJReadDataInternal(sbuf, (LPBYTE)&header, sizeof(header), PFP_4PJ, Error)) {
 		goto error;
 	}
 
 	if(IsValidHeader(header)) {
 		pRet = (PackHeader *)malloc(sizeof(header) + header.dwDataSize);
 		if(NULL == pRet || !RawPJReadDataInternal(sbuf, (LPBYTE)pRet , sizeof(header) + header.dwDataSize,
-			PFP_4PJ, bCancel, fnSetProgress)) {
-			szError.LoadString(IDS_ERROR_INTERNAL);
+			PFP_4PJ, Error, bCancel, fnSetProgress)) {
 			goto error;
 		}
 		return pRet;
 	}
+
+	Error.SetError(CPackErrors::PE_UNSUPPORT_PACK);
 
 error:
 	if(NULL != infile) {
@@ -271,7 +274,7 @@ error:
 	return pRet;
 }
 
-BOOL CPack::JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szSrc, LPCTSTR szExt,CString & szError, 
+BOOL CPack::JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szSrc, LPCTSTR szExt,CPackErrors & Error, 
 		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
 {
 	struct jpeg_compress_struct cinfo;
@@ -292,7 +295,7 @@ BOOL CPack::JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTS
 	memset(&cinfo, 0, sizeof(cinfo));
 
 	if((pBuffer = (LPBYTE)malloc(sizeof(PackHeader) + data->dwCapicity)) == NULL) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+		Error.SetError(CPackErrors::PE_INTERNAL);
 		goto error;
 	}
 
@@ -303,13 +306,8 @@ BOOL CPack::JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTS
 	}
 
 	/* progress 50% */
-	if(!sbuf.SetData((LPBYTE)pBuffer, (data->dwCapicity + sizeof(PackHeader)), (CCorBuffer::CorFormat)data->dwFormatParam, 
+	if(!sbuf.SetData((LPBYTE)pBuffer, (data->dwCapicity + sizeof(PackHeader)), (CCorBuffer::CorFormat)data->dwFormatParam, Error, 
 		bCancel, fnSetProgress)) {
-		if(bCancel && *bCancel) {
-			szError.LoadString(IDS_ERROR_CANCELED);
-		} else {
-			szError.LoadString(IDS_ERROR_INTERNAL);
-		}
 		goto error;
 	}
 	sbuf.Rewind();
@@ -335,8 +333,7 @@ BOOL CPack::JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTS
 	jsteg.steg_write = JStegWriteData;
 
 	if((outfile = _tfopen(szSrc, _T("wb"))) == NULL ) {
-		INT err = ferror(outfile);
-		szError.LoadString(IDS_ERROR_READ_FILE);
+		Error.SetError(CPackErrors::PE_IO);
 		goto error;
 	}
 	jpeg_stdio_dest(&cinfo, outfile);
@@ -389,20 +386,20 @@ BOOL CPack::JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTS
 
 	if(param.bError) {
 		if(NULL != bCancel && *bCancel) {
-			szError.LoadString(IDS_ERROR_CANCELED);
+			Error.SetError(CPackErrors::PE_CANCELED);
 		} else {
-			szError.LoadString(IDS_ERROR_INTERNAL);
+			Error.SetError(CPackErrors::PE_INTERNAL);
 		}
 		goto error;
 	}
 
 	if(!param.buffer->Eof()) {
-		szError.LoadString(IDS_ERROR_INTERNAL);
+		Error.SetError(CPackErrors::PE_INTERNAL);
 		goto error;
 	}
 
 	if(fnSetProgress) {
-			fnSetProgress(100);
+		fnSetProgress(100);
 	}
 
 	return TRUE;
