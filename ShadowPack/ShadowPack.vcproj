@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="ShadowPack"
-	ProjectGUID="{6F0264CE-6014-4C1E-A2D6-CCF9C0B29480}"
+	ProjectGUID="{8F0D44D1-80F0-48E9-AA0F-FD289479A530}"
 	RootNamespace="ShadowPack"
 	Keyword="MFCProj"
 	TargetFrameworkVersion="196613"
@@ -18,10 +18,10 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\bin"
-			IntermediateDirectory="..\Debug\ShadowPack"
+			OutputDirectory="..\$(ConfigurationName)\bin"
+			IntermediateDirectory="..\$(ConfigurationName)\ShadowPack"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -45,11 +45,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\openssl\include;&quot;..\ImageMagick-6.8.5&quot;;&quot;..\ImageMagick-6.8.5\xlib&quot;;&quot;..\ImageMagick-6.8.5\Magick++\lib&quot;;&quot;..\ImageMagick-6.8.5\zlib&quot;;&quot;..\ImageMagick-6.8.5\bzlib&quot;;&quot;..\ImageMagick-6.8.5\jpeg&quot;;&quot;..\ImageMagick-6.8.5\lcms\src&quot;;&quot;..\ImageMagick-6.8.5\lcms\include&quot;;&quot;..\ImageMagick-6.8.5\tiff\libtiff&quot;;&quot;..\ImageMagick-6.8.5\ttf\include&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\cache&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\config&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\internal&quot;;&quot;..\ImageMagick-6.8.5\libxml\include&quot;;&quot;..\ImageMagick-6.8.5\libxml\include\libxml&quot;;&quot;..\ImageMagick-6.8.5\Magick++&quot;;&quot;..\ImageMagick-6.8.5\Magick++\demo&quot;;&quot;..\ImageMagick-6.8.5\Magick++\lib\Magick++&quot;;&quot;..\ImageMagick-6.8.5\Magick++\tests&quot;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_VISUALC_;_LIB"
+				AdditionalIncludeDirectories="..\openssl\win32\include;..\libpng;..\libtiff\libtiff;..\libjpeg;..\libzlib"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -68,9 +68,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="openssl.lib CORE_DB_bzlib_.lib CORE_DB_coders_.lib CORE_DB_filters_.lib CORE_DB_jbig_.lib CORE_DB_jp2_.lib CORE_DB_jpeg_.lib CORE_DB_lcms_.lib CORE_DB_libxml_.lib CORE_DB_magick_.lib CORE_DB_Magick++_.lib CORE_DB_png_.lib CORE_DB_tiff_.lib CORE_DB_ttf_.lib CORE_DB_wand_.lib CORE_DB_wmf_.lib CORE_DB_xlib_.lib CORE_DB_zlib_.lib kernel32.lib user32.lib gdi32.lib odbc32.lib odbccp32.lib ole32.lib oleaut32.lib winmm.lib wsock32.lib advapi32.lib"
+				AdditionalDependencies="libpng.lib libtiff.lib libzlib.lib libjpeg.lib libcrypto.lib libssl.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\lib"
+				AdditionalLibraryDirectories="..\openssl\win32\lib;&quot;..\$(ConfigurationName)\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -99,11 +99,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\bin"
-			IntermediateDirectory="..\Release\ShadowPack"
+			OutputDirectory="..\$(ConfigurationName)\bin"
+			IntermediateDirectory="..\$(ConfigurationName)\ShadowPack"
 			ConfigurationType="1"
 			UseOfMFC="1"
-			UseOfATL="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -129,10 +128,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\openssl\include;&quot;..\ImageMagick-6.8.5&quot;;&quot;..\ImageMagick-6.8.5\xlib&quot;;&quot;..\ImageMagick-6.8.5\Magick++\lib&quot;;&quot;..\ImageMagick-6.8.5\zlib&quot;;&quot;..\ImageMagick-6.8.5\bzlib&quot;;&quot;..\ImageMagick-6.8.5\jpeg&quot;;&quot;..\ImageMagick-6.8.5\lcms\src&quot;;&quot;..\ImageMagick-6.8.5\lcms\include&quot;;&quot;..\ImageMagick-6.8.5\tiff\libtiff&quot;;&quot;..\ImageMagick-6.8.5\ttf\include&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\cache&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\config&quot;;&quot;..\ImageMagick-6.8.5\ttf\include\freetype\internal&quot;;&quot;..\ImageMagick-6.8.5\libxml\include&quot;;&quot;..\ImageMagick-6.8.5\libxml\include\libxml&quot;;&quot;..\ImageMagick-6.8.5\Magick++&quot;;&quot;..\ImageMagick-6.8.5\Magick++\demo&quot;;&quot;..\ImageMagick-6.8.5\Magick++\lib\Magick++&quot;;&quot;..\ImageMagick-6.8.5\Magick++\tests&quot;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_VISUALC_;_LIB"
+				AdditionalIncludeDirectories="..\openssl\win32\include;..\libpng;..\libtiff\libtiff;..\libjpeg;..\libzlib"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -152,10 +151,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="openssl.lib CORE_RL_Magick++_.lib CORE_RL_bzlib_.lib CORE_RL_coders_.lib CORE_RL_filters_.lib CORE_RL_jbig_.lib CORE_RL_jp2_.lib CORE_RL_jpeg_.lib CORE_RL_lcms_.lib CORE_RL_libxml_.lib CORE_RL_magick_.lib CORE_RL_png_.lib CORE_RL_tiff_.lib CORE_RL_ttf_.lib CORE_RL_wand_.lib CORE_RL_wmf_.lib CORE_RL_xlib_.lib CORE_RL_zlib_.lib"
+				AdditionalDependencies="libpng.lib libtiff.lib libzlib.lib libjpeg.lib libcrypto.lib libssl.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\lib"
-				IgnoreAllDefaultLibraries="false"
+				AdditionalLibraryDirectories="..\openssl\win32\lib;&quot;..\$(ConfigurationName)\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -194,15 +192,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\CorBuffer.cpp"
+				RelativePath=".\BMPImageMedia.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\JStegPack.cpp"
+				RelativePath=".\CipherStream.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\NonePack.cpp"
+				RelativePath=".\InfoBar.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MediaFactory.cpp"
 				>
 			</File>
 			<File
@@ -218,6 +220,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PackCipher.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PackErrors.cpp"
 				>
 			</File>
@@ -226,11 +232,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PackItemList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PackUtils.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PasswordDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\RawPPPack.cpp"
+				RelativePath=".\PixelImageMedia.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PNGImageMedia.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Progress.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RAWPPMedia.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RAWPPOptionDialog.cpp"
 				>
 			</File>
 			<File
@@ -265,6 +295,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\TIFFImageMedia.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -272,7 +306,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\CorBuffer.h"
+				RelativePath=".\BMPImageMedia.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CipherStream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\InfoBar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Media.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MediaFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MediaStream.h"
 				>
 			</File>
 			<File
@@ -288,6 +342,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PackCipher.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PackErrors.h"
 				>
 			</File>
@@ -296,7 +354,39 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PackItemList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PackUtils.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PasswordDialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PasswordGetter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PixelImageMedia.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PNGImageMedia.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Progress.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RAWPPMedia.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RAWPPOptionDialog.h"
 				>
 			</File>
 			<File
@@ -320,7 +410,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Stream.h"
+				>
+			</File>
+			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TIFFImageMedia.h"
 				>
 			</File>
 		</Filter>
@@ -329,6 +427,18 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\res\default.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\dir.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\icon1.ico"
+				>
+			</File>
 			<File
 				RelativePath=".\res\ShadowPack.ico"
 				>
@@ -339,6 +449,10 @@
 			</File>
 			<File
 				RelativePath=".\res\ShadowPack.rc2"
+				>
+			</File>
+			<File
+				RelativePath=".\res\up.ico"
 				>
 			</File>
 		</Filter>

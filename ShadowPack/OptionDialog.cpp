@@ -10,19 +10,12 @@
 
 IMPLEMENT_DYNAMIC(COptionDialog, CDialog)
 
-COptionDialog::COptionDialog(CWnd* pParent /*=NULL*/)
-	: CDialog(COptionDialog::IDD, pParent)
-	, m_nFormat(0)
+COptionDialog::COptionDialog(UINT IDD, CWnd* pParent)
+	: CDialog(IDD, pParent)
 	, m_bEncrypt(FALSE)
 	, m_szPassword(_T(""))
 	, m_szPassword1(_T(""))
 	, m_nEncryptMethod(0)
-	, m_bEnable1PP(FALSE)
-	, m_bEnable2PP(FALSE)
-	, m_bEnable3PP(FALSE)
-	, m_bEnable1PJ(FALSE)
-	, m_bEnable2PJ(FALSE)
-	, m_bEnable4PJ(FALSE)
 {
 
 }
@@ -34,7 +27,6 @@ COptionDialog::~COptionDialog()
 void COptionDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Radio(pDX, IDC_RTO_1PP, m_nFormat);
 	DDX_Check(pDX, IDC_CHK_ENCRYPT, m_bEncrypt);
 	DDX_Text(pDX, IDC_EDIT_PASSWORD1, m_szPassword);
 	DDX_Text(pDX, IDC_EDIT_PASSWORD2, m_szPassword1);
@@ -56,12 +48,6 @@ BOOL COptionDialog::OnInitDialog()
 	GetDlgItem(IDC_COMBO_ENCRYPT_METHOD)->EnableWindow(m_bEncrypt);
 	GetDlgItem(IDC_EDIT_PASSWORD1)->EnableWindow(m_bEncrypt);
 	GetDlgItem(IDC_EDIT_PASSWORD2)->EnableWindow(m_bEncrypt);
-	GetDlgItem(IDC_RTO_1PP)->EnableWindow(m_bEnable1PP);
-	GetDlgItem(IDC_RTO_2PP)->EnableWindow(m_bEnable2PP);
-	GetDlgItem(IDC_RTO_3PP)->EnableWindow(m_bEnable3PP);
-	GetDlgItem(IDC_RTO_1PJ)->EnableWindow(m_bEnable1PJ);
-	GetDlgItem(IDC_RTO_2PJ)->EnableWindow(m_bEnable2PJ);
-	GetDlgItem(IDC_RTO_3PJ)->EnableWindow(m_bEnable4PJ);
 	CDialog::OnInitDialog();
 	return TRUE;
 }

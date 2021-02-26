@@ -1,16 +1,19 @@
 #pragma once
 #include "afxwin.h"
 
+#include "PasswordGetter.h"
 
 // CPasswordDialog 对话框
 
-class CPasswordDialog : public CDialog
+class CPasswordDialog : public CDialog,CPasswordGetter
 {
 	DECLARE_DYNAMIC(CPasswordDialog)
 
 public:
 	CPasswordDialog(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CPasswordDialog();
+
+	CString GetPassword();
 
 // 对话框数据
 	enum { IDD = IDD_DIALOG_PASSWORD };

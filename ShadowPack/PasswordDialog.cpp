@@ -40,3 +40,11 @@ void CPasswordDialog::OnBnClickedOk()
 	// TODO: 在此添加控件通知处理程序代码
 	OnOK();
 }
+
+CString CPasswordDialog::GetPassword()
+{
+	m_strPassword = _T("");
+	if(DoModal() == IDOK)
+		return m_strPassword;
+	return _T("");
+}

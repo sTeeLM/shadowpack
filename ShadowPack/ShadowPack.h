@@ -1,3 +1,4 @@
+
 // ShadowPack.h : PROJECT_NAME 应用程序的主头文件
 //
 
@@ -14,7 +15,7 @@
 // 有关此类的实现，请参阅 ShadowPack.cpp
 //
 
-class CShadowPackApp : public CWinApp
+class CShadowPackApp : public CWinAppEx
 {
 public:
 	CShadowPackApp();

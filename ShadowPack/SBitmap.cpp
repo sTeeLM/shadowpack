@@ -14,9 +14,9 @@ CSBitmap::CSBitmap(const CSBitmap & src)
 	if(src.m_Column > 0 && src.m_Row > 0 && m_pBuffer != NULL) {
 		m_Column = src.m_Column;
 		m_Row = src.m_Row;
-		m_pBuffer = (Pixel*)malloc(m_Column * m_Row * 3);
+		m_pBuffer = (Pixel*)malloc(m_Column * m_Row * sizeof(Pixel));
 		if(NULL != m_pBuffer) {
-			memcpy(m_pBuffer, src.m_pBuffer, m_Row * m_Column * 3);
+			memcpy(m_pBuffer, src.m_pBuffer, m_Row * m_Column * sizeof(Pixel));
 		} else {
 			m_Column = m_Row = 0;
 		}
@@ -70,52 +70,6 @@ INT CSBitmap::Rows() const
 {
 	return m_Row;
 }
-BOOL CSBitmap::FromImage(Magick::Image & image)
-{
-	if(image.columns() > 0 && image.rows() > 0) {
-		m_Column = image.columns();
-		m_Row    = image.rows();
-		if(NULL != m_pBuffer) {
-			free(m_pBuffer);
-			m_pBuffer = NULL;
-		}
-
-		m_pBuffer = (Pixel *)malloc(3 * m_Column * m_Row);
-		if(NULL == m_pBuffer) {
-			m_Column = m_Row = 0;
-			return FALSE;
-		}
-
-		try {
-			image.write(0,0,m_Column, m_Row, "RGB", MagickCore::CharPixel, m_pBuffer);
-		}
-		catch (const Magick::Error & err ) {
-			free(m_pBuffer);
-			m_Column = m_Row = 0;
-			return FALSE; 	
-		}
-
-		return TRUE;
-
-	}
-
-	return FALSE;
-}
-
-BOOL CSBitmap::ToImage(Magick::Image & image)
-{
-	if(m_Column > 0 && m_Row > 0 && NULL != m_pBuffer) {
-		try {
-			image.read(m_Column,m_Row, "RGB", MagickCore::CharPixel, m_pBuffer);
-		}
-		catch (const Magick::Error & err ) {
-			return FALSE; 	
-		}
-		return TRUE;
-	}
-
-	return FALSE;
-}
 
 BOOL CSBitmap::ReAllocBuffer(INT X, INT Y)
 {
@@ -126,10 +80,10 @@ BOOL CSBitmap::ReAllocBuffer(INT X, INT Y)
 
 	m_Column = m_Row = 0;
 
-	m_pBuffer = (Pixel *)malloc(3 * X * Y);
+	m_pBuffer = (Pixel *)malloc(sizeof(Pixel) * X * Y);
 
 	if(NULL != m_pBuffer) {
-		memset(m_pBuffer, 0, 3 * X * Y);
+		memset(m_pBuffer, 0, sizeof(Pixel) * X * Y);
 		m_Column = X;
 		m_Row = Y;
 		return TRUE;
@@ -142,7 +96,7 @@ BOOL CSBitmap::SetBufferData(INT offset, INT size, void * buffer)
 {
 	LPBYTE p = (LPBYTE) m_pBuffer;
 	
-	if(offset < 0 || size < 0 || offset + size > m_Column * m_Row * 3)
+	if(offset < 0 || size < 0 || offset + size > m_Column * m_Row * (INT) sizeof(Pixel))
 		return FALSE;
 
 	memcpy(p + offset, buffer, size);
@@ -150,12 +104,132 @@ BOOL CSBitmap::SetBufferData(INT offset, INT size, void * buffer)
 	return TRUE;
 }
 
-void * CSBitmap::GetBufferPointer(INT offset) const
+LPBYTE CSBitmap::GetBufferPointer(INT offset) const
 {
 	LPBYTE p = (LPBYTE) m_pBuffer;
 
-	if(offset < 0 || offset + 1 > m_Column * m_Row * 3)
+	if(offset < 0 || offset + 1 > m_Column * m_Row * (INT) sizeof(Pixel))
 		return NULL;
 	
 	return p + offset;
+}
+BOOL CSBitmap::GetScanLineRGB(INT Y, INT size, LPBYTE buffer)
+{
+	Pixel * p = GetScanLine(Y);
+	
+	if(m_Column * 3 < size) {
+		return FALSE;
+	}
+
+	if(p) {
+		for(INT i =  0 ; i < m_Column; i ++) {
+			buffer[i*3]  = p[i].Red;
+			buffer[i*3 + 1] = p[i].Green;
+			buffer[i*3 + 2] = p[i].Blue;
+		}
+
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+BOOL CSBitmap::SetScanLineRGB(INT Y, INT size, const LPBYTE buffer)
+{
+	Pixel * p = GetScanLine(Y);
+	
+	if(m_Column * 3 < size) {
+		return FALSE;
+	}
+
+	if(p) {
+		for(INT i =  0 ; i < m_Column; i ++) {
+			p[i].Alpha = 0xFF;
+			p[i].Red = buffer[i*3];
+			p[i].Green = buffer[i*3 + 1];
+			p[i].Blue = buffer[i*3 + 2];
+		}
+
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+BOOL CSBitmap::SetScanLineRGBA(INT Y, INT size, const LPBYTE buffer)
+{
+	Pixel * p = GetScanLine(Y);
+
+	if(m_Column * 4 < size) {
+		return FALSE;
+	}
+
+	memcpy(p, buffer, m_Column * sizeof(Pixel));
+
+	return TRUE;
+}
+
+BOOL CSBitmap::GetScanLineRGBA(INT Y, INT size, LPBYTE buffer)
+{
+	Pixel * p = GetScanLine(Y);
+
+	if(m_Column * 4 < size) {
+		return FALSE;
+	}
+
+	memcpy(buffer, p, m_Column * sizeof(Pixel));
+
+	return TRUE;
+}
+
+BOOL CSBitmap::SetScanLineBGR(INT Y, INT size, const LPBYTE buffer)
+{
+	
+	Pixel * p = GetScanLine(Y);
+	
+	if(m_Column * 3 < size) {
+		return FALSE;
+	}
+
+	if(p) {
+		for(INT i =  0 ; i < m_Column; i ++) {
+			p[i].Alpha = 0xFF;
+			p[i].Blue = buffer[i*3];
+			p[i].Green = buffer[i*3 + 1];
+			p[i].Red = buffer[i*3 + 2];
+		}
+
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+BOOL CSBitmap::GetScanLineBGR(INT Y, INT size, LPBYTE buffer)
+{
+	Pixel * p = GetScanLine(Y);
+	
+	if(m_Column * 3 < size) {
+		return FALSE;
+	}
+
+	if(p) {
+		for(INT i =  0 ; i < m_Column; i ++) {
+			buffer[i*3] = p[i].Blue; 
+			buffer[i*3 + 1] = p[i].Green;
+			buffer[i*3 + 2] = p[i].Red;
+		}
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+CSBitmap::Pixel * CSBitmap::GetScanLine(INT Y)
+{
+	if(m_pBuffer) {
+		return m_pBuffer + Y * m_Column;
+	}
+	return NULL;
 }

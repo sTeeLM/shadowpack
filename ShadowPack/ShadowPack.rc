@@ -71,6 +71,9 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\ShadowPack.ico"
+IDI_ICON_UP             ICON                    "res\\up.ico"
+IDI_ICON_DIR            ICON                    "res\\dir.ico"
+IDI_ICON_DEFAULT        ICON                    "res\\default.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -82,70 +85,66 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "关于 ShadowPack"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
-    LTEXT           "ShadowPack，1.3 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
-    LTEXT           "Copyright(c) STeeL 2019",IDC_STATIC,42,26,114,8
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
+    LTEXT           "ShadowPack，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2019",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
 END
 
-IDD_SHADOWPACK_DIALOG DIALOGEX 0, 0, 291, 172
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_SHADOWPACK_DIALOG DIALOGEX 0, 0, 375, 302
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "ShadowPack"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    PUSHBUTTON      "装载图片",IDC_BTN_LOAD_IMAGE,9,15,50,14
-    PUSHBUTTON      "保存图片",IDC_BTN_SAVE_IMAGE,60,15,50,14
-    PUSHBUTTON      "关闭图片",IDC_BTN_CLOSE_IMAGE,111,15,50,14
-    PUSHBUTTON      "选项",IDC_BTN_OPTION,162,15,50,14
-    PUSHBUTTON      "添加文件",IDC_BTN_ADD_DATA,226,81,50,14
-    PUSHBUTTON      "删除文件",IDC_BTN_REMOVE_DATA,226,97,50,14
-    PUSHBUTTON      "保存文件",IDC_BTN_EXPORT_DATA,226,113,50,14
-    PUSHBUTTON      "清除",IDC_BTN_CLEAR_DATA,226,129,50,14
-    GROUPBOX        "",IDC_STATIC,7,7,208,27
-    GROUPBOX        "",IDC_IMAGE_QUOTA,220,7,64,64
-    CONTROL         "",IDC_LST_DATA,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_AUTOARRANGE | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,35,208,114
-    CONTROL         "",IDC_PROGRESS_IMAGE,"msctls_progress32",WS_BORDER,7,149,208,16
-    GROUPBOX        "",IDC_STATIC,220,73,64,73
-    LTEXT           "静态",IDC_STATIC_INFO1,7,154,155,11
-    LTEXT           "静态",IDC_STATIC_INFO2,167,154,117,11
-    PUSHBUTTON      "取消",IDC_BTN_CANCEL,226,149,50,14
+    PUSHBUTTON      "打开",IDC_BTN_MEDIA_OPEN,310,95,50,14
+    PUSHBUTTON      "关闭",IDC_BTN_MEDIA_CLOSE,310,111,50,14
+    PUSHBUTTON      "保存为",IDC_BTN_MEDIA_SAVE,310,127,50,14
+    PUSHBUTTON      "选项",IDC_BTN_MEDIA_OPTION,310,143,50,14
+    CONTROL         "",IDC_LIST_DATA,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,290,266
+    PUSHBUTTON      "保存项目",IDC_BTN_ITEM_EXPORT,310,184,50,14
+    PUSHBUTTON      "添加目录",IDC_BTN_ITEM_ADD_DIR,310,201,50,14
+    PUSHBUTTON      "添加文件",IDC_BTN_ITEM_ADD_FILE,310,218,50,14
+    PUSHBUTTON      "删除项目",IDC_BTN_ITEM_DELETE,310,235,50,14
+    DEFPUSHBUTTON   "清除所有",IDC_BTN_ITEM_CLEAR_ALL,310,252,50,14
+    GROUPBOX        "内容",IDC_STATIC,303,171,65,103
+    GROUPBOX        "",IDC_IMAGE_QUOTA,304,3,64,64
+    GROUPBOX        "媒体",IDC_STATIC,305,84,65,82
+    LTEXT           "静态",IDC_INFO2,305,67,65,16
+    PUSHBUTTON      "取消",IDC_BTN_CANCEL,310,279,50,14
+    LTEXT           "静态",IDC_INFO1,7,274,290,18,SS_WORDELLIPSIS
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",0x0,7,278,291,16
 END
 
-IDD_DIALOG_OPTION DIALOGEX 0, 0, 268, 177
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "选项"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CONTROL         "1像素8Bits(容量最大)",IDC_RTO_1PP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,32,44,84,10
-    CONTROL         "2像素8Bits(容量中等)",IDC_RTO_2PP,"Button",BS_AUTORADIOBUTTON,31,60,84,10
-    CONTROL         "3像素8Bits(容量最小)",IDC_RTO_3PP,"Button",BS_AUTORADIOBUTTON,31,78,84,10
-    CONTROL         "1Cor1Bits(容量最小)",IDC_RTO_1PJ,"Button",BS_AUTORADIOBUTTON,153,44,86,10
-    CONTROL         "1Cor2Bits(容量中等)",IDC_RTO_2PJ,"Button",BS_AUTORADIOBUTTON,153,60,86,10
-    CONTROL         "1Cor4Bits(容量最大)",IDC_RTO_4PJ,"Button",BS_AUTORADIOBUTTON,153,78,86,10
-    CONTROL         "加密",IDC_CHK_ENCRYPT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,101,41,10
-    COMBOBOX        IDC_COMBO_ENCRYPT_METHOD,72,100,135,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_EDIT_PASSWORD1,72,116,136,14,ES_PASSWORD | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_PASSWORD2,72,133,136,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "确定",IDOK,160,156,50,14
-    PUSHBUTTON      "取消",IDCANCEL,212,156,50,14
-    GROUPBOX        "RawPP格式",IDC_STATIC,23,31,96,64
-    LTEXT           "密码:",IDC_STATIC,22,119,32,8
-    LTEXT           "确认:",IDC_STATIC,22,137,32,8
-    GROUPBOX        "JSteg格式",IDC_STATIC,141,31,105,64
-    LTEXT           "RawPP：将数据存放于像素LSB中，只可保存为BMP、PNG、TIFF、TGA",IDC_STATIC,8,7,253,10
-    LTEXT           "JSteg：将像素存放于频域信息中，只可保存为JPEG",IDC_STATIC,7,18,254,8
-END
-
-IDD_DIALOG_PASSWORD DIALOGEX 0, 0, 221, 59
+IDD_DIALOG_PASSWORD DIALOGEX 0, 0, 193, 58
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "请输入密码"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "确定",IDOK,106,38,50,14
-    PUSHBUTTON      "取消",IDCANCEL,160,38,50,14
-    EDITTEXT        IDC_EDIT_PASSWORD,71,18,140,14,ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "密码:",IDC_STATIC,19,22,34,8
+    DEFPUSHBUTTON   "确定",IDOK,82,37,50,14
+    PUSHBUTTON      "取消",IDCANCEL,136,37,50,14
+    EDITTEXT        IDC_EDIT_PASSWORD,46,19,140,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "密码:",IDC_STATIC,19,22,22,8
+END
+
+IDD_DIALOG_OPTION_RAWPP DIALOGEX 0, 0, 286, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "选项"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "1 Block 8Bits(容量最大、隐秘最差)",IDC_RTO_1PP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,15,141,10
+    CONTROL         "2 Block 8Bits(容量中等、隐秘中等)",IDC_RTO_2PP,"Button",BS_AUTORADIOBUTTON,12,31,141,10
+    CONTROL         "3 Block 8Bits(容量最小、隐秘最好)",IDC_RTO_3PP,"Button",BS_AUTORADIOBUTTON,12,49,141,10
+    CONTROL         "加密",IDC_CHK_ENCRYPT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,13,31,10
+    COMBOBOX        IDC_COMBO_ENCRYPT_METHOD,200,11,69,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_PASSWORD1,200,27,70,14,ES_PASSWORD | ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PASSWORD2,200,46,70,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "确定",IDOK,178,71,50,14
+    PUSHBUTTON      "取消",IDCANCEL,230,71,50,14
+    LTEXT           "密码:",IDC_STATIC,170,31,22,8
+    LTEXT           "确认:",IDC_STATIC,170,49,25,8
+    GROUPBOX        "RawPP格式",IDC_STATIC,3,2,156,64
+    GROUPBOX        "加密",IDC_STATIC,163,2,116,64
 END
 
 
@@ -171,13 +170,13 @@ BEGIN
     BEGIN
         BLOCK "080403a8"
         BEGIN
-            VALUE "CompanyName", "Mad Cat Stdio"
-            VALUE "FileDescription", "图像隐写工具"
+            VALUE "CompanyName", "TODO: <公司名>"
+            VALUE "FileDescription", "TODO: <文件说明>"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ShadowPack.exe"
-            VALUE "LegalCopyright", "(C) <Mad Cat Stdio>。保留所有权利。"
+            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
             VALUE "OriginalFilename", "ShadowPack.exe"
-            VALUE "ProductName", "ShadowPack"
+            VALUE "ProductName", "TODO: <产品名>"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
@@ -207,26 +206,22 @@ BEGIN
     IDD_SHADOWPACK_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 284
-        VERTGUIDE, 110
+        RIGHTMARGIN, 368
         TOPMARGIN, 7
-        BOTTOMMARGIN, 165
-    END
-
-    IDD_DIALOG_OPTION, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 261
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 170
+        BOTTOMMARGIN, 295
     END
 
     IDD_DIALOG_PASSWORD, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 214
+        RIGHTMARGIN, 186
         TOPMARGIN, 7
-        BOTTOMMARGIN, 52
+        BOTTOMMARGIN, 51
+    END
+
+    IDD_DIALOG_OPTION_RAWPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 85
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -237,14 +232,14 @@ END
 // Dialog Info
 //
 
-IDD_DIALOG_OPTION DLGINIT
+IDD_DIALOG_OPTION_RAWPP DLGINIT
 BEGIN
     IDC_COMBO_ENCRYPT_METHOD, 0x403, 4, 0
 0x4541, 0x0053, 
-    IDC_COMBO_ENCRYPT_METHOD, 0x403, 9, 0
-0x4c42, 0x574f, 0x4946, 0x4853, "\000" 
     IDC_COMBO_ENCRYPT_METHOD, 0x403, 5, 0
-0x4143, 0x5453, "\000" 
+0x4553, 0x4445, "\000" 
+    IDC_COMBO_ENCRYPT_METHOD, 0x403, 9, 0
+0x4143, 0x454d, 0x4c4c, 0x4149, "\000" 
     0
 END
 
@@ -257,34 +252,49 @@ END
 STRINGTABLE 
 BEGIN
     IDS_ABOUTBOX            "关于 ShadowPack(&A)..."
-    IDS_COLUMN_ID           "序号"
-    IDS_COLUMN_NAME         "名称"
-    IDS_COLUMN_SIZE         "大小"
-    IDS_SAVE_DIRTY          "数据已经修改，保存一下？"
-    IDS_CAPICITY_USED       "容量:%s 使用:%s"
-    IDS_SELECTED            "已选择 %u"
-    IDS_ERROR_EMPTY_PASSWORD "密码不能为空"
-    IDS_ERROR_MISMATCH_PASSWORD "两次密码不匹配"
-    IDS_ERROR_IN_PROGRESS   "处理中，无法关闭"
+    IDS_COLUMN_ID           "ID"
+    IDS_COLUMN_NAME         "Name"
+    IDS_COLUMN_SIZE         "Size"
+    IDS_CAPICITY_USED       "容量 %s\n使用 %s"
+    IDS_SAVE_DIRTY          "内容已经修改，保存不？"
+    IDS_ERROR_SAVE_MEDIA    "保存媒体错误：%s"
+    IDS_ERROR_OPEN_MEDIA    "打开媒体错误：%s"
+    IDS_COLUMN_TYPE         "Type"
+    IDS_ITEM_TYPE_FILE      "文件"
+    IDS_ITEM_TYPE_DIR       "目录"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_ERROR_ADD_DATA      "添加文件错误: %s"
-    IDS_ERROR_EXPORT_DATA   "导出文件错误: %s"
-    IDS_ERROR_LOAD_IMAGE    "装载图片错误: %s"
-    IDS_ERROR_SAVE_IMAGE    "保存图片错误: %s"
-    IDS_ERROR_INTERNAL      "内部错误（内存不足?）"
-    IDS_ERROR_CANCELED      "用户已经撤销"
-    IDS_ERROR_NEED_PASSWORD "需要密码解密数据"
-    IDS_ERROR_DECRYPT       "解密错误（不支持的算法?密码错误?）"
-    IDS_ERROR_CORRUPT_DATA  "数据错误"
-    IDS_ERROR_ENCRYPT       "加密错误（不支持的算法?密码错误?）"
-    IDS_ERROR_OVER_CAPICITY "超过容量"
-    IDS_ERROR_TOO_LARGE_DATA "数据过大"
-    IDS_ERROR_FILE_IO       "读写文件错误"
-    IDS_ERROR_UNSUPPORT_FILE "不支持的格式"
-    IDS_ERROR_OK            "成功"
+    IDS_SELECTED            "选择：%d"
+    IDS_ERROR_EXPORT_ITEM   "保存项目错误：%s"
+    IDS_DELETE_ITEM         "删除项目：%s"
+    IDS_SCAN_FILE           "扫描文件：\n%s\\%s"
+    IDS_SCAN_DIR            "扫描目录：\n%s\\%s"
+    IDS_ADD_FILE            "添加文件：%s"
+    IDS_COLUMN_REF          "位置"
+    IDS_ITEM_REF_DISK       "硬盘"
+    IDS_ITEM_REF_MEDIA      "媒体"
+    IDS_ITEM_REF_OTHER      "其他"
+    IDS_ERROR_EMPTY_PASSWORD "密码不能为空"
+    IDS_ERROR_MISMATCH_PASSWORD "两次密码不匹配"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PE_CANCELED         "用户取消"
+    IDS_PE_NEED_PASSWORD    "需要密码"
+    IDS_PE_IO               "IO错误：%s：%s"
+    IDS_PE_CORRUPT_DATA     "数据损坏"
+    IDS_PE_DECRYPT          "解密错误"
+    IDS_PE_ENCRYPT          "加密错误"
+    IDS_PE_OVER_CAPICITY    "超过容量"
+    IDS_PE_UNSUPPORT_PACK   "不支持的Pack格式"
+    IDS_PE_UNSUPPORT_MEDIA  "不支持的媒体文件"
+    IDS_PE_DUP_ITEM         "重复项目：%s"
+    IDS_PE_EXISTED          "已存在项目：%s"
+    IDS_PE_NOMEM            "内存不足"
+    IDS_PE_INTERNAL         "内部错误：BUG！"
 END
 
 #endif    // 中文(中华人民共和国) resources

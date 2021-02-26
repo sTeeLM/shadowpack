@@ -1,174 +1,143 @@
 #pragma once
 
-// Pack.h : 头锟侥硷拷
-//
-#include "PackErrors.h"
+
 #include "PackItem.h"
-#include "SBitmap.h"
-#include "jpeglib.h"
+#include "PackUtils.h"
+#include "Progress.h"
+#include "PasswordGetter.h"
 
-typedef CString & (*CB_GET_PASSWORD)();
-typedef void (*CB_SET_PROGRESS)(INT nProgress);
+class CMedia;
 
-#define PFP_1PP 1
-#define PFP_2PP 2
-#define PFP_3PP 3
-
-#define PFP_1PJ 1
-#define PFP_2PJ 2
-#define PFP_4PJ 3
-
-#define PACKAGE_HEADER_SIG 0x11223344
-
-class CCorBuffer;
-
-class CPack
+class CPack :
+	public CPackItem
 {
-public:
-	enum PackFormat {
-		PF_NONE = 0,
-		PF_RAWPP = 1, // 1 bytes per pixel
-		PF_JSTEG  = 2
-	};
-
-	enum EncryptMethod {
-		EM_NONE = 0,
-		EM_AES = 1, // AES
-		EM_BLOWFISH = 2, // RC5
-		EM_CAST = 3, // CAST
-	};
-private:
-	typedef struct {
-		DWORD dwSignature; 
-		DWORD dwEncryptType;
-		DWORD dwFormat;
-		DWORD dwFormatParam;
-		DWORD dwCount;
-		DWORD dwDataSize;
-		DWORD dwCapicity;
-	}PackHeader;
-
-	typedef PackHeader *(*HANDLER_READ_IMAGE)(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
-		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	typedef BOOL (*HANDLER_WRITE_IMAGE)(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szDst, LPCTSTR szExt, 
-		CPackErrors & Error, BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	typedef BOOL (*HANDLER_CAN_SET_FORMAT)(DWORD dwParam, const PackHeader * data, const CSBitmap & bmp);
-	typedef BOOL (*HANDLER_SET_FORMAT)(DWORD dwParam, PackHeader * data, const CSBitmap & bmp);
-	typedef void (*HANDLE_GET_SAVE_FILTER)(CString & szFilter);
-	typedef void (*HANDLE_GET_SAVE_DEFAULT_EXT)(CString & szExt);
-
-
-	typedef struct {
-		TCHAR * szName;
-		PackFormat eFormat;
-		TCHAR ** szExts;
-		HANDLER_READ_IMAGE fnReadImage;
-		HANDLER_WRITE_IMAGE fnWriteImage;
-		HANDLER_CAN_SET_FORMAT fnCanSetFormat;
-		HANDLER_SET_FORMAT fnSetFormat;
-		HANDLE_GET_SAVE_FILTER fnGetSaveFilter;
-		HANDLE_GET_SAVE_DEFAULT_EXT fnGetSaveDefaultExt;
-	}PackHandler;
-
-	
-	static CPack * LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt,PackHandler * handle, CPackErrors & eErrorCode, BOOL * bCancel,
-							 CB_GET_PASSWORD fnGetPass, CB_SET_PROGRESS fnSetProgress);
-
 public:
 	CPack(void);
 	virtual ~CPack(void);
-	static CPack * LoadFromImage(LPCTSTR szSrc, LPCTSTR szFileExt, CString & szError,  BOOL * bCancel, 
-		CB_GET_PASSWORD fnGetPass, CB_SET_PROGRESS fnSetProgress);
-	BOOL SaveToImage(LPCTSTR szSrc, LPCTSTR szFileExt, CString & szError, 
-		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	DWORD GetPackItemCount() const;
-	CPackItem * GetPackItem(UINT nIndex);
-	BOOL AddPackItem(CPackItem * pItem, UINT & nIndex, CPackErrors & Error);
-	BOOL RemovePackItem(UINT nIndex, UINT nCount = 1);
+
 	BOOL IsDirty();
+	void SetDirty(BOOL bDirty = TRUE);
 	BOOL IsEmpty();
-	BOOL Clear();
-	const EncryptMethod GetEncryptMethod() const {return (EncryptMethod)m_Header.dwEncryptType;}
-	void  SetEncryptMethod(EncryptMethod eMethod){m_Header.dwEncryptType = (DWORD)eMethod;}
-	const CString & GetPassword() const {return m_szPassword;}
-	void  SetPassword(const CString & szPassword);
-	BOOL  CanSetFormat(PackFormat eFormat, DWORD dwParam) const;
-	const PackFormat GetPackFormat() const {return (PackFormat)m_Header.dwFormat;}
-	const DWORD GetPackFormatParam() const {return m_Header.dwFormatParam;}
-	BOOL  SetPackFormat(PackFormat eFormat, DWORD dwParam);
-	DWORD GetTotalSize() {return m_Header.dwDataSize + sizeof(m_Header); }
-	DWORD GetDataSize()  {return m_Header.dwDataSize; }
-	DWORD GetCapicity() {return m_Header.dwCapicity; }
-	const CString & GetFilter();
-	const CString & GetDefaultExt();
+
+	void AttachInputMedia(CMedia * pMedia) {m_pInputMedia = pMedia;}
+	void AttachOutputMedia(CMedia * pMedia) {m_pOutputMedia = pMedia;}
+
+	CMedia * GetInputMedia() {return m_pInputMedia;}
+	CMedia * GetOutputMedia() {return m_pOutputMedia;}
+
+	ULONGLONG GetTotalDataSize() {return m_nTotalDataSize;}
+	void SetTotalDataSize(LONGLONG n);
+	void DecTotalDataSize(LONGLONG n);
+	void IncTotalDataSize(LONGLONG n);
+
+
+	void SetCurrentDir(CPackItem * pItem);
+	CPackItem * GetCurrentDir();
+
+	class CAddItemCBParam
+	{
+	public:
+		CAddItemCBParam(){}
+		~CAddItemCBParam(){}
+		CProgress * pProgress;
+		LARGE_INTEGER nTotalSize;
+		CPackItem * pItem;
+		CPackErrors * pError;
+		BOOL * pbCancel;
+
+	};
+
+	class CAddItemListDirCBParam {
+	public:
+		CAddItemListDirCBParam() {}
+		~CAddItemListDirCBParam() {}
+		CArray<CString, CString> aPathToAdd;
+		CArray<DWORD, DWORD> aType;
+		CPackItem * pRoot;
+		CPackErrors * pError;
+		CProgress * pProgress;
+	};
+
+	class CDeleteItemCBParam {
+	public:
+		CDeleteItemCBParam(){}
+		~CDeleteItemCBParam(){}
+		CPackErrors * pError;
+		CProgress * pProgress;
+		BOOL * pbCancel;
+		CPack * pThis;
+		BOOL bIsRollBack;
+	};
+
+	class CExportItemCBParam {
+	public:
+		CExportItemCBParam() {}
+		~CExportItemCBParam() {}
+		CPackErrors * pError;
+		CProgress * pProgress;
+		BOOL * pbCancel;
+		CPack * pThis;
+		BOOL bIsGetSize;
+		BOOL bOnMediaOnly;
+		BOOL bChangeRefToDisk;
+		LARGE_INTEGER nTotalSize;
+		INT nTotalItemCnt;
+		CString strExportRoot;
+	};
+
+	class CSaveItemCBParam{
+	public:
+		CSaveItemCBParam() {}
+		~CSaveItemCBParam() {}
+		CPackErrors * pError;
+		CProgress * pProgress;
+		BOOL * pbCancel;
+		CPack * pThis;
+	};
+
+	static BOOL AddItemDirGetSizeCB(LPCTSTR szPath, LPWIN32_FIND_DATA pffd, LPVOID pParam);
+	static BOOL AddItemDirCreateItemCB(LPCTSTR szPath, LPWIN32_FIND_DATA pffd, LPVOID pParam);
+	static BOOL AddItemDirListItemCB(LPCTSTR szPath, LPWIN32_FIND_DATA pffd, LPVOID pParam);
+	static BOOL DeleteItemCB(CPackItem * pItem, LPVOID pParam);
+	static BOOL ExportItemCB(CPackItem * pItem,BOOL bIsEOD, LPVOID pParam);
+	static BOOL SaveItemCB(CPackItem * pItem, BOOL bIsEOD, LPVOID pParam);
+	
+	BOOL LoadPack(LPCTSTR szPathName, LPCTSTR szExt, CPasswordGetter & PasswordGetter, 
+		BOOL & bCancel, CPackErrors & Error, CProgress & Progress);
+
+
+	// 不检查重复，直接包含DIR
+	BOOL AddItemDirInternal(LPCTSTR szPathToAdd, CPackItem * pRoot, CPackErrors & Error, 
+					   BOOL & bCancel, CProgress & Progress);
+
+	// 检查重复
+	BOOL AddItemFile(LPCTSTR szPathToAdd, CPackItem * pRoot, CPackErrors & Error);
+
+	// 检查重复，根据是否是根，决定是包含还是枚举
+	BOOL AddItemDir(LPCTSTR szPathToAdd, CPackItem * pRoot, CPackErrors & Error, 
+					   BOOL & bCancel, CProgress & Progress);
+
+	BOOL DeleteItem(CPackItem * pItem, CPackErrors & Error, 
+					   BOOL & bCancel, CProgress & Progress);
+
+	BOOL Clear(CPackErrors & Error, BOOL & bCancel, CProgress & Progress);
+
+	// 检查目标是否存在
+	BOOL ExportItemToDiskPath(CArray<CPackItem *, CPackItem *> & aExport, LPCTSTR szDstDir, BOOL & bCancel, CPackErrors & Error,
+		CProgress & Progress, BOOL bMediaOnly = FALSE, BOOL bChangeRefToDisk = FALSE);	
+    // 检查目标是否存在
+	BOOL ExportItemDirToDiskPath(CPackItem * pItem, CExportItemCBParam & Param);
+    // 检查目标是否存在
+	BOOL ExportItemFileToDiskPath(CPackItem * pItem, LPCTSTR szDstPath, LPCTSTR szDstName, BOOL & bCancel, CPackErrors & Error,
+		CProgress & Progress, BOOL bMediaOnly = FALSE, BOOL bChangeRefToDisk = FALSE, BOOL bAllowOverwrite = FALSE);
+	BOOL ExportItemFileToDiskPath(CPackItem * pItem, CExportItemCBParam & Param);
+
+	BOOL SavePack(LPCTSTR szPathName, CPasswordGetter & PasswordGetter, BOOL & bCancel,  CPackErrors & Error, CProgress & Progress);
+
 private:
-	void SetCapicity();
-	static void GenerateKey(BYTE * key, LPCTSTR szPassword);
-	static BOOL DecryptData(PBYTE pBuffer, size_t size, EncryptMethod eEmethod, LPCTSTR szPassword);
-	static BOOL EncryptData(PBYTE pBuffer, size_t size, EncryptMethod eEmethod, LPCTSTR szPassword);
-	static BOOL ReadRawImage(Magick::Image &image, PBYTE pBuffer, size_t offset, 
-		size_t size, PackFormat eFormat,  BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
-	static BOOL WriteRawImage(Magick::Image &image, const PBYTE pBuffer, size_t offset, 
-		size_t size, PackFormat eFormat,  BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
-	static BOOL IsValidHeader(const PackHeader & header);
-	static PackHeader * LoadBufferFromImage(Magick::Image &image,  BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-
-	static PackHandler * GetHandlerByFormat(PackFormat eFormat);
-
-	static std::list<CPack::PackHandler *> GetHandlersByExt(LPCTSTR szExt);
-
-	static void PadMemory(LPBYTE buffer, size_t size);
-private:
-
-	PackHeader m_Header;
-	CArray<CPackItem *, CPackItem *> m_PackItemList;
-	CString m_szPassword;
-	BOOL m_bIsDirty;
-	CSBitmap m_Bmp;
-
-	CString m_szFilter;
-	CString m_szExt;
-
-	static PackHandler m_Handler[3];
-
-	// for  PF_RAWPP
-	static PackHeader * RawPPReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
-		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	static BOOL RawPPWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szSrc, LPCTSTR szExt, CPackErrors & Error,
-		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	static BOOL RawPPCanSetFormat(DWORD dwParam, const PackHeader * data, const CSBitmap & bmp);
-	static BOOL RawPPSetFormat( DWORD dwParam, PackHeader * data, const CSBitmap & bmp);
-	static void RawPPGetSaveFilter(CString & szFilter);
-	static void RawPPSaveDefaultExt(CString & szExt);
-
-	static BOOL RawPPWriteImageInternal(CSBitmap & bmp, const LPBYTE pBuffer, size_t offset, size_t size, 
-						  DWORD dwFormaParamt, CPackErrors & Error, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
-	static BOOL RawPPReadImageInternal(CSBitmap & bmp, LPBYTE pBuffer, size_t offset, size_t size, 
-						 DWORD dwFormaParamt, CPackErrors & Error, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
-	// for  PF_JSTEG
-	static PackHeader * JStegReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
-		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	static BOOL JStegWriteImage(const PackHeader * data, const CSBitmap & bmp, LPCTSTR szSrc, LPCTSTR szExt, CPackErrors & Error, 
-		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-	static BOOL JStegCanSetFormat( DWORD dwParam, const PackHeader * data, const CSBitmap & bmp);
-	static BOOL JStegSetFormat(DWORD dwParam, PackHeader * data, const CSBitmap & bmp);
-	static void JStegGetSaveFilter(CString & szFilter);
-	static void JStegSaveDefaultExt(CString & szExt);
-	static BOOL RawPJReadDataInternal(CCorBuffer & sbuf, LPBYTE pRet , size_t size,
-			DWORD dwFormatParam, CPackErrors & Error, BOOL * bCancel = NULL, CB_SET_PROGRESS fnSetProgress = NULL);
-	typedef struct {
-		CCorBuffer * buffer;
-		BOOL bError;
-		DWORD dwFormatParam;
-	}JStegParam;
-	static void JStegErrorExit(j_common_ptr cinfo);
-	static void JStegReadData(j_common_ptr cinfo, JCOEF data);
-	static JCOEF JStegWriteData(j_common_ptr cinfo, JCOEF data);
-	static INT JStegGetCap(INT x, INT y);
-
-	// for none
-	static PackHeader * DefaultReadImage(LPCTSTR szSrc, LPCTSTR szExt, CSBitmap & bmp, CPackErrors & Error, 
-		BOOL * bCancel, CB_SET_PROGRESS fnSetProgress);
-
-
+	BOOL m_isDirty;
+	LONGLONG m_nTotalDataSize;
+	CPackItem * m_pCurrentDir;
+	CMedia  * m_pInputMedia;
+	CMedia  * m_pOutputMedia;
 };

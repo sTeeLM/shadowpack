@@ -1,10 +1,9 @@
+
 // stdafx.h : 标准系统包含文件的包含文件，
 // 或是经常使用但不常更改的
 // 特定于项目的包含文件
 
 #pragma once
-
-#define _AFXDLL
 
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1
@@ -33,8 +32,10 @@
 #include <afxdtctl.h>           // MFC 对 Internet Explorer 4 公共控件的支持
 #endif
 #ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>                     // MFC 对 Windows 公共控件的支持
+#include <afxcmn.h>             // MFC 对 Windows 公共控件的支持
 #endif // _AFX_NO_AFXCMN_SUPPORT
+
+#include <afxcontrolbars.h>     // 功能区和控件条的 MFC 支持
 
 
 
@@ -55,5 +56,4 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 #endif
-
 

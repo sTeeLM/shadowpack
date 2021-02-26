@@ -1,9 +1,16 @@
 #pragma once
 
-#include "Magick++.h"
-
 class CSBitmap
 {
+public:
+	#pragma pack(push, 1)
+	typedef struct {
+		BYTE Red;
+		BYTE Green;
+		BYTE Blue;
+		BYTE Alpha;
+	}Pixel;
+	#pragma pack(pop)
 public:
 	CSBitmap(void);
 	CSBitmap(const CSBitmap & src);
@@ -11,24 +18,26 @@ public:
 	BYTE & Red(INT X, INT Y);
 	BYTE & Green(INT X, INT Y);
 	BYTE & Blue(INT X, INT Y);
+	BYTE & Alpha(INT X, INT Y);
 	INT Columns() const;
 	INT Rows() const;
-	BOOL FromImage(Magick::Image & image);
-	BOOL ToImage(Magick::Image & image);
+	Pixel * GetScanLine(INT Y);
+
+	BOOL SetScanLineRGB(INT Y, INT size, const LPBYTE buffer);
+	BOOL GetScanLineRGB(INT Y, INT size, LPBYTE buffer);
+
+	BOOL GetScanLineRGBA(INT Y, INT size, LPBYTE buffer);
+	BOOL SetScanLineRGBA(INT Y, INT size, const LPBYTE buffer);
+
+	// 
+	BOOL GetScanLineBGR(INT Y, INT size, LPBYTE buffer);
+	BOOL SetScanLineBGR(INT Y, INT size, const LPBYTE buffer);
 	BOOL ReAllocBuffer(INT X, INT Y);
 	BOOL SetBufferData(INT offset, INT size, void * buffer);
-	void * GetBufferPointer(INT offset) const;
+	LPBYTE GetBufferPointer(INT offset) const;
 private:
 	INT    m_Column;
 	INT	   m_Row;
-
-	#pragma pack(push, 1)
-	typedef struct {
-		BYTE Red;
-		BYTE Green;
-		BYTE Blue;
-	}Pixel;
-	#pragma pack(pop)
 
 	Pixel * m_pBuffer;
 

@@ -2,543 +2,795 @@
 #include "Pack.h"
 #include "Resource.h"
 
-#include "openssl\aes.h"
-#include "openssl\cast.h"
-#include "openssl\blowfish.h"
-#include "openssl\md5.h"
+#include "Media.h"
+#include "MediaFactory.h"
+#include "Stream.h"
 
-#include <list>
 
-TCHAR *NoneExts[] = {
-	_T("*"),
-	NULL
-};
-
-TCHAR *RawPPExts[] = {
-	_T("BMP"),
-	_T("PNG"),
-	_T("TIFF"),
-	_T("TGA"),
-	NULL
-};
-
-TCHAR *JStegExts[] = {
-	_T("JPEG"),
-	_T("JPG"),
-	NULL
-};
-
-CPack::PackHandler CPack::m_Handler[3] = 
+CPack::CPack(void): 
+	CPackItem(NULL),
+	m_nTotalDataSize(0),
+	m_isDirty(FALSE),
+	m_pCurrentDir(NULL),
+	m_pInputMedia(NULL),
+	m_pOutputMedia(NULL)
 {
-	{
-		_T("Default"),
-		PF_NONE,
-		NoneExts,
-		DefaultReadImage, /* default */
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	},
-	{
-		_T("RawPP"),
-		PF_RAWPP,
-		RawPPExts,
-		RawPPReadImage,
-		RawPPWriteImage,
-		RawPPCanSetFormat,
-		RawPPSetFormat,
-		RawPPGetSaveFilter,
-		RawPPSaveDefaultExt
-	},
-	{
-		_T("JSteg"),
-		PF_JSTEG,
-		JStegExts,
-		JStegReadImage,
-		JStegWriteImage,
-		JStegCanSetFormat,
-		JStegSetFormat,
-		JStegGetSaveFilter,
-		JStegSaveDefaultExt
-	}
-};
-
-CPack::CPack(void)
-{
-	m_Header.dwFormat = PF_NONE;
-	m_Header.dwEncryptType = EM_NONE;
-	m_Header.dwSignature = PACKAGE_HEADER_SIG;
-	m_Header.dwCapicity = 0;
-	m_Header.dwCount = 0;
-	m_PackItemList.RemoveAll();
-	m_szPassword = _T("");
-	m_bIsDirty = FALSE;
-	m_szFilter = _T("");
-	m_szExt = _T("");
+	SetName(ROOT_NAME);
+	SetType(CPackItem::TYPE_DIR);
+	SetRef(CPackItem::REF_NONE);
+	m_pCurrentDir = this;
 }
 
 CPack::~CPack(void)
 {
-	Clear();
+	
 }
 
 
-
-BOOL CPack::IsValidHeader(const PackHeader & header)
+void CPack::SetCurrentDir(CPackItem * pItem)
 {
-	if(header.dwSignature == PACKAGE_HEADER_SIG) {
-		if(header.dwEncryptType >= EM_NONE && header.dwEncryptType <= EM_CAST) {
-			if(header.dwFormat == PF_RAWPP ||  header.dwFormat == PF_JSTEG) {
-				if(header.dwFormatParam <= 3 && header.dwFormatParam >= 1) {
-					if(header.dwDataSize != 0 && header.dwCount != 0) {
-						if(header.dwDataSize > sizeof(CPackItem::PackItemHeader)) {
-							return TRUE;
-						}
-					} else if(header.dwDataSize == 0 && header.dwCount == 0) {
-						return TRUE;
-					}
-				}
+	m_pCurrentDir = pItem;
+}
+
+CPackItem * CPack::GetCurrentDir()
+{
+	return m_pCurrentDir;
+}
+
+void CPack::SetDirty(BOOL bDirty /*= TRUE*/)
+{
+	m_isDirty = bDirty;
+}
+
+BOOL CPack::IsDirty()
+{
+	return m_isDirty;
+}
+
+BOOL CPack::IsEmpty()
+{
+	return GetChildrenCount() == 0;
+}
+
+
+void CPack::SetTotalDataSize(LONGLONG n)
+{
+	TRACE(_T("root SetTotalDataSize %lld\n"), n);
+	m_nTotalDataSize = n;
+	if(m_pInputMedia) {
+		m_pInputMedia->SetDataSize(m_nTotalDataSize);
+	}
+	if(m_pOutputMedia) {
+		m_pOutputMedia->SetDataSize(m_nTotalDataSize);
+	}
+}
+void CPack::DecTotalDataSize(LONGLONG n)
+{
+	TRACE(_T("root DecTotalDataSize %lld -> %lld\n"),m_nTotalDataSize, (m_nTotalDataSize - n));
+	m_nTotalDataSize -= n;
+	if(m_pInputMedia) {
+		m_pInputMedia->SetDataSize(m_nTotalDataSize);
+	}
+	if(m_pOutputMedia) {
+		m_pOutputMedia->SetDataSize(m_nTotalDataSize);
+	}
+}
+void CPack::IncTotalDataSize(LONGLONG n)
+{
+	TRACE(_T("root IncTotalDataSize %lld -> %lld\n"),m_nTotalDataSize, (m_nTotalDataSize + n));
+	m_nTotalDataSize += n;
+	if(m_pInputMedia) {
+		m_pInputMedia->SetDataSize(m_nTotalDataSize);
+	}
+	if(m_pOutputMedia) {
+		m_pOutputMedia->SetDataSize(m_nTotalDataSize);
+	}
+}
+
+BOOL CPack::AddItemDirGetSizeCB(LPCTSTR szPath, LPWIN32_FIND_DATA pffd, LPVOID pParam)
+{
+	CAddItemCBParam * p = (CAddItemCBParam *)pParam;
+	LARGE_INTEGER nSize;
+
+	CString strInfo;
+
+	if(*p->pbCancel) {
+		p->pError->SetError(CPackErrors::PE_CANCELED);
+		return FALSE;
+	}
+
+	if(NULL == pffd) { // is EOD
+		
+	} else if(pffd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		p->nTotalSize.QuadPart += CPackItem::EvalSize(CPackItem::TYPE_DIR, pffd->cFileName, 0);
+		strInfo.Format(IDS_SCAN_DIR, szPath, pffd->cFileName);
+	} else {
+		strInfo.Format(IDS_SCAN_FILE, szPath, pffd->cFileName);
+		nSize.HighPart = pffd->nFileSizeHigh;
+		nSize.LowPart = pffd->nFileSizeLow;
+		p->nTotalSize.QuadPart += CPackItem::EvalSize(CPackItem::TYPE_FILE, pffd->cFileName, nSize.QuadPart);
+	}
+
+	p->pProgress->SetInfo(strInfo);
+	
+	return TRUE;
+}
+BOOL CPack::AddItemDirCreateItemCB(LPCTSTR szPath, LPWIN32_FIND_DATA pffd, LPVOID pParam)
+{
+	CAddItemCBParam * p = (CAddItemCBParam *)pParam; 
+	CPackItem * pItem = NULL;
+	LARGE_INTEGER nSize;
+
+	if(*p->pbCancel) {
+		p->pError->SetError(CPackErrors::PE_CANCELED);
+		return FALSE;
+	}
+
+	if(NULL == pffd) { // is EOD
+		p->pItem = p->pItem->GetParent();
+	} else if(pffd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		pItem = CPackItem::CreatePackItemFromDir(p->pItem, szPath, pffd->cFileName, *p->pError);
+		if(pItem) {
+			p->pItem->AddChild(pItem);
+			p->pItem = pItem;
+			p->pProgress->IncScale(pItem->GetTotalSize());
+		}
+	} else {
+		nSize.HighPart = pffd->nFileSizeHigh;
+		nSize.LowPart = pffd->nFileSizeLow;
+		pItem = CPackItem::CreatePackItemFromFile(p->pItem, szPath, pffd->cFileName, nSize.QuadPart, *p->pError);
+		if(pItem) {
+			p->pItem->AddChild(pItem);
+			p->pProgress->IncScale(pItem->GetTotalSize());
+		}
+	}
+	
+	return (pffd != NULL && pItem != NULL) || (pffd == NULL && pItem == NULL);
+}
+
+BOOL CPack::AddItemDirInternal(LPCTSTR szPathToAdd, CPackItem * pRoot, CPackErrors & Error, 
+					   BOOL & bCancel, CProgress & Progress)
+{
+	BOOL bRet = FALSE;
+	CString strDirName;
+	CPackItem * pItem = NULL;
+
+	CAddItemCBParam Param;
+	Param.pItem = NULL;
+	Param.pbCancel = &bCancel;
+	Param.nTotalSize.QuadPart = 0;
+	Param.pError = &Error;
+	Param.pProgress = &Progress;
+
+	TRACE(_T("AddItemDir %s, root is %s\n"), szPathToAdd, pRoot->GetName());
+
+	strDirName = CPackUtils::GetPathName(szPathToAdd);
+
+	if((pItem = CPackItem::CreatePackItemFromDir(pRoot,szPathToAdd, strDirName, Error)) == NULL) {
+		goto error;
+	}
+	
+	Param.pItem = pItem;
+
+	// get total size, and test each dir and file ok, see if > cap of media
+	
+	if(!CPackUtils::WalkDir(szPathToAdd, AddItemDirGetSizeCB, &Param)) {
+		if(bCancel) {
+			Error.SetError(CPackErrors::PE_CANCELED);
+		}
+		goto error;
+	}
+
+	Progress.SetFullScale(Param.nTotalSize.QuadPart);
+	Progress.ShowProgressBar();
+	Progress.ShowInfoBar(FALSE);
+
+	Param.nTotalSize.QuadPart += Param.pItem->GetTotalSize();
+
+	if(Param.nTotalSize.QuadPart + GetTotalDataSize() > GetOutputMedia()->GetCapicity()) {
+		Error.SetError(CPackErrors::PE_OVER_CAPICITY);
+		goto error;
+	}
+
+	// real work!
+	if(!CPackUtils::WalkDir(szPathToAdd, AddItemDirCreateItemCB, &Param)) {
+		if(bCancel) {
+			Error.SetError(CPackErrors::PE_CANCELED);
+		}
+		goto error;
+	}
+
+	pRoot->AddChild(pItem);
+	IncTotalDataSize(Param.nTotalSize.QuadPart);
+
+	SetDirty();
+
+	bRet = TRUE;
+	return bRet;
+
+error:
+
+	CDeleteItemCBParam ParamRemove;
+	ParamRemove.pError = & Error;
+	ParamRemove.pProgress = &Progress;
+	ParamRemove.pbCancel = &bCancel;
+	ParamRemove.pThis = this;
+	ParamRemove.bIsRollBack = TRUE;
+	
+	Progress.ShowProgressBar(FALSE);
+	Progress.ShowInfoBar(TRUE);
+
+	if(pItem != NULL) {
+		pItem->RemoveAllChildren(DeleteItemCB, &ParamRemove);
+		delete pItem;
+		pItem = NULL;
+	}
+	return bRet;
+}
+
+BOOL CPack::AddItemDirListItemCB(LPCTSTR szPath, LPWIN32_FIND_DATA pffd, LPVOID pParam)
+{
+	CAddItemListDirCBParam * p = (CAddItemListDirCBParam *) pParam;
+	if(NULL != pffd) {
+		if(!p->pRoot->HasChild(pffd->cFileName, 
+			(pffd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? CPackItem::TYPE_DIR :
+			CPackItem::TYPE_FILE)) {
+			CString strPath = szPath;
+			CString strInfo;
+			strPath += _T("\\");
+			strPath += pffd->cFileName;
+			p->aPathToAdd.Add(strPath);
+			p->aType.Add((pffd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? CPackItem::TYPE_DIR : 
+				CPackItem::TYPE_FILE);
+			TRACE(_T("AddItemDirListItemCB: add item %s , type %d\n"), strPath, 
+				(pffd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? CPackItem::TYPE_DIR : 
+				CPackItem::TYPE_FILE);
+			if(pffd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				strInfo.Format(IDS_SCAN_DIR, szPath, pffd->cFileName);
+			} else {
+				strInfo.Format(IDS_SCAN_FILE, szPath, pffd->cFileName);
+			}
+			p->pProgress->SetInfo(strInfo);
+		} else {
+			p->pError->SetError(CPackErrors::PE_DUP_ITEM, pffd->cFileName);
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+BOOL CPack::AddItemDir(LPCTSTR szPathToAdd, CPackItem * pRoot, CPackErrors & Error, 
+				   BOOL & bCancel, CProgress & Progress)
+{
+	CAddItemListDirCBParam * pParam = new(std::nothrow) CAddItemListDirCBParam();
+	pParam->pRoot = pRoot;
+	pParam->pError = &Error;
+	pParam->pProgress = &Progress;
+	INT nSize = 0;
+	BOOL bRet = FALSE;
+
+	CString strNameToAdd = CPackUtils::GetPathName(szPathToAdd);
+	if(strNameToAdd[0] == 0) { // is end with \ (C:\), no name part
+	// 添加内容
+		if(!CPackUtils::WalkDir(szPathToAdd, &AddItemDirListItemCB, pParam, TRUE, 1)){
+			goto error;
+		}
+	} else {
+	// 添加目录，首先检查是否有重复项目
+		if(pRoot->HasChild(strNameToAdd, CPackItem::TYPE_DIR)) {
+			pParam->pError->SetError(CPackErrors::PE_DUP_ITEM, strNameToAdd);
+			goto error;
+		} else {
+			pParam->aPathToAdd.Add(szPathToAdd);
+			pParam->aType.Add(CPackItem::TYPE_DIR);
+		}
+	}
+
+	nSize = pParam->aPathToAdd.GetCount();
+	for(INT i = 0 ; i < nSize; i ++) {
+		if(pParam->aType[i] == CPackItem::TYPE_DIR) {
+			if(!AddItemDirInternal(pParam->aPathToAdd[i], pRoot, Error, bCancel, Progress)) {
+				goto error;
+			}
+		} else {
+			if(!AddItemFile(pParam->aPathToAdd[i], pRoot, Error)) {
+				goto error;
 			}
 		}
 	}
-	return FALSE;
+	SetDirty();
+	bRet = TRUE;
+error:
+	if(NULL != pParam) {
+		delete pParam;
+		pParam = NULL;
+	}
+	return bRet;
 }
 
-void CPack::GenerateKey(BYTE * key, LPCTSTR szPassword)
+BOOL CPack::AddItemFile(LPCTSTR szPathToAdd, CPackItem * pRoot, CPackErrors & Error)
 {
-	MD5_CTX ctx;
+	BOOL bRet = FALSE;
+	CString strFileName, strParentPath;
+	CPackItem * pItem = NULL;
+	ULONGLONG nSize;
 
-	MD5_Init(&ctx);
+	TRACE(_T("AddItemFile %s, root is %s\n"), szPathToAdd, pRoot->GetName());
 
-	MD5_Update(&ctx, szPassword, _tcslen(szPassword) * sizeof(TCHAR));
-
-	MD5_Final(key, &ctx);
-}
-
-BOOL CPack::DecryptData(PBYTE pBuffer, size_t size, EncryptMethod eEmethod, LPCTSTR szPassword)
-{
-	BYTE key[16];
-	BYTE iv[16];
-
-	AES_KEY aes_key;
-	CAST_KEY cast_key;
-	BF_KEY bf_key;
-
-	int num = 0;
-
-	if(eEmethod == EM_NONE)
-		return TRUE;
-
-	if(NULL == szPassword || _tcslen(szPassword) == 0)
-		return FALSE;
-
-	// generate key
-	GenerateKey(key, szPassword);
-
-	memcpy(iv, key, sizeof(iv));
-
-	if(eEmethod == EM_AES) {
-		AES_set_encrypt_key(key, 128, &aes_key);
-		AES_cfb8_encrypt(pBuffer, pBuffer, size, &aes_key, iv, &num, AES_ENCRYPT);
-	} else if(eEmethod == EM_BLOWFISH){
-		BF_set_key(&bf_key, 16, key);
-		BF_cfb64_encrypt(pBuffer, pBuffer, size, &bf_key, iv, &num, BF_ENCRYPT);
-	} else if(eEmethod == EM_CAST){
-		CAST_set_key(&cast_key, 16, key);
-		CAST_cfb64_encrypt(pBuffer, pBuffer, size, &cast_key, iv, &num, CAST_ENCRYPT);
+	if(!CPackUtils::GetFileSize(szPathToAdd, nSize)) {
+		Error.SetError(CPackErrors::PE_IO, szPathToAdd, CPackUtils::GetLastError(::GetLastError()));
+		goto error;
 	}
 
+	strFileName = CPackUtils::GetPathName(szPathToAdd);
+
+	if(pRoot->HasChild(strFileName, CPackItem::TYPE_FILE)) {
+		Error.SetError(CPackErrors::PE_DUP_ITEM, strFileName);
+		goto error;
+	}
+
+	strParentPath = CPackUtils::GetPathPath(szPathToAdd);
+	
+
+	if((pItem = CPackItem::CreatePackItemFromFile(pRoot,strParentPath, strFileName, nSize, Error)) == NULL) {
+		goto error;
+	}
+
+	if(pItem->GetTotalSize() + GetTotalDataSize() > GetOutputMedia()->GetCapicity()) {
+		Error.SetError(CPackErrors::PE_OVER_CAPICITY);
+		goto error;
+	}
+
+	pRoot->AddChild(pItem);
+	IncTotalDataSize(pItem->GetTotalSize());
+	SetDirty();
+
+	bRet = TRUE;
+	return bRet;
+error:
+
+	if(pItem != NULL) {
+		pItem->RemoveAllChildren();
+		delete pItem;
+		pItem = NULL;
+	}
+	return bRet;
+}
+
+BOOL CPack::DeleteItemCB(CPackItem * pItem, LPVOID pParam)
+{
+	CString strInfo;
+	CDeleteItemCBParam * p = (CDeleteItemCBParam *)pParam;
+
+	if(*p->pbCancel && !p->bIsRollBack) {
+		p->pError->SetError(CPackErrors::PE_CANCELED);
+		return FALSE;
+	}
+
+	if(!p->bIsRollBack) {
+		p->pThis->DecTotalDataSize(pItem->GetTotalSize());
+	}
+	strInfo.Format(IDS_DELETE_ITEM, pItem->GetName());
+	p->pProgress->SetInfo(strInfo);
+	TRACE(_T("deleteing %s\n"), pItem->GetName());
 	return TRUE;
 }
 
-BOOL CPack::EncryptData(PBYTE pBuffer, size_t size, EncryptMethod eEmethod, LPCTSTR szPassword)
+BOOL CPack::DeleteItem(CPackItem * pItem, CPackErrors & Error, 
+				   BOOL & bCancel, CProgress & Progress)
 {
-	BYTE key[16];
-	BYTE iv[16];
+	CDeleteItemCBParam Param;
+	Param.pError = & Error;
+	Param.pProgress = &Progress;
+	Param.pbCancel = &bCancel;
+	Param.pThis = this;
+	Param.bIsRollBack = FALSE;
+	CPackItem *pParent = NULL;
+	BOOL bRet = FALSE;
 
-	AES_KEY aes_key;
-	CAST_KEY cast_key;
-	BF_KEY bf_key;
+	pParent = pItem->GetParent();
 
-	int num = 0;
-
-	if(eEmethod == EM_NONE)
-		return TRUE;
-
-	if(NULL == szPassword || _tcslen(szPassword) == 0)
-		return FALSE;
-
-	// generate key
-	GenerateKey(key, szPassword);
-
-	memcpy(iv, key, sizeof(iv));
-
-	if(eEmethod == EM_AES) {
-		AES_set_encrypt_key(key, 128, &aes_key);
-		AES_cfb8_encrypt(pBuffer, pBuffer, size, &aes_key, iv, &num, AES_DECRYPT);
-	} else if(eEmethod == EM_BLOWFISH){
-		BF_set_key(&bf_key, 16, key);
-		BF_cfb64_encrypt(pBuffer, pBuffer, size, &bf_key, iv, &num, BF_DECRYPT);
-	} else if(eEmethod == EM_CAST){
-		CAST_set_key(&cast_key, 16, key);
-		CAST_cfb64_encrypt(pBuffer, pBuffer, size, &cast_key, iv, &num, CAST_DECRYPT);
-	}
-
-	return TRUE;
-}
-
-
-BOOL  CPack::SetPackFormat(PackFormat eFormat, DWORD dwParam)
-{
-	PackHandler * handle = NULL;
-	BOOL bRet = TRUE;
-
-	handle = GetHandlerByFormat(eFormat);
-
-	if(eFormat != m_Header.dwFormat || dwParam != m_Header.dwFormatParam) {
-		bRet = handle->fnSetFormat(dwParam, &m_Header, m_Bmp);
-		if(bRet) {
-			m_bIsDirty = TRUE;
-		}
+	if(pParent) {
+		bRet = pParent->RemoveChild(pItem, DeleteItemCB, &Param);
+		SetDirty();
 	}
 
 	return bRet;
 }
 
-CPack * CPack::LoadFromImageByHandle(LPCTSTR szSrc, LPCTSTR szExt, PackHandler * handle, CPackErrors & Error, BOOL * bCancel,
-							 CB_GET_PASSWORD fnGetPass, CB_SET_PROGRESS fnSetProgress)
+BOOL CPack::ExportItemCB(CPackItem * pItem, BOOL bIsEOD, LPVOID pParam)
 {
-	CPack * pPack = NULL;
-	PackHeader * pBuffer = NULL;
-	size_t offset = 0;
-	size_t itemSize = 0;
-	UINT nIndex;
+	CExportItemCBParam * p = (CExportItemCBParam * )pParam;
+	CString strInfo;
+	CString strPath;
 
-	pPack = new CPack();
-	pBuffer = handle->fnReadImage(szSrc, szExt, pPack->m_Bmp, Error, bCancel, fnSetProgress);
-	if(NULL == pBuffer) {
-		/*
-		if(bCancel && *bCancel) {
-			eErrorCode = CPackErrors::PE_CANCELED;
-			Error.SetError( CPackErrors::PE_CANCELED);
-		}
-		*/
-		goto load_image_error;
-	}
-
-	memcpy(&pPack->m_Header, pBuffer, sizeof(pPack->m_Header));
-	if(pPack->m_Header.dwEncryptType != EM_NONE) {
-		pPack->m_szPassword = fnGetPass();
-	}
-
-	if(pPack->m_szPassword.IsEmpty() && pPack->m_Header.dwEncryptType != EM_NONE) {
-		Error.SetError(CPackErrors::PE_NEED_PASSWORD);
-		goto load_pack_error;
-	}
-	if(pPack->m_Header.dwCount != 0 && pPack->m_Header.dwDataSize != 0) {
-		if(!DecryptData(((PBYTE)pBuffer) + sizeof(pPack->m_Header), 
-			pPack->m_Header.dwDataSize, 
-			(EncryptMethod)pPack->m_Header.dwEncryptType, (LPCTSTR)pPack->m_szPassword)) {
-			Error.SetError(CPackErrors::PE_DECRYPT);
-			goto decrypt_pack_error;
-		}
-	}
-	for( DWORD i = 0 ; i < pPack->m_Header.dwCount ; i++) {
-		CPackItem * pItem = CPackItem::CreatePackItemFromMemory(
-			(const CPackItem::PackItemHeader *)(((PBYTE)pBuffer) + sizeof(pPack->m_Header) + offset), 
-			pPack->m_Header.dwDataSize - itemSize,
-			Error);
-		if(NULL == pItem) {
-			goto load_pack_item_error;
-		}
-		nIndex = pPack->m_PackItemList.Add(pItem);
-		offset += pItem->GetTotalSize();
-		itemSize += pItem->GetTotalSize();
-		if(itemSize > pPack->m_Header.dwDataSize) {
-			Error.SetError(CPackErrors::PE_CORRUPT_DATA);
-			goto load_pack_item_error;
-		}
-	}
-	if(itemSize != pPack->m_Header.dwDataSize) {
-		Error.SetError(CPackErrors::PE_CORRUPT_DATA);
-		goto load_pack_item_error;
-	}
-
-	if(NULL != pBuffer) {
-		free(pBuffer);
-		pBuffer = NULL;		
-	}	
-	return pPack;
-
-load_pack_item_error:
-decrypt_pack_error:
-load_pack_error:
-load_image_error:
-	if(NULL != pPack) {
-		delete pPack;
-		pPack = NULL;
-	}
-	if(NULL != pBuffer) {
-		free(pBuffer);
-		pBuffer = NULL;		
-	}
-	return pPack;
-}
-
-CPack * CPack::LoadFromImage(LPCTSTR szSrc, LPCTSTR szExt, CString & szError, BOOL * bCancel,
-							 CB_GET_PASSWORD fnGetPass, CB_SET_PROGRESS fnSetProgress)
-{
-
-	std::list<PackHandler *> handles;
-	std::list<PackHandler *>::iterator it;
-	CPack * ret = NULL;
-	CPackErrors Error;
-
-	handles = GetHandlersByExt(szExt);
-
-	for(it = handles.begin(); it!= handles.end(); it++) {
-		TRACE(_T("load image try handler %s\n"), (*it)->szName);
-		ret = LoadFromImageByHandle(szSrc, szExt, *it, Error, bCancel,
-							 fnGetPass, fnSetProgress);
-		if(NULL != ret) {// OK!
-			break;
-		}
-
-		if(Error.GetError() != CPackErrors::PE_UNSUPPORT_PACK) { // some thing wrong, do not continue
-			break;
-		}
-	}
-
-	szError = Error.ToString();
-	return ret;
-}
-
-BOOL CPack::SaveToImage(LPCTSTR szDst, LPCTSTR szExt, CString & szError, BOOL * bCancel, CB_SET_PROGRESS fnSetProgress)
-{
-	PackHeader * pBuffer = NULL;
-	DWORD offset = 0;
-	UINT nIndex;
-	PackHandler * handle = NULL;
-	CPackErrors Error;
-
-	handle = GetHandlerByFormat((PackFormat)m_Header.dwFormat);
-
-	pBuffer = (PackHeader *)malloc(sizeof(PackHeader) + m_Header.dwDataSize);
-
-	if(NULL == pBuffer) {
-		Error.SetError(CPackErrors::PE_INTERNAL);
-		goto malloc_error;
-	}
-
-	memcpy(pBuffer, &m_Header, sizeof(m_Header));
-
-	for(nIndex = 0 ; nIndex < m_PackItemList.GetCount() ; nIndex ++) {
-		CPackItem * pItem = m_PackItemList[nIndex];
-		if(!pItem->ExportDataToMemory((PBYTE)pBuffer + sizeof(m_Header) + offset,m_Header.dwDataSize - offset ,Error)) {
-			goto save_pack_item_error;
-		}
-		offset += pItem->GetTotalSize();
-	}
-
-	// encrypt it;
-	if(!EncryptData((PBYTE)pBuffer + sizeof(m_Header), m_Header.dwDataSize, (EncryptMethod)m_Header.dwEncryptType, (LPCTSTR)m_szPassword)) {
-		Error.SetError(CPackErrors::PE_ENCRYPT);
-		goto encrypt_error;
-	}
-
-	if(!handle->fnWriteImage(pBuffer, m_Bmp, szDst, szExt, Error, bCancel, fnSetProgress)) {
-		/*
-			if(bCancel && *bCancel) {
-				Error.SetError(CPackErrors::PE_CANCELED);
-			} else {
-				//szError = _T("pack data error!");
-				szError.LoadString(IDS_ERROR_INTERNAL);
-			}
-		*/
-			goto pack_data_error;
-	}
-
-	if(NULL != pBuffer) {
-		free(pBuffer);
-		pBuffer = NULL;
-	}
-
-	m_bIsDirty = FALSE;
-	szError = Error.ToString();
-	return TRUE;
-
-pack_data_error:
-encrypt_error:
-save_pack_item_error:
-malloc_error:
-	if(NULL != pBuffer) {
-		free(pBuffer);
-		pBuffer = NULL;
-	}
-	szError = Error.ToString();
-	return FALSE;
-}
-
-DWORD CPack::GetPackItemCount() const
-{
-	return m_Header.dwCount;
-}
-
-
-CPackItem * CPack::GetPackItem(UINT nIndex)
-{
-	UINT nSize = m_PackItemList.GetCount();
-	if( nIndex < nSize) {
-		return m_PackItemList[nIndex];
-	}
-	return NULL;
-}
-
-
-BOOL CPack::AddPackItem(CPackItem * pItem, 	UINT & nIndex, CPackErrors & Error)
-{
-	if(m_Header.dwDataSize + pItem->GetTotalSize() > m_Header.dwCapicity) {
-		Error.SetError(CPackErrors::PE_OVER_CAPICITY);
+	if(*p->pbCancel) {
+		p->pError->SetError(CPackErrors::PE_CANCELED);
 		return FALSE;
 	}
-	nIndex = m_PackItemList.Add(pItem);
-	m_Header.dwCount ++;
-	m_Header.dwDataSize += pItem->GetTotalSize();
 
-	m_bIsDirty = TRUE;
+	if(p->bIsGetSize) {
 
-	return TRUE;
-}
-
-
-
-BOOL CPack::IsDirty()
-{
-	return m_bIsDirty;
-}
-
-BOOL CPack::IsEmpty()
-{
-	return m_Header.dwCount == 0;
-}
-
-BOOL CPack::Clear()
-{
-	if(m_Header.dwCount != 0) {
-		for(UINT i = 0; i < m_PackItemList.GetCount() ; i++) {
-			CPackItem * pItem = m_PackItemList[i];
-			delete pItem;
-		}	
-		m_PackItemList.RemoveAll();
-		m_Header.dwDataSize = 0;
-		m_Header.dwCount = 0;
-
-		m_bIsDirty = TRUE;
-	}
-	return TRUE;
-}
-
-BOOL CPack::RemovePackItem(UINT nIndex, UINT nCount/* = 1 */)
-{
-	UINT nSize = m_PackItemList.GetCount();
-	if(nCount > 0 && nIndex < nSize && nIndex + nCount - 1 < nSize) {
-		for(UINT i = nIndex; i < nIndex + nCount ; i++) {
-			CPackItem * pItem = m_PackItemList[i];
-			m_Header.dwDataSize -= pItem->GetTotalSize();
-			m_Header.dwCount --;
-			delete pItem;
+		if(!bIsEOD && pItem->IsFile()) {
+			p->nTotalSize.QuadPart += pItem->GetDataSize();
 		}
-		m_PackItemList.RemoveAt(nIndex, nCount);
-		m_bIsDirty = TRUE;
+		p->nTotalItemCnt ++;
+		
+		if(!bIsEOD) {
+			strPath = p->strExportRoot + _T("\\") + pItem->GetName();
+			if(CPackUtils::IsPathExist(strPath)) {
+				p->pError->SetError(CPackErrors::PE_EXISTED, strPath);
+				return FALSE;
+			}
+		} else {
+			strPath = p->strExportRoot;
+		}
+
+		if(!bIsEOD && pItem->IsFile()) {
+			strInfo.Format(IDS_SCAN_FILE, p->strExportRoot, pItem->GetName());
+			TRACE(_T("check file %s\\%s\n"),p->strExportRoot, pItem->GetName());
+			p->pProgress->SetInfo(strInfo);
+		} else if(!bIsEOD  && pItem->IsDir()){
+			strInfo.Format(IDS_SCAN_DIR, p->strExportRoot, pItem->GetName());
+			p->strExportRoot = strPath;
+			TRACE(_T("into dir %s\n"), p->strExportRoot);
+			p->pProgress->SetInfo(strInfo);
+		} else{
+			strPath = CPackUtils::GetPathPath(p->strExportRoot);
+			TRACE(_T("up to dir %s -> %s\n"), p->strExportRoot, strPath);
+			p->strExportRoot = strPath;
+		}
+		return TRUE;
+	} else {
+		if(!bIsEOD) {
+			strPath = p->strExportRoot + _T("\\") + pItem->GetName();
+			if(CPackUtils::IsPathExist(strPath)) {
+				p->pError->SetError(CPackErrors::PE_EXISTED, strPath);
+				return FALSE;
+			}
+		} else {
+			strPath = p->strExportRoot;
+		}
+		if(!bIsEOD) {
+			if(p->bOnMediaOnly && !pItem->IsRefMedia()) {
+				TRACE(_T("skip item %s\\%s\n"), p->strExportRoot, pItem->GetName());
+				if(pItem->IsDir()) {
+					p->strExportRoot = strPath;
+				}
+			} else {
+				if(!pItem->ExportToDiskPath(p->pThis->GetInputMedia()->GetStream(),
+					strPath, *p->pbCancel, *p->pError, *p->pProgress, p->bChangeRefToDisk)) {
+					return FALSE;
+				}
+		
+				if(pItem->IsDir()) {
+					p->strExportRoot = strPath;
+				}
+			}
+		} else {
+			strPath = CPackUtils::GetPathPath(p->strExportRoot);
+			TRACE(_T("up to dir %s -> %s\n"), p->strExportRoot, strPath);
+			p->strExportRoot = strPath;
+		}
 		return TRUE;
 	}
-	return FALSE;
+
 }
 
-
-BOOL CPack::CanSetFormat(PackFormat eFormat, DWORD dwParam) const
+BOOL CPack::ExportItemDirToDiskPath(CPackItem * pItem, CExportItemCBParam & Param)
 {
-	PackHandler * handle = NULL;
-
-	handle = GetHandlerByFormat(eFormat);
-
-	return handle->fnCanSetFormat(dwParam, &m_Header, m_Bmp);
+	return pItem->WalkItemTree(ExportItemCB, &Param);
 }
 
-void CPack::SetPassword(const CString & szPassword) 
+BOOL CPack::ExportItemFileToDiskPath(CPackItem * pItem, LPCTSTR szDstPath, LPCTSTR szDstName, BOOL & bCancel, CPackErrors & Error,
+		CProgress & Progress, BOOL bMediaOnly, BOOL bChangeRefToDisk, BOOL bAllowOverwrite)
 {
-	if(m_szPassword.Compare(szPassword) != 0){
-		m_szPassword = szPassword; 
-		m_bIsDirty = TRUE;
+	CString strPath;
+	if(bMediaOnly && !pItem->IsRefMedia()) {
+		return TRUE;
 	}
+	strPath.Format(_T("%s\\%s"), szDstPath, szDstName);
+	if(!bAllowOverwrite) {
+		if(CPackUtils::IsPathExist(strPath)) {
+			Error.SetError(CPackErrors::PE_EXISTED, strPath);
+			return FALSE;
+		}
+	}
+	return pItem->ExportToDiskPath(GetInputMedia()->GetStream(),strPath, bCancel, Error, Progress, bChangeRefToDisk);
 }
 
-
-std::list<CPack::PackHandler *> CPack::GetHandlersByExt(LPCTSTR szExt)
+BOOL CPack::ExportItemFileToDiskPath(CPackItem * pItem, CExportItemCBParam & Param)
 {
-	std::list<PackHandler *> ret;
-	PackHandler * pHandler;
-	for(INT i = 0 ; i < sizeof(m_Handler)/sizeof(PackHandler) ; i++) {
-		pHandler = &m_Handler[i];
-		for(INT j = 0 ; pHandler->szExts[j] != NULL; j++) {
-			if(lstrcmpi(szExt, pHandler->szExts[j]) == 0) {
-				ret.push_back(pHandler);
-				break;
+	CString strPath;
+
+	if(Param.bIsGetSize) {
+		Param.nTotalSize.QuadPart += pItem->GetTotalSize();
+		return TRUE;
+	} else {
+		return ExportItemFileToDiskPath(pItem, Param.strExportRoot, pItem->GetName(), 
+			*Param.pbCancel, *Param.pError, *Param.pProgress, Param.bOnMediaOnly, Param.bChangeRefToDisk, FALSE);
+	}
+	return TRUE;
+}
+
+BOOL CPack::ExportItemToDiskPath(CArray<CPackItem *, CPackItem *> & aExport, LPCTSTR szDstDir, BOOL & bCancel, CPackErrors & Error,
+		CProgress & Progress, BOOL bMediaOnly, BOOL bChangeRefToDisk)
+{
+	INT nSize = aExport.GetCount();
+
+	CExportItemCBParam Param;
+	Param.pError = &Error;
+	Param.pProgress = &Progress;
+	Param.pbCancel = &bCancel;
+	Param.pThis = this;
+	Param.bIsGetSize = TRUE;
+	Param.nTotalSize.QuadPart = 0;
+	Param.nTotalItemCnt = 0;
+	Param.strExportRoot = szDstDir;
+	Param.bOnMediaOnly = bMediaOnly;
+	Param.bChangeRefToDisk = bChangeRefToDisk;
+
+	Progress.ShowInfoBar();
+	Progress.ShowProgressBar(FALSE);
+
+	// get size;
+	for(INT i = 0 ; i < nSize ; i ++) {
+		if(aExport[i]->IsDir()) {
+			if(!ExportItemDirToDiskPath(aExport[i], Param)) {
+				return FALSE;
+			}
+		} else if(aExport[i]->IsFile()){
+			if(!ExportItemFileToDiskPath(aExport[i], Param)) {
+				return FALSE;
 			}
 		}
 	}
 
-	ret.push_back(&m_Handler[0]); /* default handler */
+	// real work
 
-	return ret;
-}
+	Progress.ShowInfoBar(FALSE);
+	Progress.ShowProgressBar();
+	Progress.SetFullScale(Param.nTotalSize.QuadPart);
+	Param.bIsGetSize = FALSE;
 
-
-CPack::PackHandler * CPack::GetHandlerByFormat(PackFormat eFormat)
-{
-	if(eFormat <= PF_JSTEG && eFormat >= PF_NONE) {
-		return &m_Handler[eFormat];
-	}
-	return NULL;
-}
-
-const CString & CPack::GetFilter()
-{
-	PackHandler * pHandler = GetHandlerByFormat((PackFormat)m_Header.dwFormat);
-	pHandler->fnGetSaveFilter(m_szFilter);
-	return m_szFilter;
-}
-
-const CString & CPack::GetDefaultExt()
-{
-	PackHandler * pHandler = GetHandlerByFormat((PackFormat)m_Header.dwFormat);
-	pHandler->fnGetSaveDefaultExt(m_szExt);
-	return m_szExt;
-}
-
-void CPack::PadMemory(LPBYTE buffer, size_t size)
-{
-	size_t n = 0, r = 0;
-	INT b;
-
-	if(size == 0)
-		return;
-
-	n = size / sizeof(INT);
-	r = size % sizeof(INT);
-
-	srand(time(NULL));
-
-	for(size_t i = 0 ; i < n ; i ++) {
-		b = rand();
-		memcpy(buffer, &b, sizeof(INT));
-		buffer += sizeof(INT);
+	for(INT i = 0 ; i < nSize ; i ++) {
+		if(aExport[i]->IsDir()) {
+			if(!ExportItemDirToDiskPath(aExport[i], Param)) {
+				return FALSE;
+			}
+		} else if(aExport[i]->IsFile()){
+			if(!ExportItemFileToDiskPath(aExport[i], Param)) {
+				return FALSE;
+			}
+		}
 	}
 
-	for(size_t i = 0 ; i < r ; i ++) {
-		b = rand();
-		buffer[i] = (BYTE)rand();
-	}	
+	return TRUE;
+}
+
+
+BOOL CPack::Clear( CPackErrors & Error, 
+				   BOOL & bCancel, CProgress & Progress)
+{
+	CDeleteItemCBParam Param;
+	Param.pError = & Error;
+	Param.pProgress = &Progress;
+	Param.pbCancel = &bCancel;
+	Param.pThis = this;
+	CPackItem *pParent = NULL;
+	BOOL bRet = FALSE;
+	Param.bIsRollBack = FALSE;
+
+	bRet = RemoveAllChildren(DeleteItemCB, &Param);
+
+	SetCurrentDir(this);
+
+	SetDirty();
+
+	return bRet;
+}
+
+BOOL CPack::SaveItemCB(CPackItem * pItem, BOOL bIsEOD, LPVOID pParam)
+{
+	CSaveItemCBParam * p = (CSaveItemCBParam * )pParam;
+
+	if(pItem->IsRoot()) {
+		TRACE(_T("skip root\n"));
+	} else if(bIsEOD && pItem->IsDir()){
+		if(!pItem->SaveToMediaEOD(p->pThis->GetInputMedia()->GetStream(),
+			p->pThis->GetOutputMedia()->GetStream(), 
+			*p->pProgress, *p->pError)) {
+			return FALSE;
+		}
+	} else{
+		if(!pItem->SaveToMedia(p->pThis->GetInputMedia()->GetStream(),
+			p->pThis->GetOutputMedia()->GetStream(),
+			*p->pbCancel, *p->pError, *p->pProgress)) {
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
+BOOL CPack::SavePack(LPCTSTR szPathName, CPasswordGetter & PasswordGetter, BOOL & bCancel,  CPackErrors & Error, CProgress & Progress)
+{
+
+	CSaveItemCBParam Param;
+	CMedia * pNewInputMedia = NULL, * pNewOutputMedia = NULL;
+
+	Param.pError = &Error;
+	Param.pProgress = &Progress;
+	Param.pbCancel = &bCancel;
+	Param.pThis = this;
+
+	
+	Progress.ShowInfoBar(FALSE);
+	Progress.ShowProgressBar();
+
+
+	GetOutputMedia()->SetDataSize(GetTotalDataSize());
+
+	if(!GetOutputMedia()->OpenMedia(CMedia::MODE_WRITE, szPathName, PasswordGetter, bCancel, Error, Progress)) {
+		goto err;
+	}
+
+	// 开始保存
+	Progress.Reset();
+	Progress.SetFullScale(GetTotalDataSize());
+	if(!GetOutputMedia()->GetStream()->Seek(0, SEEK_SET, Error)) {
+		goto err;
+	}
+	if(!WalkItemTree(SaveItemCB, &Param)) {
+		goto err;
+	}
+
+	Progress.Reset();
+	// 需要SaveMedia自己设置Progress的FullScale
+	if(!GetOutputMedia()->SaveMedia(bCancel, Error, Progress)) {
+		goto err;
+	}
+
+	SetDirty(FALSE);
+	GetOutputMedia()->SetFormatChanged(FALSE);
+
+	// close input
+	GetInputMedia()->CloseMedia();
+	
+	// make output media new input
+	pNewInputMedia = GetOutputMedia();
+	if(!pNewInputMedia->SetToRead(Error)) {
+		pNewInputMedia->CloseMedia();
+		pNewInputMedia = NULL;
+		AttachInputMedia(NULL);
+		goto err;
+	}
+
+	if(!(pNewOutputMedia = pNewInputMedia->CloneMedia(Error))) {
+		AttachOutputMedia(NULL);
+		goto err;
+	}
+
+	AttachOutputMedia(pNewInputMedia);
+	AttachInputMedia(pNewOutputMedia);
+
+	return TRUE;
+err:
+	return FALSE;
+}
+
+BOOL CPack::LoadPack(LPCTSTR szPathName, LPCTSTR szExt, CPasswordGetter & PasswordGetter, 
+					 BOOL & bCancel, CPackErrors & Error, CProgress & Progress)
+{
+
+	ULONGLONG nOffset = 0;
+	CStream * pInput = NULL;
+	CPackItem * pItem = NULL, *pRoot = NULL;
+	ULONGLONG nSize, nReaded;
+	pack_item_header_t header;
+	CMedia * pInputMedia = NULL;
+	CMedia *pOutputMedia = NULL;
+
+	pRoot = this;
+
+
+	if(!(pInputMedia = CMediaFactory::CreateMediaFromExt(szExt))) {
+		Error.SetError(CPackErrors::PE_UNSUPPORT_MEDIA);
+		goto err;
+	}
+
+	if(!pInputMedia->OpenMedia(CMedia::MODE_READ, szPathName, PasswordGetter, bCancel, Error, Progress)) {
+		pInputMedia->CloseMedia();
+		pInputMedia = NULL;
+		goto err;
+	}
+
+	if(!(pOutputMedia = pInputMedia->CloneMedia(Error))) {
+		pInputMedia->CloseMedia();
+		pInputMedia = NULL;
+		goto err;
+	}
+
+	pInput = pInputMedia->GetStream();
+
+	if(!pInput->Seek(0, SEEK_SET, Error)) {
+		goto err;
+	}
+
+	Progress.Reset();
+	Progress.SetFullScale(pInputMedia->GetDataSize());
+	nReaded = 0;
+
+	while(nReaded < pInputMedia->GetDataSize()) {
+		nSize = sizeof(header);
+		if(!pInput->Read(&header,nSize, Progress, Error)) {
+			goto err;
+		}
+
+		if(bCancel) {
+			Error.SetError(CPackErrors::PE_CANCELED);
+			goto err;
+		}
+
+
+		if(!CPackItem::IsValidItemHeader(header)) {
+			Error.SetError(CPackErrors::PE_CORRUPT_DATA);
+			goto err;
+		}
+
+		if(header.dwType == CPackItem::TYPE_EOD) {
+			nSize = (DWORD)header.dwNameSize;
+			if(!pInput->Seek(header.dwNameSize, SEEK_CUR, Error)) {
+				goto err;
+			}
+			Progress.IncScale(header.dwNameSize);
+			nReaded += header.dwNameSize + sizeof(header);
+			if(pRoot) {
+				TRACE(_T("load dir EOD %s->%s\n"), pRoot->GetName(), pRoot->GetParent()->GetName());
+				pRoot = pRoot->GetParent();
+			}
+			else {
+				Error.SetError(CPackErrors::PE_CORRUPT_DATA);
+				goto err;
+			}
+		} else if(header.dwType == CPackItem::TYPE_FILE) {
+			if(!(pItem = CPackItem::CreatePackItemFromMediaFile(pRoot, header, pInput, bCancel, Progress, Error))) {
+				goto err;
+			}
+			nReaded += pItem->GetTotalSize();
+			TRACE(_T("load file %s, offset %lld\n"), pItem->GetName(), pItem->GetOffset());
+			pRoot->AddChild(pItem);
+			SetDirty();
+			IncTotalDataSize(pItem->GetTotalSize());
+		} else if(header.dwType == CPackItem::TYPE_DIR) {
+			if(!(pItem = CPackItem::CreatePackItemFromMediaDir(pRoot, header, pInput, bCancel, Progress, Error))) {
+				goto err;
+			}
+			nReaded += pItem->GetTotalSize() - pItem->GetEODSize();
+			TRACE(_T("load dir %s, %s->%s, offset %lld\n"), pItem->GetName(), pRoot->GetName(), pItem->GetName(), pItem->GetOffset());
+			pRoot->AddChild(pItem);
+			SetDirty();
+			pRoot = pItem;
+			IncTotalDataSize(pItem->GetTotalSize());
+		}
+	}
+
+	if(pRoot != this) {
+		Error.SetError(CPackErrors::PE_CORRUPT_DATA);
+		goto err;
+	}
+
+	
+	AttachInputMedia(pInputMedia);
+	AttachOutputMedia(pOutputMedia);
+	SetDirty(FALSE);
+
+	return TRUE;
+
+err:
+	AttachOutputMedia(pOutputMedia);
+	AttachInputMedia(pInputMedia);
+	SetDirty(FALSE);
+	return FALSE;
+
 }

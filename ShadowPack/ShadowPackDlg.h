@@ -1,13 +1,17 @@
+
 // ShadowPackDlg.h : 头文件
 //
 
 #pragma once
 
-#include "Pack.h"
-#include "afxwin.h"
-#include "afxcmn.h"
-
 #include "PackChart.h"
+#include "Progress.h"
+#include "PackItemList.h"
+#include "PackItem.h"
+#include "Pack.h"
+#include "Media.h"
+#include "PackErrors.h"
+#include "PasswordDialog.h"
 
 // CShadowPackDlg 对话框
 class CShadowPackDlg : public CDialog
@@ -25,8 +29,9 @@ protected:
 
 // 实现
 public:
-	static CString & fnGetPassword();
-	static void fnSetProgress(INT nPercent);
+	static UINT __cdecl fnThread( LPVOID pParam );
+	static CString fnGetPassword();
+	
 protected:
 	HICON m_hIcon;
 
@@ -35,48 +40,71 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnClose( );
+	afx_msg void OnClose();
 	DECLARE_MESSAGE_MAP()
 
-	CPack * m_pPack;
+typedef void (CShadowPackDlg::*FN_PACK_THREAD) (LPVOID pParam);
+
+	class CPackThreadParam {
+	public:
+		CPackThreadParam() {};
+		virtual ~CPackThreadParam() {};
+	public:
+		CShadowPackDlg * m_pThis;
+		FN_PACK_THREAD m_pfn;
+		LPVOID m_pParam;
+	};
+
+protected:
+	CPasswordDialog m_dlgPassword;
+	CPackChart m_ctlImageQuota;
+	CProgress m_Progress;
+	CStatic   m_ctlInfo2;
+	CPackItemList m_ctlPackItemList;
+	CPack m_PackRoot;
+	BOOL m_bInProgress;
+	BOOL m_bShowProgressBar;
+	BOOL m_bQuit;
+	BOOL m_bCancel;
+
+	// cache...
 	CString m_szPathName;
 	CString m_szFileExt;
-	BOOL AddListItem(UINT nID, LPCTSTR szName, UINT nSize);
-	BOOL RemoveListItem(UINT nID, UINT nCount);
-	BOOL ClearListItem();
-	void TranslateSize(UINT nSize, CString & strOut);
-	static UINT LoadImage(LPVOID pParam);
-	static UINT SaveImage(LPVOID pParam);
-	void EndSave(BOOL bOK, CString & szError);
-	void EndLoad(BOOL bOK, CString & szError);
-	void BeginSave();
-	void BeginLoad();
-	void BeginLoadSave();
+
+#ifdef _DEBUG
+	CMemoryState m_msOld;
+#endif
+
+
+protected:
+	void Quit();
 	void UpdateUI();
-	void CloseImage();
+	void CloseMedia();
+	BOOL ShowLocationDirDlg(CString & strDir);
+	void StartThread(FN_PACK_THREAD fn, LPVOID pParam = NULL, BOOL bShowProgressBar = TRUE);
+	void ThreadSaveMedia(LPVOID pParam);
+	void ThreadOpenMedia(LPVOID pParam);
+	void ThreadCloseMedia(LPVOID pParam);
+	void ThreadClearItem(LPVOID pParam);
+	void ThreadExportItem(LPVOID pParam);
+	void ThreadDeleteItem(LPVOID pParam);
+	void ThreadAddItemDir(LPVOID pParam);
+	void ThreadAddItemFile(LPVOID pParam);
+	
+
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
-	afx_msg void OnBnClickedBtnLoadImage();
-	afx_msg void OnBnClickedBtnSaveImage();
-	afx_msg void OnBnClickedBtnOption();
-	afx_msg void OnBnClickedBtnAddData();
-	afx_msg void OnBnClickedBtnRemoveData();
-	afx_msg void OnBnClickedBtnClearData();
-	afx_msg void OnBnClickedBtnClose();
-	afx_msg void OnLbnSelchangeLstData();
-	afx_msg void OnLvnItemchangedLstData(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnBnClickedBtnExportData();
+	afx_msg void OnBnClickedItemDelete();
+	afx_msg void OnBnClickedMediaOpen();
+	afx_msg void OnBnClickedMediaClose();
+	afx_msg void OnBnClickedMediaOption();
+	afx_msg void OnBnClickedMediaSave();
+	afx_msg void OnBnClickedItemExport();
+	afx_msg void OnBnClickedItemAddDir();
+	afx_msg void OnBnClickedItemAddFile();
+	afx_msg void OnBnClickedItemClear();
 	afx_msg void OnBnClickedBtnCancel();
-
-	CPackChart m_ctlImageQuota;
-	CListCtrl m_ctlPackItemList;
-	static CString m_szPackPassword;
-	static BOOL m_bCancel;
-	BOOL m_bInProgress;
-	BOOL m_bQuit;
-	BOOL m_bCloseImage;
-	CProgressCtrl m_ctlProgress;
-	CStatic m_ctlInfo1;
-	CStatic m_ctlInfo2;
+	afx_msg void OnLvnItemChangedListData(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMDblclkListData(NMHDR *pNMHDR, LRESULT *pResult);
 };

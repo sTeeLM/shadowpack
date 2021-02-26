@@ -30,6 +30,16 @@ END_MESSAGE_MAP()
 
 // CPackChart 消息处理程序
 
+void CPackChart::Initialize(CWnd * pParent)
+{
+	SubclassDlgItem(IDC_IMAGE_QUOTA, pParent);
+
+	LONG lEx = ::GetWindowLong(GetSafeHwnd(), GWL_STYLE);
+
+	lEx |= SS_OWNERDRAW;
+
+	lEx = ::SetWindowLong(GetSafeHwnd(), GWL_STYLE, lEx);
+}
 
 void CPackChart::SetFreePercent(INT nPercent, BOOL bEnable/*  = TRUE */)
 {
