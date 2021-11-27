@@ -1,36 +1,40 @@
-
-// ShadowPackDlg.cpp :  µœ÷Œƒº˛
+Ôªø
+// ShadowPackDlg.cpp: ÂÆûÁé∞Êñá‰ª∂
 //
 
-#include "stdafx.h"
+#include "pch.h"
+#include "framework.h"
 #include "ShadowPack.h"
 #include "ShadowPackDlg.h"
-#include "PackErrors.h"
-#include "PasswordDialog.h"
-#include "PackUtils.h"
-#include "PackItem.h"
+#include "afxdialogex.h"
 #include "MediaFactory.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
 
-// ”√”⁄”¶”√≥Ã–Ú°∞πÿ”⁄°±≤Àµ•œÓµƒ CAboutDlg ∂‘ª∞øÚ
+
+// Áî®‰∫éÂ∫îÁî®Á®ãÂ∫è‚ÄúÂÖ≥‰∫é‚ÄùËèúÂçïÈ°πÁöÑ CAboutDlg ÂØπËØùÊ°Ü
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// ∂‘ª∞øÚ ˝æ›
+// ÂØπËØùÊ°ÜÊï∞ÊçÆ
+#ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
+#endif
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV ÷ß≥÷
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV ÊîØÊåÅ
 
-//  µœ÷
+// ÂÆûÁé∞
 protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
+CAboutDlg::CAboutDlg() : CDialog(IDD_ABOUTBOX)
 {
 }
 
@@ -43,17 +47,12 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CShadowPackDlg ∂‘ª∞øÚ
+// CShadowPackDlg ÂØπËØùÊ°Ü
 
 
 
-
-CShadowPackDlg::CShadowPackDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CShadowPackDlg::IDD, pParent),
-	m_bInProgress(FALSE),
-	m_bShowProgressBar(FALSE),
-	m_bQuit(FALSE),
-	m_bCancel(FALSE)
+CShadowPackDlg::CShadowPackDlg(CWnd* pParent /*=nullptr*/)
+	: CDialog(IDD_SHADOWPACK_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -61,50 +60,40 @@ CShadowPackDlg::CShadowPackDlg(CWnd* pParent /*=NULL*/)
 void CShadowPackDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_INFO2, m_ctlInfo2);
+	DDX_Control(pDX, IDC_INFO_CAPICITY, m_ctlCapicityInfo);
+	DDX_Control(pDX, IDC_INFO_FOOTER, m_ctlFooterInfo);
 }
 
 BEGIN_MESSAGE_MAP(CShadowPackDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_WM_CLOSE()
-	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDOK, &CShadowPackDlg::OnBnClickedOk)
-	ON_BN_CLICKED(IDCANCEL, &CShadowPackDlg::OnBnClickedCancel)
-	ON_BN_CLICKED(IDC_BTN_ITEM_DELETE, &CShadowPackDlg::OnBnClickedItemDelete)
-	ON_BN_CLICKED(IDC_BTN_MEDIA_OPEN, &CShadowPackDlg::OnBnClickedMediaOpen)
-	ON_BN_CLICKED(IDC_BTN_MEDIA_CLOSE, &CShadowPackDlg::OnBnClickedMediaClose)
-	ON_BN_CLICKED(IDC_BTN_MEDIA_OPTION, &CShadowPackDlg::OnBnClickedMediaOption)
-	ON_BN_CLICKED(IDC_BTN_MEDIA_SAVE, &CShadowPackDlg::OnBnClickedMediaSave)
-	ON_BN_CLICKED(IDC_BTN_ITEM_EXPORT, &CShadowPackDlg::OnBnClickedItemExport)
-	ON_BN_CLICKED(IDC_BTN_ITEM_ADD_DIR, &CShadowPackDlg::OnBnClickedItemAddDir)
-	ON_BN_CLICKED(IDC_BTN_ITEM_ADD_FILE, &CShadowPackDlg::OnBnClickedItemAddFile)
-	ON_BN_CLICKED(IDC_BTN_ITEM_CLEAR_ALL, &CShadowPackDlg::OnBnClickedItemClear)
+	ON_BN_CLICKED(IDC_BTN_MEDIA_OPEN, &CShadowPackDlg::OnBnClickedBtnMediaOpen)
+	ON_BN_CLICKED(IDC_BTN_MEDIA_CLOSE, &CShadowPackDlg::OnBnClickedBtnMediaClose)
+	ON_BN_CLICKED(IDC_BTN_MEDIA_SAVE, &CShadowPackDlg::OnBnClickedBtnMediaSave)
+	ON_BN_CLICKED(IDC_BTN_MEDIA_OPTION, &CShadowPackDlg::OnBnClickedBtnMediaOption)
+	ON_BN_CLICKED(IDC_BTN_ITEM_EXPORT, &CShadowPackDlg::OnBnClickedBtnItemExport)
+	ON_BN_CLICKED(IDC_BTN_ITEM_ADD, &CShadowPackDlg::OnBnClickedBtnItemAdd)
+	ON_BN_CLICKED(IDC_BTN_ITEM_CLEAR_ALL, &CShadowPackDlg::OnBnClickedBtnItemClearAll)
 	ON_BN_CLICKED(IDC_BTN_CANCEL, &CShadowPackDlg::OnBnClickedBtnCancel)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_DATA, &CShadowPackDlg::OnLvnItemChangedListData)
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST_DATA, &CShadowPackDlg::OnNMDblclkListData)
+	ON_BN_CLICKED(IDC_BTN_ITEM_DELETE, &CShadowPackDlg::OnBnClickedBtnItemDelete)
 END_MESSAGE_MAP()
 
 
-// CShadowPackDlg œ˚œ¢¥¶¿Ì≥Ã–Ú
+// CShadowPackDlg Ê∂àÊÅØÂ§ÑÁêÜÁ®ãÂ∫è
 
 BOOL CShadowPackDlg::OnInitDialog()
 {
-#ifdef _DEBUG
-	m_msOld.Checkpoint();
-#endif
-
 	CDialog::OnInitDialog();
 
-	// Ω´°∞πÿ”⁄...°±≤Àµ•œÓÃÌº”µΩœµÕ≥≤Àµ•÷–°£
+	// Â∞Ü‚ÄúÂÖ≥‰∫é...‚ÄùËèúÂçïÈ°πÊ∑ªÂä†Âà∞Á≥ªÁªüËèúÂçï‰∏≠„ÄÇ
 
-	// IDM_ABOUTBOX ±ÿ–Î‘⁄œµÕ≥√¸¡Ó∑∂Œßƒ⁄°£
+	// IDM_ABOUTBOX ÂøÖÈ°ªÂú®Á≥ªÁªüÂëΩ‰ª§ËåÉÂõ¥ÂÜÖ„ÄÇ
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL)
+	if (pSysMenu != nullptr)
 	{
 		BOOL bNameValid;
 		CString strAboutMenu;
@@ -117,22 +106,19 @@ BOOL CShadowPackDlg::OnInitDialog()
 		}
 	}
 
-	// …Ë÷√¥À∂‘ª∞øÚµƒÕº±Í°£µ±”¶”√≥Ã–Ú÷˜¥∞ø⁄≤ª «∂‘ª∞øÚ ±£¨øÚº‹Ω´◊‘∂Ø
-	//  ÷¥––¥À≤Ÿ◊˜
-	SetIcon(m_hIcon, TRUE);			// …Ë÷√¥ÛÕº±Í
-	SetIcon(m_hIcon, FALSE);		// …Ë÷√–°Õº±Í
+	// ËÆæÁΩÆÊ≠§ÂØπËØùÊ°ÜÁöÑÂõæÊ†á„ÄÇ  ÂΩìÂ∫îÁî®Á®ãÂ∫è‰∏ªÁ™óÂè£‰∏çÊòØÂØπËØùÊ°ÜÊó∂ÔºåÊ°ÜÊû∂Â∞ÜËá™Âä®
+	//  ÊâßË°åÊ≠§Êìç‰Ωú
+	SetIcon(m_hIcon, TRUE);			// ËÆæÁΩÆÂ§ßÂõæÊ†á
+	SetIcon(m_hIcon, FALSE);		// ËÆæÁΩÆÂ∞èÂõæÊ†á
 
-	// TODO: ‘⁄¥ÀÃÌº”∂ÓÕ‚µƒ≥ı ºªØ¥˙¬Î
+	ShowWindow(SW_MINIMIZE);
 
-	m_ctlImageQuota.Initialize(this);
+	// TODO: Âú®Ê≠§Ê∑ªÂä†È¢ùÂ§ñÁöÑÂàùÂßãÂåñ‰ª£Á†Å
+	m_ctlCapicityChart.Initialize(this, IDC_IMAGE_CAPICITY);
+	m_ctlProgress.Initialize(this, IDC_PROGRESS);
+	m_ctlFileManager.Initialize(this, IDC_LIST_DATA);
 
-	m_Progress.Initialize(this);
-
-	m_ctlPackItemList.Initialize(this);
-
-	UpdateUI();
-
-	return TRUE;  // ≥˝∑«Ω´Ωπµ„…Ë÷√µΩøÿº˛£¨∑Ò‘Ú∑µªÿ TRUE
+	return TRUE;  // Èô§ÈùûÂ∞ÜÁÑ¶ÁÇπËÆæÁΩÆÂà∞Êéß‰ª∂ÔºåÂê¶ÂàôËøîÂõû TRUE
 }
 
 void CShadowPackDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -148,19 +134,19 @@ void CShadowPackDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// »Áπ˚œÚ∂‘ª∞øÚÃÌº”◊Ó–°ªØ∞¥≈•£¨‘Ú–Ë“™œ¬√Êµƒ¥˙¬Î
-//  ¿¥ªÊ÷∆∏√Õº±Í°£∂‘”⁄ π”√Œƒµµ/ ”Õºƒ£–Õµƒ MFC ”¶”√≥Ã–Ú£¨
-//  ’‚Ω´”…øÚº‹◊‘∂ØÕÍ≥…°£
+// Â¶ÇÊûúÂêëÂØπËØùÊ°ÜÊ∑ªÂä†ÊúÄÂ∞èÂåñÊåâÈíÆÔºåÂàôÈúÄË¶Å‰∏ãÈù¢ÁöÑ‰ª£Á†Å
+//  Êù•ÁªòÂà∂ËØ•ÂõæÊ†á„ÄÇ  ÂØπ‰∫é‰ΩøÁî®ÊñáÊ°£/ËßÜÂõæÊ®°ÂûãÁöÑ MFC Â∫îÁî®Á®ãÂ∫èÔºå
+//  ËøôÂ∞ÜÁî±Ê°ÜÊû∂Ëá™Âä®ÂÆåÊàê„ÄÇ
 
 void CShadowPackDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ”√”⁄ªÊ÷∆µƒ…Ë±∏…œœ¬Œƒ
+		CPaintDC dc(this); // Áî®‰∫éÁªòÂà∂ÁöÑËÆæÂ§á‰∏ä‰∏ãÊñá
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		//  πÕº±Í‘⁄π§◊˜«¯æÿ–Œ÷–æ”÷–
+		// ‰ΩøÂõæÊ†áÂú®Â∑•‰ΩúÂå∫Áü©ÂΩ¢‰∏≠Â±Ö‰∏≠
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -168,7 +154,7 @@ void CShadowPackDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// ªÊ÷∆Õº±Í
+		// ÁªòÂà∂ÂõæÊ†á
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -177,517 +163,201 @@ void CShadowPackDlg::OnPaint()
 	}
 }
 
-
-
-//µ±”√ªßÕœ∂Ø◊Ó–°ªØ¥∞ø⁄ ±œµÕ≥µ˜”√¥À∫Ø ˝»°µ√π‚±Í
-//œ‘ æ°£
+//ÂΩìÁî®Êà∑ÊãñÂä®ÊúÄÂ∞èÂåñÁ™óÂè£Êó∂Á≥ªÁªüË∞ÉÁî®Ê≠§ÂáΩÊï∞ÂèñÂæóÂÖâÊ†á
+//ÊòæÁ§∫„ÄÇ
 HCURSOR CShadowPackDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CShadowPackDlg::UpdateUI()
+
+UINT __cdecl CShadowPackDlg::fnThread(LPVOID p)
 {
-	BOOL bMediaBtnOther = FALSE;
-	BOOL bMediaBtnOpen  = FALSE;
-	BOOL bShowProgress = FALSE;
-	BOOL bItemBtnClear = FALSE;
-	BOOL bItemBtnDelete = FALSE;
-	BOOL bItemBtnOther  = FALSE;
-	BOOL bItemBtnExport  = FALSE;
-	BOOL bMediaBtnSave = FALSE;
-
-	CString szInfo, szCap, szUsed;
-
-	bShowProgress = m_bInProgress;
-
-	bMediaBtnOther = (m_PackRoot.GetInputMedia() != NULL && ! bShowProgress);
-	bMediaBtnOpen  = (m_PackRoot.GetInputMedia() == NULL && ! bShowProgress);
-	bMediaBtnSave  = (m_PackRoot.GetInputMedia() != NULL && (m_PackRoot.IsDirty() 
-		||m_PackRoot.GetOutputMedia() && m_PackRoot.GetOutputMedia()->FormatChanged())
-		&& !bShowProgress);
-	bItemBtnClear = (!m_PackRoot.IsEmpty() && !bShowProgress);
-	bItemBtnOther = (m_PackRoot.GetInputMedia() != NULL && ! bShowProgress);
-	bItemBtnExport = !m_bInProgress && m_ctlPackItemList.GetSelectedCount() != 0;
-	bItemBtnDelete = bItemBtnExport;
-
-	GetDlgItem(IDC_BTN_MEDIA_OPEN)->EnableWindow(bMediaBtnOpen);
-	GetDlgItem(IDC_BTN_MEDIA_CLOSE)->EnableWindow(bMediaBtnOther);
-	GetDlgItem(IDC_BTN_MEDIA_SAVE)->EnableWindow(bMediaBtnSave);
-	GetDlgItem(IDC_BTN_MEDIA_OPTION)->EnableWindow(bMediaBtnOther);
-
-	GetDlgItem(IDC_BTN_ITEM_DELETE)->EnableWindow(bItemBtnDelete);
-	GetDlgItem(IDC_BTN_ITEM_CLEAR_ALL)->EnableWindow(bItemBtnClear);
-	GetDlgItem(IDC_BTN_ITEM_ADD_FILE)->EnableWindow(bItemBtnOther);
-	GetDlgItem(IDC_BTN_ITEM_EXPORT)->EnableWindow(bItemBtnExport);
-	GetDlgItem(IDC_BTN_ITEM_ADD_DIR)->EnableWindow(bItemBtnOther);
-
-	GetDlgItem(IDC_BTN_CANCEL)->EnableWindow(bShowProgress && !m_bCancel);
-
-	m_ctlPackItemList.EnableWindow(!bShowProgress);
-
-	m_Progress.ShowProgressBar(bShowProgress && m_bShowProgressBar);
-	m_Progress.ShowInfoBar(bShowProgress && !m_bShowProgressBar);
-	m_Progress.SetInfo(_T(""));
-
-	CMenu *pSysMenu = GetSystemMenu(FALSE);
-	if(pSysMenu != NULL) {
-		pSysMenu->EnableMenuItem(SC_CLOSE, MF_BYCOMMAND| m_bInProgress? MF_DISABLED : MF_ENABLED);
-	}
-
-	CPackUtils::TranslateSize(m_PackRoot.GetOutputMedia() != NULL ? m_PackRoot.GetOutputMedia()->GetCapicity() : 0, szCap);
-	CPackUtils::TranslateSize(m_PackRoot.GetTotalDataSize(), szUsed);
-	szInfo.Format(IDS_CAPICITY_USED, szCap, szUsed);
-	m_ctlInfo2.SetWindowText(szInfo);
-
-	if(!bShowProgress) {
-		if(m_PackRoot.GetOutputMedia() && m_PackRoot.GetOutputMedia()->GetCapicity() != 0)
-			m_ctlImageQuota.SetFreePercent((INT)((m_PackRoot.GetOutputMedia()->GetCapicity() - m_PackRoot.GetTotalDataSize()) * 100 / m_PackRoot.GetOutputMedia()->GetCapicity()));
-		else
-			m_ctlImageQuota.SetFreePercent(100, FALSE);
-	}
-}
-
-
-void CShadowPackDlg::OnBnClickedOk()
-{
-	// TODO: ‘⁄¥ÀÃÌº”øÿº˛Õ®÷™¥¶¿Ì≥Ã–Ú¥˙¬Î
-	//OnOK();
-}
-
-void CShadowPackDlg::OnBnClickedCancel()
-{
-	// TODO: ‘⁄¥ÀÃÌº”øÿº˛Õ®÷™¥¶¿Ì≥Ã–Ú¥˙¬Î
-	//OnCancel();
-}
-
-CString CShadowPackDlg::fnGetPassword()
-{
-	CString strPassword(_T(""));
-
-	CPasswordDialog dlg;
-	if(dlg.DoModal() == IDOK) {
-		strPassword = dlg.m_strPassword;
-	} else {
-		strPassword = (_T(""));
-	}
-
-	return strPassword;
-}
-
-void CShadowPackDlg::Quit()
-{
-	CDialog::OnCancel();
-}
-
-void CShadowPackDlg::OnClose()
-{
-	if(!m_PackRoot.IsEmpty()) {
-		m_bQuit = TRUE;
-		OnBnClickedMediaClose();
-	} else {
-		Quit();
-	}
-}
-
-UINT __cdecl CShadowPackDlg::fnThread( LPVOID p )
-{
-	CPackThreadParam * pParam = (CPackThreadParam *)p;
-	CShadowPackDlg * pThis = pParam->m_pThis;
-	FN_PACK_THREAD pfn = pParam->m_pfn;
-	(pThis->*pfn)(pParam->m_pParam);
-	pThis->m_bInProgress = FALSE;
-	pThis->m_bShowProgressBar = FALSE;
-	pThis->m_bCancel = FALSE;
-	pThis->UpdateUI();
+	CPackThreadParam* pParam = (CPackThreadParam*)p;
+	(pParam->m_pThis->*(pParam->m_pFn))();
 	delete pParam;
-	if(pThis->m_bQuit) {
-		pThis->Quit();
-	}
 	return 0;
 }
 
-void CShadowPackDlg::StartThread(FN_PACK_THREAD fn, LPVOID param, BOOL bShowProgressBar)
+void CShadowPackDlg::StartThread(FN_PACK_THREAD fn)
 {
-	CPackThreadParam * pParam = new(std::nothrow) CPackThreadParam();
-	if(pParam) {
-		pParam->m_pfn = fn;
-		pParam->m_pThis = this;
-		pParam->m_pParam = param;
-		m_bInProgress = TRUE;
-		m_bCancel = FALSE;
-		m_bShowProgressBar = bShowProgressBar;
-		UpdateUI();
-		AfxBeginThread(fnThread, pParam);
-	}
+	CPackThreadParam* pParam = new CPackThreadParam(this, fn);
+	AfxBeginThread(fnThread, pParam);
 }
 
-
-void CShadowPackDlg::ThreadOpenMedia(LPVOID pParam)
+BOOL CShadowPackDlg::ShowLocationDirDlg(CString& strDir)
 {
-	CPackErrors Error;
-	CString strError;
-
-	if(!m_PackRoot.LoadPack(m_szPathName, m_szFileExt, (CPasswordGetter &)m_dlgPassword, m_bCancel, Error, m_Progress)) {
-		goto error;
-	}
-	
-	m_ctlPackItemList.LoadPackItem(&m_PackRoot);
-	return;
-error:
-	m_ctlPackItemList.LoadPackItem(&m_PackRoot);
-	strError.Format(IDS_ERROR_OPEN_MEDIA, Error.ToString());
-	AfxMessageBox(strError);
-	return;
-}
-
-
-void CShadowPackDlg::OnBnClickedMediaOpen()
-{
-	// create ext table from factory
-	CString szFilter = CMediaFactory::CreateExtTable();
-	CPackErrors Error;
-	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, NULL, 0, TRUE);
-	
-	if(dlg.DoModal() == IDOK) {
-
-		m_szPathName = dlg.GetPathName();
-		m_szFileExt  = dlg.GetFileExt();
-		
-		StartThread(&CShadowPackDlg::ThreadOpenMedia, NULL, FALSE);
-	}
-}
-
-void CShadowPackDlg::ThreadCloseMedia(LPVOID pParam)
-{
-	CPackErrors Error;
-	if(!m_PackRoot.Clear(Error, m_bCancel, m_Progress)) {
-		AfxMessageBox(Error.ToString());
-		goto error;
-	}
-
-	m_PackRoot.SetDirty(FALSE);
-	if(m_PackRoot.GetInputMedia()) {
-		m_PackRoot.GetInputMedia()->CloseMedia();
-		m_PackRoot.AttachInputMedia(NULL);
-	}
-	if(m_PackRoot.GetOutputMedia()) {
-		m_PackRoot.GetOutputMedia()->CloseMedia();
-		m_PackRoot.AttachOutputMedia(NULL);
-	}
-
-	m_ctlPackItemList.LoadPackItem(&m_PackRoot);
-
-	return;
-
-error:
-	m_ctlPackItemList.LoadPackItem(&m_PackRoot);
-	m_bQuit = FALSE;
-	return;
-}
-
-void CShadowPackDlg::CloseMedia()
-{
-	StartThread(&CShadowPackDlg::ThreadCloseMedia, NULL, FALSE);
-}
-
-void CShadowPackDlg::OnBnClickedMediaClose()
-{
-	if(NULL != m_PackRoot.GetInputMedia() || m_PackRoot.GetOutputMedia()) {
-		if(m_PackRoot.IsDirty() || m_PackRoot.GetOutputMedia()->FormatChanged()) {
-			if(AfxMessageBox(IDS_SAVE_DIRTY,MB_YESNO) == IDYES) {
-				OnBnClickedMediaSave();
-			} else {
-				CloseMedia();
-			}
-		} else {
-			CloseMedia();
-		}	
-	}
-}
-
-void CShadowPackDlg::OnBnClickedMediaOption()
-{
-	if( m_PackRoot.GetOutputMedia()->ShowOptionDlg()) {
-		UpdateUI();
-	}
-}
-
-void CShadowPackDlg::ThreadSaveMedia(LPVOID pParam)
-{
-	BOOL bRet;
-	CPackErrors Error;
-	CString strError;
-	m_bCancel = FALSE;
-
-	bRet = m_PackRoot.SavePack(m_szPathName, (CPasswordGetter &) m_dlgPassword ,m_bCancel, Error, m_Progress);
-
-	if(!bRet) {
-		strError.Format(IDS_ERROR_SAVE_MEDIA, Error.ToString());
-		AfxMessageBox(strError);
-		m_bQuit = FALSE;
-		return;
-	}
-
-	m_PackRoot.SetDirty(FALSE);
-
-	m_ctlPackItemList.LoadPackItem(m_PackRoot.GetCurrentDir());
-
-	if(m_bQuit) {
-		ThreadCloseMedia(pParam);
-	}
-}
-
-void CShadowPackDlg::OnBnClickedMediaSave()
-{
-	CFileDialog dlg(FALSE, m_PackRoot.GetOutputMedia()->GetDefaultExt(), _T("Output"), 
-				OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, NULL, 0, TRUE);
-
-	if(dlg.DoModal() == IDOK) {
-		m_szPathName = dlg.GetPathName();
-		m_szFileExt  = dlg.GetFileExt();
-		StartThread(&CShadowPackDlg::ThreadSaveMedia, NULL, FALSE);
-	}
-}
-
-BOOL CShadowPackDlg::ShowLocationDirDlg(CString & strDir)
-{
-		// get dir location
-		BROWSEINFO bi;
-		ZeroMemory(&bi, sizeof(BROWSEINFO));
-		bi.hwndOwner = GetSafeHwnd();
-		bi.ulFlags   = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;  
-		LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
-		BOOL bRet = FALSE;  
-		TCHAR szFolder[MAX_PATH*2];  
-		szFolder[0] = 0; 
-		if (pidl)  
-		{  
-			if (SHGetPathFromIDList(pidl, szFolder))    
-				bRet = TRUE;  
-			 IMalloc *pMalloc = NULL;  
-			 if (SUCCEEDED(SHGetMalloc(&pMalloc)) && pMalloc)  
-			{   
-				pMalloc->Free(pidl);   
-				pMalloc->Release();  
-			 }  
-		}  
-		strDir = szFolder;
-		return bRet;
-}
-
-void CShadowPackDlg::ThreadExportItem(LPVOID pParam)
-{
-	POSITION pos = m_ctlPackItemList.GetFirstSelectedItemPosition();
-	CArray<CPackItem *, CPackItem *> aExport;
-	CPackErrors Error;
+	// get dir location
+	BROWSEINFO bi;
+	ZeroMemory(&bi, sizeof(BROWSEINFO));
+	bi.hwndOwner = GetSafeHwnd();
+	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	BOOL bRet = FALSE;
-	CString strError;
-
-	if (pos != NULL) {
-		while(pos) {
-			INT nItem = m_ctlPackItemList.GetNextSelectedItem(pos);
-			CPackItem * p = (CPackItem *) m_ctlPackItemList.GetItemData(nItem);
-			aExport.Add(p);
-			TRACE(_T("add %s to export\n"), p->GetName());
+	TCHAR szFolder[MAX_PATH * 2];
+	szFolder[0] = 0;
+	if (pidl)
+	{
+		if (SHGetPathFromIDList(pidl, szFolder))
+			bRet = TRUE;
+		IMalloc* pMalloc = NULL;
+		if (SUCCEEDED(SHGetMalloc(&pMalloc)) && pMalloc)
+		{
+			pMalloc->Free(pidl);
+			pMalloc->Release();
 		}
+	}
+	strDir = szFolder;
+	return bRet;
+}
 
-		if(aExport.GetSize() == 0) {
-			return;
-		}
+void CShadowPackDlg::ThreadOpenMedia()
+{
+	CPackErrors Errors;
+	if (!m_ctlFileManager.LoadMedia(m_ctlProgress, m_dlgPassword, Errors)) {
+		AfxMessageBox(Errors.ToString());
+		m_ctlFileManager.DettachMedia();
+	}
+}
 
-		CString strDstPath;
-		if(aExport.GetSize() == 1 && aExport[0]->IsFile()) { // ºÏ≤È «≤ª «µ•“ªŒƒº˛£ø
-			CFileDialog dlg(FALSE, NULL, aExport[0]->GetName(), 
-				OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, NULL, 0, TRUE);
-			if(dlg.DoModal() == IDOK) {
-				strDstPath = dlg.GetPathName();
-				if(!m_PackRoot.ExportItemFileToDiskPath(aExport[0], dlg.GetFolderPath(), dlg.GetFileName(),m_bCancel, Error, m_Progress,
-					FALSE, FALSE, TRUE)) {
-					strError.Format(IDS_ERROR_EXPORT_ITEM, Error.ToString());
-					AfxMessageBox(strError);
-				}
-				
-			}
-		} else {
-			if(ShowLocationDirDlg(strDstPath)) {
-				if(!m_PackRoot.ExportItemToDiskPath(aExport, strDstPath, m_bCancel, Error, m_Progress)) {
-					strError.Format(IDS_ERROR_EXPORT_ITEM, Error.ToString());
-					AfxMessageBox(strError);
-				}
+
+void CShadowPackDlg::OnBnClickedBtnMediaOpen()
+{
+	CString szFilter = CMediaFactory::CreateExtTable();
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, 
+		szFilter, NULL, 0, TRUE);
+	if (!m_ctlFileManager.MediaAttached()) {
+		if (dlg.DoModal() == IDOK) {
+			m_szMediaPathName = dlg.GetPathName();
+			m_pMedia = CMediaFactory::CreateMediaFromExt(dlg.GetFileExt());
+			m_ctlProgress.Reset();
+			if(m_pMedia) {
+				m_ctlFileManager.AttachMedia(m_pMedia);
+				StartThread(&CShadowPackDlg::ThreadOpenMedia);
+			} 
+			else
+			{
+				CPackErrors Errors;
+				AfxMessageBox(Errors.ToString());
 			}
 		}
 	}
+}
 
+
+void CShadowPackDlg::OnBnClickedBtnMediaClose()
+{
+	if (m_ctlFileManager.MediaAttached()) {
+		if (m_ctlFileManager.IsDirty()) {
+			if (AfxMessageBox(_T("Save?"), MB_YESNO) == IDYES) {
+				m_bCloseOnSave = TRUE;
+				OnBnClickedBtnMediaSave();
+			} else {
+				m_ctlFileManager.DettachMedia();
+			}
+		} else {
+			m_ctlFileManager.DettachMedia();
+		}
+	}
+}
+
+void CShadowPackDlg::ThreadSaveMedia()
+{
+	CPackErrors Errors;
+	if (!m_ctlFileManager.Save(m_ctlProgress, m_dlgPassword, Errors)) {
+		AfxMessageBox(Errors.ToString());
+	} else {
+		if (m_bCloseOnSave) {
+			m_ctlFileManager.DettachMedia();
+			m_bCloseOnSave = FALSE;
+		}
+	}
+}
+
+void CShadowPackDlg::OnBnClickedBtnMediaSave()
+{
+	if (m_ctlFileManager.MediaAttached() && m_ctlFileManager.IsDirty()) {
+		m_ctlProgress.Reset();
+		StartThread(&CShadowPackDlg::ThreadSaveMedia);
+	}
+}
+
+
+void CShadowPackDlg::OnBnClickedBtnMediaOption()
+{
+	if(m_ctlFileManager.MediaAttached())
+		m_ctlFileManager.GetMedia()->ShowOptionDlg();
+}
+
+void CShadowPackDlg::ThreadExportItem()
+{
+	CPackErrors Errors;
+	if (m_ctlFileManager.GetSelectedItemCnt() == 1) {
+		if (!m_ctlFileManager.ExportFirstSelectedItemToFile(m_szItemPathName, m_ctlProgress, Errors)) {
+			AfxMessageBox(Errors.ToString());
+		}
+	} else {
+		if (!m_ctlFileManager.ExportSelectedItemsToDir(m_szItemPathName, m_ctlProgress, Errors)) {
+			AfxMessageBox(Errors.ToString());
+		}
+	}
 
 }
 
-void CShadowPackDlg::OnBnClickedItemExport()
+void CShadowPackDlg::OnBnClickedBtnItemExport()
 {
-	StartThread(&CShadowPackDlg::ThreadExportItem, NULL, FALSE);
-}
-
-void CShadowPackDlg::ThreadDeleteItem(LPVOID pParam)
-{
-	POSITION pos;
-	CPackErrors Error;
-
-	pos = m_ctlPackItemList.GetFirstSelectedItemPosition();
-
-	while(pos) {
-		INT nItem = m_ctlPackItemList.GetNextSelectedItem(pos);
-		CPackItem * pItem = (CPackItem *) m_ctlPackItemList.GetItemData(nItem);
-		if(!m_PackRoot.DeleteItem(pItem, Error, m_bCancel, m_Progress)) {
-			AfxMessageBox(Error.ToString());
-			break;
+	if (m_ctlFileManager.MediaAttached() && m_ctlFileManager.GetSelectedItemCnt()) {
+		m_ctlProgress.Reset();
+		if (m_ctlFileManager.GetSelectedItemCnt() == 1) {
+			CFileDialog dlg(FALSE, NULL, m_ctlFileManager.GetFirstSelectedItemName(),
+				OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, NULL, 0, TRUE);
+			if (dlg.DoModal() == IDOK) {
+				m_szItemPathName = dlg.GetPathName();
+				StartThread(&CShadowPackDlg::ThreadExportItem);
+			}
+		} else {
+			if (ShowLocationDirDlg(m_szItemPathName)) {
+				StartThread(&CShadowPackDlg::ThreadExportItem);
+			}
 		}
 		
 	}
-
-	m_ctlPackItemList.LoadPackItem(m_PackRoot.GetCurrentDir());
 }
 
-void CShadowPackDlg::OnBnClickedItemDelete()
+void CShadowPackDlg::ThreadAddItem()
 {
-	StartThread(&CShadowPackDlg::ThreadDeleteItem, NULL, FALSE);
-}
-
-
-void CShadowPackDlg::ThreadAddItemDir(LPVOID pParam)
-{
-	CPackErrors Error;
-	if(!m_PackRoot.AddItemDir(m_szPathName, m_PackRoot.GetCurrentDir(), Error, m_bCancel, m_Progress)) {
-		AfxMessageBox(Error.ToString());		
+	CPackErrors Errors;
+	if (!m_ctlFileManager.AddItemFromFile(m_szItemPathName, m_ctlProgress, Errors)) {
+		AfxMessageBox(Errors.ToString());
 	}
-
-	m_ctlPackItemList.LoadPackItem(m_PackRoot.GetCurrentDir());
 }
 
-void CShadowPackDlg::OnBnClickedItemAddDir()
+void CShadowPackDlg::OnBnClickedBtnItemAdd()
 {
-	if(ShowLocationDirDlg(m_szPathName)) {
-		StartThread(&CShadowPackDlg::ThreadAddItemDir, NULL, FALSE);
-	}	
-}
-
-void CShadowPackDlg::ThreadAddItemFile(LPVOID pParam)
-{
-	POSITION pos;
-	CFileDialog * pdlg = (CFileDialog *)pParam;
-	CPackErrors Error;
-	pos = pdlg->GetStartPosition();
-	while(pos) {
-		CString strPath = pdlg->GetNextPathName(pos);
-		if(!m_PackRoot.AddItemFile(strPath, m_PackRoot.GetCurrentDir(), Error)) {
-			AfxMessageBox(Error.ToString());
-			break;
-		}
-		CString info;
-		info.Format(IDS_ADD_FILE, strPath);
-		m_Progress.SetInfo(info);
-	}
-	delete [] pdlg->GetOFN().lpstrFile;
-	delete pdlg;
-	m_ctlPackItemList.LoadPackItem(m_PackRoot.GetCurrentDir());
-}
-
-void CShadowPackDlg::OnBnClickedItemAddFile()
-{
-	static TCHAR BASED_CODE szFilter[] = 
+	static TCHAR BASED_CODE szFilter[] =
 		_T("All Files (*.*)|*.*||");
-	INT nMaxFiles = 1024;
-	TCHAR * pBuffer = new(std::nothrow) TCHAR[(nMaxFiles * (MAX_PATH + 1)) + 1];
-	if(!pBuffer) {
-		return;
-	}
-	ZeroMemory(pBuffer, (nMaxFiles * (MAX_PATH + 1)) + 1);
-	CFileDialog *pdlg = new CFileDialog(TRUE, NULL, NULL, OFN_ALLOWMULTISELECT|OFN_EXPLORER  , szFilter, NULL, 0, TRUE);
-	if(pdlg) {
-		pdlg->GetOFN().lpstrFile = pBuffer;
-		pdlg->GetOFN().nMaxFile = nMaxFiles;
-
-		if(pdlg->DoModal() == IDOK) {
-			StartThread(&CShadowPackDlg::ThreadAddItemFile, pdlg, FALSE);
-		} else {
-			delete [] pBuffer;
-			pBuffer = NULL;
-			delete pdlg;
-			pdlg = NULL;
-		}
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_EXPLORER, szFilter, NULL, 0, TRUE);
+	if (dlg.DoModal() == IDOK) {
+		m_szItemPathName = dlg.GetPathName();
+		StartThread(&CShadowPackDlg::ThreadAddItem);
 	}
 }
 
-void CShadowPackDlg::ThreadClearItem(LPVOID pParam)
+void CShadowPackDlg::OnBnClickedBtnItemDelete()
 {
-	CPackErrors Error;
-
-	if(!m_PackRoot.Clear(Error, m_bCancel, m_Progress)) {
-		AfxMessageBox(Error.ToString());
-	}
-	
-	m_ctlPackItemList.LoadPackItem(m_PackRoot.GetCurrentDir());
+	m_ctlFileManager.DeleteSelectedItems();
 }
 
-void CShadowPackDlg::OnBnClickedItemClear()
+void CShadowPackDlg::OnBnClickedBtnItemClearAll()
 {
-	StartThread(&CShadowPackDlg::ThreadClearItem, NULL, FALSE);
+	m_ctlFileManager.ClearAllItems();
 }
+
 
 void CShadowPackDlg::OnBnClickedBtnCancel()
 {
-	GetDlgItem(IDC_BTN_CANCEL)->EnableWindow(FALSE);
-	m_bCancel = TRUE;
-}
-
-void CShadowPackDlg::OnLvnItemChangedListData(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	CString szInfo;
-	BOOL bEnable = TRUE;	
-	POSITION pos = m_ctlPackItemList.GetFirstSelectedItemPosition();
-
-	//TRACE(_T("OnLvnItemChangedListData %d %u %u\n"), pNMLV->iItem, pNMLV->uOldState, pNMLV->uNewState);
-	
-	if (pos == NULL)
-	{
-	   TRACE(_T("No items were selected!\n"));
-	   bEnable = FALSE;
-	}
-	else
-	{
-	   while (pos)
-	   {
-		  INT nItem = m_ctlPackItemList.GetNextSelectedItem(pos);
-		  CPackItem * pItem = (CPackItem *)m_ctlPackItemList.GetItemData(nItem);
-		  if(pItem->IsRoot()) {
-			bEnable = FALSE;
-		  }
-	   }
-	}
-
-	GetDlgItem(IDC_BTN_ITEM_DELETE)->EnableWindow(bEnable);
-	GetDlgItem(IDC_BTN_ITEM_EXPORT)->EnableWindow(bEnable);
-
-	*pResult = 0;
+	m_ctlProgress.Cancel();
 }
 
 
-void CShadowPackDlg::OnNMDblclkListData(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	//TRACE(_T("OnNMDblclkListData: item %d db clicked!\n"), pNMItemActivate->iItem);
-	if(pNMItemActivate->iItem >= 0) {
-		CPackItem * pItem = (CPackItem *) m_ctlPackItemList.GetItemData(pNMItemActivate->iItem);
-		if(pItem != NULL) {
-			if(pItem->IsDir() || pItem->IsRoot()) {
-				m_ctlPackItemList.LoadPackItem(pItem);
-				m_PackRoot.SetCurrentDir(pItem);
-			} else if(pItem->IsFile()) {
-				CString strFile;
-				strFile.Format(_T("should open file %s"), pItem->GetDiskLocation());
-				AfxMessageBox(strFile);
-			}
-		}
-	}
-	*pResult = 0;
-}
+

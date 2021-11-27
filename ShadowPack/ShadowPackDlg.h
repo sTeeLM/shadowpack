@@ -1,110 +1,87 @@
-
-// ShadowPackDlg.h : Õ∑Œƒº˛
+Ôªø
+// ShadowPackDlg.h: Â§¥Êñá‰ª∂
 //
 
 #pragma once
 
-#include "PackChart.h"
-#include "Progress.h"
-#include "PackItemList.h"
-#include "PackItem.h"
-#include "Pack.h"
-#include "Media.h"
-#include "PackErrors.h"
-#include "PasswordDialog.h"
+#include "ChartControl.h"
+#include "ProgressControl.h"
+#include "FileManager.h"
+#include "PasswordDlg.h"
 
-// CShadowPackDlg ∂‘ª∞øÚ
+// CShadowPackDlg ÂØπËØùÊ°Ü
 class CShadowPackDlg : public CDialog
 {
-// ππ‘Ï
+// ÊûÑÈÄ†
 public:
-	CShadowPackDlg(CWnd* pParent = NULL);	// ±Í◊ºππ‘Ï∫Ø ˝
+	CShadowPackDlg(CWnd* pParent = nullptr);	// Ê†áÂáÜÊûÑÈÄ†ÂáΩÊï∞
 
-// ∂‘ª∞øÚ ˝æ›
+// ÂØπËØùÊ°ÜÊï∞ÊçÆ
+#ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_SHADOWPACK_DIALOG };
+#endif
 
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV ÷ß≥÷
+	protected:
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV ÊîØÊåÅ
 
 
-//  µœ÷
-public:
-	static UINT __cdecl fnThread( LPVOID pParam );
-	static CString fnGetPassword();
-	
+// ÂÆûÁé∞
 protected:
 	HICON m_hIcon;
 
-	// …˙≥…µƒœ˚œ¢”≥…‰∫Ø ˝
+	// ÁîüÊàêÁöÑÊ∂àÊÅØÊò†Â∞ÑÂáΩÊï∞
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnClose();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedBtnMediaOpen();
+	afx_msg void OnBnClickedBtnMediaClose();
+	afx_msg void OnBnClickedBtnMediaSave();
+	afx_msg void OnBnClickedBtnMediaOption();
+	afx_msg void OnBnClickedBtnItemExport();
+	afx_msg void OnBnClickedBtnItemAdd();
+	afx_msg void OnBnClickedBtnItemClearAll();
+	afx_msg void OnBnClickedBtnCancel();
+	afx_msg void OnBnClickedBtnItemDelete();
 
-typedef void (CShadowPackDlg::*FN_PACK_THREAD) (LPVOID pParam);
-
-	class CPackThreadParam {
-	public:
-		CPackThreadParam() {};
-		virtual ~CPackThreadParam() {};
-	public:
-		CShadowPackDlg * m_pThis;
-		FN_PACK_THREAD m_pfn;
-		LPVOID m_pParam;
-	};
-
-protected:
-	CPasswordDialog m_dlgPassword;
-	CPackChart m_ctlImageQuota;
-	CProgress m_Progress;
-	CStatic   m_ctlInfo2;
-	CPackItemList m_ctlPackItemList;
-	CPack m_PackRoot;
-	BOOL m_bInProgress;
-	BOOL m_bShowProgressBar;
-	BOOL m_bQuit;
-	BOOL m_bCancel;
-
-	// cache...
-	CString m_szPathName;
-	CString m_szFileExt;
-
-#ifdef _DEBUG
-	CMemoryState m_msOld;
-#endif
-
-
-protected:
-	void Quit();
-	void UpdateUI();
-	void CloseMedia();
-	BOOL ShowLocationDirDlg(CString & strDir);
-	void StartThread(FN_PACK_THREAD fn, LPVOID pParam = NULL, BOOL bShowProgressBar = TRUE);
-	void ThreadSaveMedia(LPVOID pParam);
-	void ThreadOpenMedia(LPVOID pParam);
-	void ThreadCloseMedia(LPVOID pParam);
-	void ThreadClearItem(LPVOID pParam);
-	void ThreadExportItem(LPVOID pParam);
-	void ThreadDeleteItem(LPVOID pParam);
-	void ThreadAddItemDir(LPVOID pParam);
-	void ThreadAddItemFile(LPVOID pParam);
-	
+	BOOL ShowLocationDirDlg(CString& strDir);
 
 public:
-	afx_msg void OnBnClickedOk();
-	afx_msg void OnBnClickedCancel();
-	afx_msg void OnBnClickedItemDelete();
-	afx_msg void OnBnClickedMediaOpen();
-	afx_msg void OnBnClickedMediaClose();
-	afx_msg void OnBnClickedMediaOption();
-	afx_msg void OnBnClickedMediaSave();
-	afx_msg void OnBnClickedItemExport();
-	afx_msg void OnBnClickedItemAddDir();
-	afx_msg void OnBnClickedItemAddFile();
-	afx_msg void OnBnClickedItemClear();
-	afx_msg void OnBnClickedBtnCancel();
-	afx_msg void OnLvnItemChangedListData(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMDblclkListData(NMHDR *pNMHDR, LRESULT *pResult);
+	CChartControl m_ctlCapicityChart;
+	CStatic m_ctlCapicityInfo;
+	CStatic m_ctlFooterInfo;
+	CProgressControl m_ctlProgress;
+	CFileManager m_ctlFileManager;
+	CPasswordDlg m_dlgPassword;
+
+public:
+	CString m_szMediaPathName;
+	CString m_szItemPathName;
+	BOOL m_bCloseOnSave;
+	CMediaBase* m_pMedia;
+
+protected:
+	typedef void (CShadowPackDlg::* FN_PACK_THREAD) ();
+	class CPackThreadParam
+	{
+	public:
+		CPackThreadParam(CShadowPackDlg* pThis, FN_PACK_THREAD pFn):
+			m_pThis(pThis),
+			m_pFn(pFn)
+		{}
+		virtual ~CPackThreadParam() {}
+	public:
+		CShadowPackDlg* m_pThis;
+		FN_PACK_THREAD  m_pFn;
+	};
+	void CShadowPackDlg::StartThread(FN_PACK_THREAD fn);
+	static UINT __cdecl fnThread(LPVOID p);
+protected:
+	void ThreadOpenMedia();
+	void ThreadSaveMedia();
+	void ThreadExportItem();
+	void ThreadAddItem();
+	
 };

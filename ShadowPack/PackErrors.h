@@ -1,5 +1,7 @@
 #pragma once
 
+#include "framework.h"
+
 class CPackErrors
 {
 public:
@@ -19,15 +21,15 @@ public:
 			PE_NOMEM,          // no memory
 			PE_INTERNAL,       // other error, bug??
 			PE_COUNT
-	}pack_error_t;
+	}PACK_ERROR_T;
 
 public:
 	CPackErrors();
 	~CPackErrors();
 	CString & ToString();
-	void SetError(pack_error_t eErrorCode, LPCTSTR szPath = NULL, LPCTSTR szReason = NULL);
-	pack_error_t GetError();
+	void SetError(PACK_ERROR_T eErrorCode, LPCTSTR szPath = NULL, LPCTSTR szReason = NULL);
+	PACK_ERROR_T GetError();
 private:
-	pack_error_t m_eErrorCode;
+	PACK_ERROR_T m_eErrorCode;
 	CString m_eString;
 };

@@ -1,26 +1,8 @@
+ï»¿#pragma once
 
-#pragma once
+// åŒ…æ‹¬ SDKDDKVer.h å°†å®šä¹‰å¯ç”¨çš„æœ€é«˜ç‰ˆæœ¬çš„ Windows å¹³å°ã€‚
 
-// ÒÔÏÂºê¶¨ÒåÒªÇóµÄ×îµÍÆ½Ì¨¡£ÒªÇóµÄ×îµÍÆ½Ì¨
-// ÊÇ¾ßÓÐÔËÐÐÓ¦ÓÃ³ÌÐòËùÐè¹¦ÄÜµÄ Windows¡¢Internet Explorer µÈ²úÆ·µÄ
-// ×îÔç°æ±¾¡£Í¨¹ýÔÚÖ¸¶¨°æ±¾¼°¸üµÍ°æ±¾µÄÆ½Ì¨ÉÏÆôÓÃËùÓÐ¿ÉÓÃµÄ¹¦ÄÜ£¬ºê¿ÉÒÔ
-// Õý³£¹¤×÷¡£
+//å¦‚æžœè¦ä¸ºä»¥å‰çš„ Windows å¹³å°ç”Ÿæˆåº”ç”¨ç¨‹åºï¼Œè¯·åŒ…æ‹¬ WinSDKVer.hï¼Œå¹¶
+// å°† _WIN32_WINNT å®è®¾ç½®ä¸ºè¦æ”¯æŒçš„å¹³å°ï¼Œç„¶åŽå†åŒ…æ‹¬ SDKDDKVer.hã€‚
 
-// Èç¹û±ØÐëÒªÕë¶ÔµÍÓÚÒÔÏÂÖ¸¶¨°æ±¾µÄÆ½Ì¨£¬ÇëÐÞ¸ÄÏÂÁÐ¶¨Òå¡£
-// ÓÐ¹Ø²»Í¬Æ½Ì¨¶ÔÓ¦ÖµµÄ×îÐÂÐÅÏ¢£¬Çë²Î¿¼ MSDN¡£
-#ifndef WINVER                          // Ö¸¶¨ÒªÇóµÄ×îµÍÆ½Ì¨ÊÇ Windows Vista¡£
-#define WINVER 0x0600           // ½«´ËÖµ¸ü¸ÄÎªÏàÓ¦µÄÖµ£¬ÒÔÊÊÓÃÓÚ Windows µÄÆäËû°æ±¾¡£
-#endif
-
-#ifndef _WIN32_WINNT            // Ö¸¶¨ÒªÇóµÄ×îµÍÆ½Ì¨ÊÇ Windows Vista¡£
-#define _WIN32_WINNT 0x0600     // ½«´ËÖµ¸ü¸ÄÎªÏàÓ¦µÄÖµ£¬ÒÔÊÊÓÃÓÚ Windows µÄÆäËû°æ±¾¡£
-#endif
-
-#ifndef _WIN32_WINDOWS          // Ö¸¶¨ÒªÇóµÄ×îµÍÆ½Ì¨ÊÇ Windows 98¡£
-#define _WIN32_WINDOWS 0x0410 // ½«´ËÖµ¸ü¸ÄÎªÊÊµ±µÄÖµ£¬ÒÔÊÊÓÃÓÚ Windows Me »ò¸ü¸ß°æ±¾¡£
-#endif
-
-#ifndef _WIN32_IE                       // Ö¸¶¨ÒªÇóµÄ×îµÍÆ½Ì¨ÊÇ Internet Explorer 7.0¡£
-#define _WIN32_IE 0x0700        // ½«´ËÖµ¸ü¸ÄÎªÏàÓ¦µÄÖµ£¬ÒÔÊÊÓÃÓÚ IE µÄÆäËû°æ±¾¡£
-#endif
-
+#include <SDKDDKVer.h>

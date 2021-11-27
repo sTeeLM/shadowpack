@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Media.h"
+#include "framework.h"
+#include "MediaBase.h"
 
-typedef CMedia * (*FN_MEDIA_FACTORY)();
-typedef BOOL (*FN_TEST_EXT)(LPCTSTR szExt);
-typedef LPCTSTR (*FN_GET_FILTER)();
 class CMediaFactory
 {
 public:
@@ -12,9 +10,12 @@ public:
 	virtual ~CMediaFactory(void);
 
 public:
-	static CMedia * CreateMediaFromExt(LPCTSTR szExt);
+	static CMediaBase* CreateMediaFromExt(LPCTSTR szExt);
 	static CString CreateExtTable();
 private:
+	typedef CMediaBase* (*FN_MEDIA_FACTORY)();
+	typedef BOOL(*FN_TEST_EXT)(LPCTSTR szExt);
+	typedef LPCTSTR(*FN_GET_FILTER)();
 	typedef struct {
 		FN_TEST_EXT fnTestExt;
 		FN_GET_FILTER fnGetFilter;

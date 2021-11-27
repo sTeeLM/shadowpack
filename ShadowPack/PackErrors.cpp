@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "pch.h"
 #include "PackErrors.h"
 #include "resource.h"
 
@@ -14,10 +14,10 @@ CPackErrors::~CPackErrors()
 
 }
 
-void  CPackErrors::SetError( CPackErrors::pack_error_t eErrorCode, LPCTSTR szPath /* = NULL*/, LPCTSTR szReason /* = 0*/)
+void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPath /* = NULL*/, LPCTSTR szReason /* = 0*/)
 {
 	m_eErrorCode = eErrorCode;
-
+/*
 	switch (m_eErrorCode) {
 	case PE_CANCELED:  // user canceled
 		m_eString.Format(IDS_PE_CANCELED);
@@ -60,9 +60,10 @@ void  CPackErrors::SetError( CPackErrors::pack_error_t eErrorCode, LPCTSTR szPat
 		break;
 	default: m_eString = _T("ERROR!");
 	}
+	*/
 }
 
- CPackErrors::pack_error_t  CPackErrors::GetError()
+ CPackErrors::PACK_ERROR_T  CPackErrors::GetError()
 {
 	return m_eErrorCode;
 }
