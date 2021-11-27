@@ -1,0 +1,54 @@
+﻿  BMPFileMedia.cpp
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29): error C2259: “CBMPFileMedia”: 无法实例化抽象类
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.h(3): message : 参见“CBMPFileMedia”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29): message : 由于下列成员:
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29): message : “BOOL CMediaBase::Load(LPCTSTR,CPasswordGetterBase &,CProgressBase &,CPackErrors &)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(17): message : 参见“CMediaBase::Load”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29): message : “BOOL CMediaBase::Save(LPCTSTR,CPasswordGetterBase &,CProgressBase &,CPackErrors &)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(21): message : 参见“CMediaBase::Save”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29): message : “void CMediaBase::Close(void)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(25): message : 参见“CMediaBase::Close”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29): message : “void CMediaBase::ShowOptionDlg(void)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(28): message : 参见“CMediaBase::ShowOptionDlg”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29): message : “INT CMediaBase::Read(UINT,LPBYTE,UINT)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(31): message : 参见“CMediaBase::Read”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29): message : “INT CMediaBase::Write(UINT,LPBYTE,UINT)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(32): message : 参见“CMediaBase::Write”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29,40): error C2259: “CBMPFileMedia”: 无法实例化抽象类
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.h(3): message : 参见“CBMPFileMedia”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29,40): message : 由于下列成员:
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29,40): message : “BOOL CMediaBase::Load(LPCTSTR,CPasswordGetterBase &,CProgressBase &,CPackErrors &)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(17): message : 参见“CMediaBase::Load”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29,40): message : “BOOL CMediaBase::Save(LPCTSTR,CPasswordGetterBase &,CProgressBase &,CPackErrors &)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(21): message : 参见“CMediaBase::Save”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29,40): message : “void CMediaBase::Close(void)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(25): message : 参见“CMediaBase::Close”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29,40): message : “void CMediaBase::ShowOptionDlg(void)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(28): message : 参见“CMediaBase::ShowOptionDlg”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29,40): message : “INT CMediaBase::Read(UINT,LPBYTE,UINT)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(31): message : 参见“CMediaBase::Read”的声明
+C:\Data\shadowpack\ShadowPack\BMPFileMedia.cpp(29,40): message : “INT CMediaBase::Write(UINT,LPBYTE,UINT)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\MediaBase.h(32): message : 参见“CMediaBase::Write”的声明
+  ChartControl.cpp
+  FileManager.cpp
+  MediaFactory.cpp
+C:\Data\shadowpack\ShadowPack\MediaFactory.cpp(46,1): fatal error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "pch.h"”?
+  PackErrors.cpp
+  PasswordDlg.cpp
+  ProgressControl.cpp
+  ShadowPack.cpp
+C:\Data\shadowpack\ShadowPack\ShadowPackDlg.h(55,19): error C2259: “CProgressControl”: 无法实例化抽象类
+C:\Data\shadowpack\ShadowPack\ProgressControl.h(7): message : 参见“CProgressControl”的声明
+C:\Data\shadowpack\ShadowPack\ShadowPackDlg.h(55,19): message : 由于下列成员:
+C:\Data\shadowpack\ShadowPack\ShadowPackDlg.h(55,19): message : “void CProgressBase::Cancel(void)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\ProgressBase.h(9): message : 参见“CProgressBase::Cancel”的声明
+  ShadowPackDlg.cpp
+C:\Data\shadowpack\ShadowPack\ShadowPackDlg.h(55,19): error C2259: “CProgressControl”: 无法实例化抽象类
+C:\Data\shadowpack\ShadowPack\ProgressControl.h(7): message : 参见“CProgressControl”的声明
+C:\Data\shadowpack\ShadowPack\ShadowPackDlg.h(55,19): message : 由于下列成员:
+C:\Data\shadowpack\ShadowPack\ShadowPackDlg.h(55,19): message : “void CProgressBase::Cancel(void)”: 是抽象的
+C:\Data\shadowpack\ShadowPack\ProgressBase.h(9): message : 参见“CProgressBase::Cancel”的声明
+C:\Data\shadowpack\ShadowPack\ShadowPackDlg.cpp(267,24): error C2039: "Save": 不是 "CFileManager" 的成员
+C:\Data\shadowpack\ShadowPack\FileManager.h(7): message : 参见“CFileManager”的声明
+  正在生成代码...
+C:\Data\shadowpack\ShadowPack\FileManager.cpp(61): error C4716: “CFileManager::GetFirstSelectedItemName”: 必须返回一个值

@@ -1,0 +1,4 @@
+﻿cl : 命令行 warning D9035: “Gm”选项已否决，并将在将来的版本中移除
+  custom_dir.c
+LINK : fatal error LNK1104: 无法打开文件“libtiff.lib”
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(1074,5): error MSB6006: “link.exe”已退出，代码为 1104。
