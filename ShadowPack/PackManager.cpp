@@ -64,7 +64,7 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 	// load media meta
 	Errors.SetError(CPackErrors::PE_OK);
 
-	if (!m_pMedia || !m_pMedia->Load(szFilePath, Password, Progress, Errors)) {
+	if (!m_pMedia || !m_pMedia->LoadMedia(szFilePath, Password, Progress, Errors)) {
 	if (!m_pMedia)
 		Errors.SetError(CPackErrors::PE_INTERNAL);
 		goto err;
@@ -105,7 +105,7 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 		}
 	}
 
-	ASSERT(m_nTotalSize == m_pMedia->GetUsedBytes());
+	ASSERT(m_nTotalSize == m_pMedia->GetMediaUsedBytes());
 
 	if (Errors.GetError() == CPackErrors::PE_EOF) {
 		Errors.SetError(CPackErrors::PE_OK);
@@ -160,7 +160,7 @@ BOOL CPackManager::SaveMedia(CProgressBase& Progress, CPackErrors& Errors)
 	Progress.Reset();
 
 	// save media
-	if (!m_pMedia->Save(m_strMediaPath, Progress, Errors)) {
+	if (!m_pMedia->SaveMedia(m_strMediaPath, Progress, Errors)) {
 		goto err;
 	}
 	return TRUE;
@@ -171,7 +171,7 @@ err:
  void CPackManager::DettachMedia()
 {
 	 ClearAllItems();
-	 m_pMedia->Close();
+	 m_pMedia->CloseMedia();
 	 delete m_pMedia;
 	 m_pMedia = NULL;
 	 m_bDirty = FALSE;
@@ -255,7 +255,7 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 
 	pPackItem = CPackItem::CreateItemFromFile(szItemPath, Progress, Errors);
 	if (!pPackItem) {
-		if (pPackItem->GetTotalSize() > (m_pMedia->GetTotalBytes() - m_nTotalSize)) {
+		if (pPackItem->GetTotalSize() > (m_pMedia->GetMediaTotalBytes() - m_nTotalSize)) {
 			Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
 			CPackItem::Free(pPackItem);
 		}
@@ -313,7 +313,7 @@ CMediaBase* CPackManager::GetMedia()
 
 BOOL CPackManager::IsDirty()
 {
-	return m_bDirty || (m_pMedia && m_pMedia->IsDirty());
+	return m_bDirty || (m_pMedia && m_pMedia->IsMediaDirty());
 }
 
 UINT CPackManager::GetTotalSize()

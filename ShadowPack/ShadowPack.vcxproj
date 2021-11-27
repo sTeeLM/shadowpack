@@ -196,6 +196,7 @@
     <ClInclude Include="PasswordDlg.h" />
     <ClInclude Include="PasswordGetterBase.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PixelImageMedia.h" />
     <ClInclude Include="ProgressBase.h" />
     <ClInclude Include="ProgressControl.h" />
     <ClInclude Include="Resource.h" />
@@ -217,6 +218,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PixelImageMedia.cpp" />
     <ClCompile Include="ProgressControl.cpp" />
     <ClCompile Include="ShadowPack.cpp" />
     <ClCompile Include="ShadowPackDlg.cpp" />

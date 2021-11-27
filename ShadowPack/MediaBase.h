@@ -11,34 +11,36 @@ class CMediaBase
 public:
 	CMediaBase() {}
 	virtual ~CMediaBase() {}
-
+protected:
+#define MEDIA_HEADER_SIGN 0x12abcdef
+	typedef struct _MEDIA_HEADER_T
+	{
+		DWORD dwSign;
+		DWORD dwDataSize;
+	}MEDIA_HEADER_T;
 public:
 // open and close
 	// load meta data of media into memory
-	virtual BOOL Load(LPCTSTR szFilePath, CPasswordGetterBase& PasswordGetter,
+	virtual BOOL LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordGetter,
 		CProgressBase& Progress, CPackErrors& Errors) = 0;
 
 	// save changes to file
-	virtual BOOL Save(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors) = 0;
+	virtual BOOL SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors) = 0;
 
 	// free all buffers
-	virtual void Close() = 0;
+	virtual void CloseMedia() = 0;
 
 // show options
-	virtual void ShowOptionDlg() = 0;
-
-// read and write
-	virtual INT Read(UINT nOffset, LPBYTE pBuffer, UINT nSize) = 0;
-	virtual INT Write(UINT nOffset, LPBYTE pBuffer, UINT nSize) = 0;
+	virtual void ShowMediaOptionDlg() = 0;
 
 // stream read and write
 	virtual CStreamBase * GetStream() = 0;
 
 // size
-	virtual UINT GetUsedBytes() = 0;
-	virtual UINT GetTotalBytes() = 0;
+	virtual UINT GetMediaUsedBytes() = 0;
+	virtual UINT GetMediaTotalBytes() = 0;
 
 // misc
-	virtual BOOL IsDirty() = 0;
+	virtual BOOL IsMediaDirty() = 0;
 
 };
