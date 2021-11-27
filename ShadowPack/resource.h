@@ -7,6 +7,9 @@
 #define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101
 #define IDD_SHADOWPACK_DIALOG           102
+#define IDS_COLUMN_NAME                 102
+#define IDS_COLUMN_TIME                 103
+#define IDS_COLUMN_SIZE                 104
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_PASSWORD             129
 #define IDC_LIST_DATA                   1000

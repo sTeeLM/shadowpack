@@ -1,4 +1,12 @@
 *.user
+*.manifest
+*.res
+*.tlog
+*.recipe
+*.pch
+*.log
+*.dep
+*.idb
 *.obj
 *.old
 *.ncb

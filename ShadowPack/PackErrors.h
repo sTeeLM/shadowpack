@@ -19,6 +19,8 @@ public:
 			PE_DUP_ITEM,        // dup item
 			PE_EXISTED,        // item exist
 			PE_NOMEM,          // no memory
+			PE_EOF,            // end of file
+			PE_TOO_LARGE_FILE, // file is too large
 			PE_INTERNAL,       // other error, bug??
 			PE_COUNT
 	}PACK_ERROR_T;

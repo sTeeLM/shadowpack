@@ -187,8 +187,8 @@
   <ItemGroup>
     <ClInclude Include="BMPFileMedia.h" />
     <ClInclude Include="ChartControl.h" />
-    <ClInclude Include="FileManager.h" />
-    <ClInclude Include="FileManagerBase.h" />
+    <ClInclude Include="PackManager.h" />
+    <ClInclude Include="PackManagerBase.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MediaBase.h" />
     <ClInclude Include="MediaFactory.h" />
@@ -201,12 +201,13 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ShadowPack.h" />
     <ClInclude Include="ShadowPackDlg.h" />
+    <ClInclude Include="StreamBase.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BMPFileMedia.cpp" />
     <ClCompile Include="ChartControl.cpp" />
-    <ClCompile Include="FileManager.cpp" />
+    <ClCompile Include="PackManager.cpp" />
     <ClCompile Include="MediaFactory.cpp" />
     <ClCompile Include="PackErrors.cpp" />
     <ClCompile Include="PasswordDlg.cpp" />

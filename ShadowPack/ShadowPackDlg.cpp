@@ -214,7 +214,7 @@ BOOL CShadowPackDlg::ShowLocationDirDlg(CString& strDir)
 void CShadowPackDlg::ThreadOpenMedia()
 {
 	CPackErrors Errors;
-	if (!m_ctlFileManager.LoadMedia(m_ctlProgress, m_dlgPassword, Errors)) {
+	if (!m_ctlFileManager.LoadMedia(m_szMediaPathName, m_ctlProgress, m_dlgPassword, Errors)) {
 		AfxMessageBox(Errors.ToString());
 		m_ctlFileManager.DettachMedia();
 	}
@@ -264,7 +264,7 @@ void CShadowPackDlg::OnBnClickedBtnMediaClose()
 void CShadowPackDlg::ThreadSaveMedia()
 {
 	CPackErrors Errors;
-	if (!m_ctlFileManager.Save(m_ctlProgress, m_dlgPassword, Errors)) {
+	if (!m_ctlFileManager.SaveMedia(m_ctlProgress, Errors)) {
 		AfxMessageBox(Errors.ToString());
 	} else {
 		if (m_bCloseOnSave) {

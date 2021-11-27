@@ -54,16 +54,19 @@
     <ClInclude Include="PackErrors.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="FileManagerBase.h">
+    <ClInclude Include="PackManagerBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="FileManager.h">
+    <ClInclude Include="PackManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MediaFactory.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="BMPFileMedia.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StreamBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,7 +92,7 @@
     <ClCompile Include="PackErrors.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FileManager.cpp">
+    <ClCompile Include="PackManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MediaFactory.cpp">

@@ -53,7 +53,7 @@ public:
 	CStatic m_ctlCapicityInfo;
 	CStatic m_ctlFooterInfo;
 	CProgressControl m_ctlProgress;
-	CFileManager m_ctlFileManager;
+	CPackManager m_ctlFileManager;
 	CPasswordDlg m_dlgPassword;
 
 public:
