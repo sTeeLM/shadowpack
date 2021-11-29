@@ -186,6 +186,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BMPFileMedia.h" />
+    <ClInclude Include="BytePerBlockMedia.h" />
     <ClInclude Include="ChartControl.h" />
     <ClInclude Include="PackManager.h" />
     <ClInclude Include="PackManagerBase.h" />
@@ -207,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BMPFileMedia.cpp" />
+    <ClCompile Include="BytePerBlockMedia.cpp" />
     <ClCompile Include="ChartControl.cpp" />
     <ClCompile Include="PackManager.cpp" />
     <ClCompile Include="MediaFactory.cpp" />
