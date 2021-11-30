@@ -26,8 +26,11 @@ public:
 		{};
 		virtual ~CPixelBlock() {}
 		BYTE GetByteFromBlocks(CBlockBase* pBlock, UINT nBlockPerByte);
-		void SetByteToBlocks(CBlockBase* pBlock, UINT nBlockPerByte);
+		void SetByteToBlocks(BYTE nData, CBlockBase* pBlock, UINT nBlockPerByte);
 		void CopyFrom(const CBlockBase* pBlock);
+	protected:
+		static BYTE F5LookupTable[4][8];
+		static BYTE F5RevLookupTable[8];
 	protected:
 		BYTE m_nRed;
 		BYTE m_nGreen;
@@ -44,8 +47,10 @@ public:
 	void GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE& nBlue);
 	void SetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
 	void GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
+
 protected:
 	UINT m_nWidth;
 	UINT m_nHeight;
+
 };
 

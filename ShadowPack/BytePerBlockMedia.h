@@ -27,7 +27,7 @@ protected:
 		virtual ~CBlockBase() {};
 	public:
 		virtual BYTE GetByteFromBlocks(CBlockBase* pBlock, UINT nBlockPerByte) = 0;
-		virtual void SetByteToBlocks(CBlockBase* pBlock, UINT nBlockPerByte) = 0;
+		virtual void SetByteToBlocks(BYTE nData, CBlockBase* pBlock, UINT nBlockPerByte) = 0;
 		virtual void CopyFrom(const CBlockBase * pBlock) = 0;
 	};
 	
