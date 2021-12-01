@@ -175,6 +175,7 @@ data = 0, target = 4, res = 0, res ^ target = 4, ext = 0
 data = 0, target = 5, res = 7, res ^ target = 2, ext = 0
 data = 0, target = 6, res = 7, res ^ target = 1, ext = 0
 data = 0, target = 7, res = 7, res ^ target = 0, ext = 0
+
 data = 1, target = 0, res = 1, res ^ target = 1, ext = 1
 data = 1, target = 1, res = 1, res ^ target = 0, ext = 1
 data = 1, target = 2, res = 6, res ^ target = 4, ext = 1
@@ -183,6 +184,7 @@ data = 1, target = 4, res = 6, res ^ target = 2, ext = 1
 data = 1, target = 5, res = 1, res ^ target = 4, ext = 1
 data = 1, target = 6, res = 6, res ^ target = 0, ext = 1
 data = 1, target = 7, res = 6, res ^ target = 1, ext = 1
+
 data = 2, target = 0, res = 2, res ^ target = 2, ext = 2
 data = 2, target = 1, res = 5, res ^ target = 4, ext = 2
 data = 2, target = 2, res = 2, res ^ target = 0, ext = 2
@@ -191,6 +193,7 @@ data = 2, target = 4, res = 5, res ^ target = 1, ext = 2
 data = 2, target = 5, res = 5, res ^ target = 0, ext = 2
 data = 2, target = 6, res = 2, res ^ target = 4, ext = 2
 data = 2, target = 7, res = 5, res ^ target = 2, ext = 2
+
 data = 3, target = 0, res = 4, res ^ target = 4, ext = 3
 data = 3, target = 1, res = 3, res ^ target = 2, ext = 3
 data = 3, target = 2, res = 3, res ^ target = 1, ext = 3
@@ -203,10 +206,10 @@ data = 3, target = 7, res = 3, res ^ target = 4, ext = 3
 */
 
 BYTE CPixelImageMedia::CPixelBlock::F5LookupTable[4][8] = {
-	{0,0,0,7,0,7,7,7},
-	{1,1,6,1,6,1,6,6},
-	{2,5,2,2,5,5,2,5},
-	{4,3,3,3,4,4,4,3},
+	{0,1,2,4,4,2,2,1},
+	{1,0,4,2,2,4,0,1},
+	{2,4,0,1,1,0,4,2},
+	{4,2,1,0,0,1,2,4},
 };
 
 BYTE CPixelImageMedia::CPixelBlock::F5RevLookupTable[8] = {
@@ -220,12 +223,12 @@ BYTE CPixelImageMedia::CPixelBlock::GetByteFromBlocks(CBlockBase* pBlock, UINT n
 	CPixelBlock* pPixelBlock = dynamic_cast<CPixelBlock*>(pBlock);
 	BYTE nRet = 0;
 	BYTE nTarget = 0;
-	if (nBlockPerByte == 1) {          /* R: 3, G 2, B 2*/
+	if (nBlockPerByte == 1) {          /* R: 3, G 2, B 3*/
 		nRet = pPixelBlock[0].m_nRed & 0x7;
 		nRet <<= 3;
 		nRet |= pPixelBlock[0].m_nGreen & 0x3;
 		nRet <<= 2;
-		nRet |= pPixelBlock[0].m_nBlue & 0x3;
+		nRet |= pPixelBlock[0].m_nBlue & 0x7;
 	} else if (nBlockPerByte == 2) {   /* R£º2£¬G 1£¬ B 1|R£º2£¬G 1£¬ B 1*/
 		nRet = pPixelBlock[0].m_nRed & 0x3;
 		nRet <<= 2;
@@ -260,6 +263,7 @@ BYTE CPixelImageMedia::CPixelBlock::GetByteFromBlocks(CBlockBase* pBlock, UINT n
 		nRet |= pPixelBlock[2].m_nBlue & 0x1;
 	} else if (nBlockPerByte == 4) {  
 		/* F5 algo , every pixel offer 3 bits as target hide 2 bits data, max 1 bit of target changed */
+		nRet = 0;
 		for (INT i = 0; i < 4; i++) {
 			nRet <<= 2;
 			nTarget = pPixelBlock[i].m_nRed & 0x1;
@@ -280,18 +284,82 @@ void CPixelImageMedia::CPixelBlock::SetByteToBlocks(BYTE nData, CBlockBase* pBlo
 	CPixelBlock* pPixelBlock = dynamic_cast<CPixelBlock*>(pBlock);
 	BYTE nTarget = 0;
 	BYTE nRet = 0;
-	if (nBlockPerByte == 1) {          /* R: 3, G 2, B 2*/
+	BYTE nRes;
+	if (nBlockPerByte == 1) {          /* R: 3, G 2, B 3*/
+		pPixelBlock[0].m_nRed &= ~0x7;
+		pPixelBlock[0].m_nRed |= ((nData & 0xE0) >> 5);
 
-	}
-	else if (nBlockPerByte == 2) {   /* R£º2£¬G 1£¬ B 1|R£º2£¬G 1£¬ B 1*/
+		pPixelBlock[0].m_nGreen &= ~0x3;
+		pPixelBlock[0].m_nGreen |= ((nData & 0x18) >> 3);
 
-	}
-	else if (nBlockPerByte == 3) {   /* R£º1£¬G 1£¬ B 1|R£º1£¬G 1£¬ B 1|R£º1£¬G 0£¬ B 1*/
+		pPixelBlock[0].m_nBlue &= ~0x7;
+		pPixelBlock[0].m_nBlue |= (nData & 0x7);
 
-	}
-	else if (nBlockPerByte == 4) {  /* F5 algo */
+	} else if (nBlockPerByte == 2) {   /* R£º2£¬G 1£¬ B 1|R£º2£¬G 1£¬ B 1*/
+
+		pPixelBlock[0].m_nRed &= ~0x3;
+		pPixelBlock[0].m_nRed |= ((nData & 0xC0) >> 6);
+
+		pPixelBlock[0].m_nGreen &= ~0x1;
+		pPixelBlock[0].m_nGreen |= ((nData & 0x20) >> 5);
+
+		pPixelBlock[0].m_nBlue &= ~0x1;
+		pPixelBlock[0].m_nBlue |= ((nData & 0x10) >> 4);
+
+
+		pPixelBlock[1].m_nRed &= ~0x3;
+		pPixelBlock[1].m_nRed |= ((nData & 0xC) >> 2);
+
+		pPixelBlock[1].m_nGreen &= ~0x1;
+		pPixelBlock[1].m_nGreen |= ((nData & 0x2) >> 1);
+
+		pPixelBlock[1].m_nBlue &= ~0x1;
+		pPixelBlock[1].m_nBlue |= (nData & 0x1);
+	} else if (nBlockPerByte == 3) {   /* R£º1£¬G 1£¬ B 1|R£º1£¬G 1£¬ B 1|R£º1£¬G 0£¬ B 1*/
+
+		pPixelBlock[0].m_nRed &= ~0x1;
+		pPixelBlock[0].m_nRed |= ((nData & 0x80) >> 7);
+		 
+		pPixelBlock[0].m_nGreen &= ~0x1;
+		pPixelBlock[0].m_nGreen |= ((nData & 0x40) >> 6);
+
+		pPixelBlock[0].m_nBlue &= ~0x1;
+		pPixelBlock[0].m_nBlue |= ((nData & 0x20) >> 5);
+
+		pPixelBlock[1].m_nRed &= ~0x1;
+		pPixelBlock[1].m_nRed |= ((nData & 0x10) >> 4);
+
+		pPixelBlock[1].m_nGreen &= ~0x1;
+		pPixelBlock[1].m_nGreen |= ((nData & 0x8) >> 3);
+
+		pPixelBlock[1].m_nBlue &= ~0x1;
+		pPixelBlock[1].m_nBlue |= ((nData & 0x4) >> 2);
+
+		pPixelBlock[2].m_nRed &= ~0x1;
+		pPixelBlock[2].m_nRed |= ((nData & 0x2) >> 1);
+
+		pPixelBlock[2].m_nBlue &= ~0x1;
+		pPixelBlock[2].m_nBlue |= (nData & 0x1);
+
+	} else if (nBlockPerByte == 4) {  /* F5 algo */
 		/* F5 algo , every pixel offer 3 bits as target hide 2 bits data, max 1 bit of target changed */
-		
+		nRet = 0xC0;
+		for (INT i = 0; i < 4; i++) {
+			nTarget = pPixelBlock[i].m_nRed & 0x1;
+			nTarget <<= 1;
+			nTarget |= pPixelBlock[i].m_nGreen & 0x1;
+			nTarget <<= 1;
+			nTarget |= pPixelBlock[i].m_nBlue & 0x1;
+			nRes = F5LookupTable[((nData & nRet) >> ((3 - i) * 2))][nTarget];
+			if (nRes == 4) {
+				pPixelBlock[i].m_nRed ^= 0x1;
+			} else if (nRes == 2) {
+				pPixelBlock[i].m_nGreen ^= 0x1;
+			} else { /* is 0 */
+				pPixelBlock[i].m_nBlue ^= 0x1;
+			}
+			nRet >>= 2;
+		}
 	}
 }
 
