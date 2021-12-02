@@ -1,5 +1,6 @@
 #pragma once
 #include "MediaBase.h"
+#include "PackCipher.h"
 
 // 几个“Block”包含一个byte的Media抽象实现
 class CBytePerBlockMedia :
@@ -18,6 +19,9 @@ protected:
 		DWORD dwBPBMediaSign;
 		DWORD dwBPBBlockPerByte;
 	}BPB_MEDIA_HEADER_T;
+
+#define MAX_BPB_MEDIA_BPB_SIZE 4
+#define MIN_BPB_MEDIA_BPB_SIZE 1
 
 	// 子类需要定义Block长啥样
 	class CBlockBase
@@ -44,10 +48,10 @@ public:
 	BOOL SaveMeta(CPackErrors& Errors);
 
 	// 实现了CStreamBase的接口
+#define BPB_STREAM_BATCH_SIZE 4096
 	BOOL Read(LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Error);
 	BOOL Write(const LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Error);
-	BOOL Seek(INT nOffset, INT nOrg, CPackErrors& Error);
-	UINT GetOffset();
+	BOOL Seek(INT nOffset, CStreamBase::SEEK_TYPE_T Org, CPackErrors& Error);
 
 // 实现CMediaBase接口
 	// stream read and write
@@ -55,13 +59,21 @@ public:
 	// size
 	UINT GetMediaUsedBytes();
 	UINT GetMediaTotalBytes();
+	BOOL SetMediaUsedBytes(UINT nSize, CPackErrors& Error);
 
 	// misc
-	BOOL IsMediaDirty();
+	BOOL IsMediaDirty() { return m_bIsDirty; }
+
+protected:
+	BOOL TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader);
+	BOOL RawReadData(LPVOID pBuffer, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
+	BOOL RawWriteData(LPVOID pBuffer, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
 
 protected:
 	BPB_MEDIA_HEADER_T m_Header;
 	CBlockBase* m_pBlockBuffer;
 	UINT m_nBlockBufferSize;
+	CPackCipher m_Cipher;
+	BOOL m_bIsDirty;
 };
 

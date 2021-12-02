@@ -13,7 +13,7 @@ public:
 		CProgressBase& Progress, CPackErrors& Errors);
 
 	// save changes to file
-	BOOL SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors);
+	BOOL SaveMedia(LPCTSTR szFilePath, UINT nDataSize, CProgressBase& Progress, CPackErrors& Errors);
 
 	// free all buffers
 	void CloseMedia();

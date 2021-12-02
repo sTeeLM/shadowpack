@@ -355,9 +355,9 @@ void CPixelImageMedia::CPixelBlock::SetByteToBlocks(BYTE nData, CBlockBase* pBlo
 				pPixelBlock[i].m_nRed ^= 0x1;
 			} else if (nRes == 2) {
 				pPixelBlock[i].m_nGreen ^= 0x1;
-			} else { /* is 0 */
+			} else if (nRes == 1) { 
 				pPixelBlock[i].m_nBlue ^= 0x1;
-			}
+			} 
 			nRet >>= 2;
 		}
 	}

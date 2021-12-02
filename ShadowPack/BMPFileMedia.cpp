@@ -62,7 +62,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	}
 
 	// alloc buffer
-	if (!CPixelImageMedia::GetBitmap().AllocBuffer(pinfoHeader->biWidth, pinfoHeader->biHeight, Errors)) {
+	if (!CPixelImageMedia::Alloc(pinfoHeader->biWidth, pinfoHeader->biHeight, Errors)) {
 		goto err;
 	}
 
@@ -82,7 +82,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 			Errors.SetError(CPackErrors::PE_IO);
 			goto err;
 		}
-		CPixelImageMedia::GetBitmap().SetScanline(i, pScanLine, CPixelImageMedia::CPixelBitmap::PIXEL_FORMAT_BGR);
+		CPixelImageMedia::SetScanline(i, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
 		Progress.Increase(1);
 	}
 
@@ -108,7 +108,7 @@ err:
 }
 
 // save changes to file
-BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors)
+BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, UINT nDataSize, CProgressBase& Progress, CPackErrors& Errors)
 {
 	BITMAPFILEHEADER fileHeader;
 	LPBITMAPINFOHEADER  pinfoHeader = NULL;
@@ -119,6 +119,10 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 
 	if (!m_pfileHeader) {
 		Errors.SetError(CPackErrors::PE_INTERNAL);
+		goto err;
+	}
+
+	if (!CPixelImageMedia::SetMediaUsedBytes(nDataSize,Errors)) {
 		goto err;
 	}
 
@@ -149,15 +153,17 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 
 	// write scanline
 	for (INT i = 0; i < pinfoHeader->biHeight; i++) {
-		CPixelImageMedia::GetBitmap().GetScanline(i, pScanLine, CPixelImageMedia::CPixelBitmap::PIXEL_FORMAT_BGR);
+		CPixelImageMedia::GetScanline(i, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
 		if (fwrite(pScanLine, nScanLineSize, 1, pFile) != 1) {
 			Errors.SetError(CPackErrors::PE_IO);
 			goto err;
 		}
 		Progress.Increase(1);
 	}
-
+	
 	// done!
+	m_bIsDirty = FALSE;
+
 	bRet = TRUE;
 
 err:
@@ -177,7 +183,7 @@ void CBMPFileMedia::CloseMedia()
 		m_pfileHeader = NULL;
 	}
 	// free buffer
-	CPixelImageMedia::GetBitmap().FreeBuffer();
+	CPixelImageMedia::Free();
 }
 
 void CBMPFileMedia::ShowMediaOptionDlg()

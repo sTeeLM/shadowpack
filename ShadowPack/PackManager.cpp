@@ -160,7 +160,7 @@ BOOL CPackManager::SaveMedia(CProgressBase& Progress, CPackErrors& Errors)
 	Progress.Reset();
 
 	// save media
-	if (!m_pMedia->SaveMedia(m_strMediaPath, Progress, Errors)) {
+	if (!m_pMedia->SaveMedia(m_strMediaPath, GetTotalSize(), Progress, Errors)) {
 		goto err;
 	}
 	return TRUE;

@@ -30,12 +30,14 @@ public:
 	virtual ~CPackCipher(void);
 	BOOL SetKeyType(pack_cipher_type_t type,LPCTSTR szPassword);
 	void EncryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset);
+	void EncryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset);
 	void DecryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset);
+	void DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset);
 	pack_cipher_type_t GetCipherType(){return m_Type;}
 private:
 	void GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex);
 	void GenerateKey(LPCTSTR szPassword);
-	void Crypt(LPVOID pBuffer, size_t nSize, BOOL bIsEncrypt, ULONGLONG nOffset);
+	void Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL bIsEncrypt, ULONGLONG nOffset);
 private:
 	BYTE m_Key[CIPHER_BLOCK_SIZE];
 	pack_cipher_type_t m_Type;

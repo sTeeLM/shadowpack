@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "BytePerBlockMedia.h"
 
-CBytePerBlockMedia::CBytePerBlockMedia():
+CBytePerBlockMedia::CBytePerBlockMedia() :
 	m_pBlockBuffer(NULL),
-	m_nBlockBufferSize(0)
+	m_nBlockBufferSize(0),
+	m_bIsDirty(FALSE)
 {
+	memset(&m_Header, 0, sizeof(m_Header));
 }
 
 CBytePerBlockMedia::~CBytePerBlockMedia()
@@ -37,53 +39,217 @@ void CBytePerBlockMedia::GetBlocks(UINT nBlockOffset, CBlockBase* pBlock, UINT n
 	}
 }
 
+BOOL CBytePerBlockMedia::TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader)
+{
+
+}
+
+BOOL CBytePerBlockMedia::RawReadData(LPVOID pBuffer, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors)
+{
+
+}
+
+BOOL CBytePerBlockMedia::RawWriteData(LPVOID pBuffer, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors)
+{
+	m_bIsDirty = TRUE;
+}
 
 BOOL CBytePerBlockMedia::LoadMeta(CPasswordGetterBase& PasswordGetter, CPackErrors& Errors)
 {
-	return 0;
+	BPB_MEDIA_HEADER_T Header, HeaderPlain;
+	CString strPassword;
+	BOOL bRet = FALSE;
+
+	// try header with crypt
+	
+test_encrypt:
+	for (INT i = 1; i <= 4; i++) {
+		if (RawReadData(&Header, sizeof(Header), i, Errors)) {
+
+			if (!strPassword.GetLength()) {
+				if (m_Cipher.SetKeyType(CPackCipher::CIPHER_NONE, NULL)) {
+					m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
+					if (TestHeaderValid(&HeaderPlain)) {
+						bRet = TRUE;
+						goto success;
+					}
+				}
+				else {
+					Errors.SetError(CPackErrors::PE_ENCRYPT);
+					goto err;
+				}
+				continue;
+			}
+
+			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_AES, (LPCTSTR)strPassword)) {
+				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
+				if (TestHeaderValid(&HeaderPlain)) {
+					bRet = TRUE;
+					goto success;
+				}
+			} else {
+				Errors.SetError(CPackErrors::PE_ENCRYPT);
+				goto err;
+			}
+
+			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_SEED, (LPCTSTR)strPassword)) {
+				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
+				if (TestHeaderValid(&HeaderPlain)) {
+					bRet = TRUE;
+					goto success;
+				}
+			} else {
+				Errors.SetError(CPackErrors::PE_ENCRYPT);
+				goto err;
+			}
+
+			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_CAMELLIA, (LPCTSTR)strPassword)) {
+				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
+				if (TestHeaderValid(&HeaderPlain)) {
+					bRet = TRUE;
+					goto success;
+				}
+			} else {
+				Errors.SetError(CPackErrors::PE_ENCRYPT);
+				goto err;
+			}
+		}
+	}
+
+	if (!strPassword.GetLength()) {
+		strPassword = PasswordGetter.GetPassword();
+		if (strPassword.GetLength())
+			goto test_encrypt;
+	}
+
+// 没有发现任何有效的头，作为空白文件处理
+	if (m_nBlockBufferSize >= sizeof(Header)) {
+		HeaderPlain.dwBPBMediaSign = MEDIA_HEADER_SIGN;
+		HeaderPlain.dwBPBBlockPerByte = 1;
+		HeaderPlain.BPBHeader.dwSign = BPB_MEDIA_HEADER_SIGN;
+		HeaderPlain.BPBHeader.dwDataSize = 0;
+		m_Cipher.SetKeyType(CPackCipher::CIPHER_NONE, NULL);
+		goto success;
+	} else {
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_PACK);
+	}
+
+err:
+	return bRet;
+
+success:
+	bRet = TRUE;
+	memcpy(&m_Header, &HeaderPlain, sizeof(HeaderPlain));
+	return bRet;
 }
 
 BOOL CBytePerBlockMedia::SaveMeta(CPackErrors& Errors)
 {
-	return 0;
+	BPB_MEDIA_HEADER_T Header;
+	// save header
+	m_Cipher.EncryptBlock(&m_Header, &Header, sizeof(Header), 0);
+	if (!RawWriteData(&Header, sizeof(Header), m_Header.dwBPBBlockPerByte, Errors)) {
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 BOOL CBytePerBlockMedia::Read(LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Error)
 {
-	return 0;
+	UINT nRead;
+	BOOL bRet = FALSE;
+	LPBYTE p = (LPBYTE)pBuffer;
+	ASSERT(nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL);
+	if (nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL) {
+		while (nSize > 0) {
+			nRead = nSize > BPB_STREAM_BATCH_SIZE ? BPB_STREAM_BATCH_SIZE : nSize;
+			if (!RawReadData(p, nRead, m_Header.dwBPBBlockPerByte, Error)) {
+				break;
+			}
+			m_Cipher.DecryptBlock(p, nRead, GetOffset() + sizeof(m_Header));
+			if (!Seek(nRead, STREAM_SEEK_CUR, Error)) {
+				break;
+			}
+			nSize -= nRead;
+			p += nRead;
+			Progress.Increase(nRead);
+		}
+		if (nSize == 0) {
+			bRet = TRUE;
+		}
+	}
+	return bRet;
 }
 
 BOOL CBytePerBlockMedia::Write(const LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Error)
 {
-	return 0;
+	UINT nWrite;
+	BOOL bRet = FALSE;
+	LPBYTE p = (LPBYTE)pBuffer;
+	ASSERT(nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL);
+	if (nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL) {
+		while (nSize > 0) {
+			nWrite = nSize > BPB_STREAM_BATCH_SIZE ? BPB_STREAM_BATCH_SIZE : nSize;
+			if (!RawWriteData(p, nWrite, m_Header.dwBPBBlockPerByte, Error)) {
+				break;
+			}
+			m_Cipher.EncryptBlock(p, nWrite, GetOffset() + sizeof(m_Header));
+			m_nOffset += nWrite;
+			if (!Seek(nWrite, STREAM_SEEK_CUR, Error)) {
+				break;
+			}
+			p += nWrite;
+			Progress.Increase(nWrite);
+		}
+		if (nSize == 0) {
+			bRet = TRUE;
+		}
+	}
+	return bRet;
 }
 
-BOOL CBytePerBlockMedia::Seek(INT nOffset, INT nOrg, CPackErrors& Error)
+BOOL CBytePerBlockMedia::Seek(INT nOffset, CStreamBase::SEEK_TYPE_T Org, CPackErrors& Error)
 {
-	return 0;
-}
-
-UINT CBytePerBlockMedia::GetOffset()
-{
-	return 0;
+	if (Org == STREAM_SEEK_SET && nOffset <= GetMediaTotalBytes() && nOffset >= 0) {
+		m_nOffset = nOffset;
+	} else if (Org == STREAM_SEEK_CUR && (nOffset + m_nOffset) <= GetMediaTotalBytes() && (nOffset + m_nOffset) >= 0) {
+		m_nOffset += nOffset;
+	} else if (Org == STREAM_SEEK_END && nOffset <= 0 && (0 - nOffset) <= GetMediaTotalBytes()) {
+		m_nOffset = 0 - nOffset;
+	} else {
+		Error.SetError(CPackErrors::PE_INTERNAL);
+		return FALSE;
+	}
+	return TRUE;
 }
 
 CStreamBase* CBytePerBlockMedia::GetStream()
 {
-	return nullptr;
+	return this;
+}
+
+BOOL CBytePerBlockMedia::SetMediaUsedBytes(UINT nSize, CPackErrors& Error)
+{
+	ASSERT(nSize <= GetMediaTotalBytes());
+	if (nSize <= GetMediaTotalBytes()) {
+		m_Header.BPBHeader.dwDataSize = nSize;
+		return TRUE;
+	} else {
+		Error.SetError(CPackErrors::PE_INTERNAL);
+		return FALSE;
+	}
 }
 
 UINT CBytePerBlockMedia::GetMediaUsedBytes()
 {
-	return 0;
+	return GetMediaTotalBytes() - m_Header.BPBHeader.dwDataSize;
 }
 
 UINT CBytePerBlockMedia::GetMediaTotalBytes()
 {
-	return 0;
+	ASSERT(m_nBlockBufferSize / m_Header.dwBPBBlockPerByte >= sizeof(m_Header));
+	if(m_nBlockBufferSize / m_Header.dwBPBBlockPerByte >= sizeof(m_Header))
+		return m_nBlockBufferSize / m_Header.dwBPBBlockPerByte - sizeof(m_Header);
 }
 
-BOOL CBytePerBlockMedia::IsMediaDirty()
-{
-	return 0;
-}

@@ -95,9 +95,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>..\openssl\win32\static\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcrypto.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -188,6 +191,7 @@
     <ClInclude Include="BMPFileMedia.h" />
     <ClInclude Include="BytePerBlockMedia.h" />
     <ClInclude Include="ChartControl.h" />
+    <ClInclude Include="PackCipher.h" />
     <ClInclude Include="PackManager.h" />
     <ClInclude Include="PackManagerBase.h" />
     <ClInclude Include="framework.h" />
@@ -210,6 +214,7 @@
     <ClCompile Include="BMPFileMedia.cpp" />
     <ClCompile Include="BytePerBlockMedia.cpp" />
     <ClCompile Include="ChartControl.cpp" />
+    <ClCompile Include="PackCipher.cpp" />
     <ClCompile Include="PackManager.cpp" />
     <ClCompile Include="MediaFactory.cpp" />
     <ClCompile Include="PackErrors.cpp" />

@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "pch.h"
+#include "framework.h"
 #include "PackCipher.h"
 
 CPackCipher::CPackCipher(void):
@@ -67,9 +68,8 @@ BOOL CPackCipher::SetKeyType(pack_cipher_type_t type,LPCTSTR szPassword)
 	return TRUE;
 }
 
-void CPackCipher::Crypt(LPVOID pBuffer, size_t nSize, BOOL bIsEncrypt, ULONGLONG nOffset)
+void CPackCipher::Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL bIsEncrypt, ULONGLONG nOffset)
 {
-
 	// 根据计算nIndex计算block index
 	ULONGLONG nBlockIndex = nOffset / CIPHER_BLOCK_SIZE;
 	BYTE ecount_buf[CIPHER_BLOCK_SIZE];
@@ -77,8 +77,8 @@ void CPackCipher::Crypt(LPVOID pBuffer, size_t nSize, BOOL bIsEncrypt, ULONGLONG
 	block128_f block = NULL;
 	unsigned int num = 0;
 
-	switch(m_Type) {
-	case CIPHER_AES: 
+	switch (m_Type) {
+	case CIPHER_AES:
 		block = (block128_f)AES_encrypt;
 		break;
 	case CIPHER_SEED:
@@ -89,7 +89,7 @@ void CPackCipher::Crypt(LPVOID pBuffer, size_t nSize, BOOL bIsEncrypt, ULONGLONG
 		break;
 	}
 
-	if(block == NULL) {
+	if (block == NULL) {
 		return; // CIPHER_NONE
 	}
 
@@ -98,16 +98,26 @@ void CPackCipher::Crypt(LPVOID pBuffer, size_t nSize, BOOL bIsEncrypt, ULONGLONG
 
 	num = (int)(nOffset % CIPHER_BLOCK_SIZE);
 
-	CRYPTO_ctr128_encrypt((const unsigned char *)pBuffer, (unsigned char *)pBuffer, 
+	CRYPTO_ctr128_encrypt((const unsigned char*)pBufferFrom, (unsigned char*)pBufferTo,
 		nSize, &m_CipherKey, iv, ecount_buf, &num, block);
 }
 
 void CPackCipher::EncryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset)
 {
-	Crypt(pBuffer, nSize, TRUE, nOffset);
+	Crypt(pBuffer, pBuffer, nSize, TRUE, nOffset);
+}
+
+void CPackCipher::EncryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset)
+{
+	Crypt(pBufferFrom, pBufferTo, nSize, TRUE, nOffset);
 }
 
 void CPackCipher::DecryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset)
 {
-	Crypt(pBuffer, nSize, FALSE, nOffset);
+	Crypt(pBuffer, pBuffer, nSize, FALSE, nOffset);
+}
+
+void CPackCipher::DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset)
+{
+	Crypt(pBufferFrom, pBufferTo, nSize, FALSE, nOffset);
 }
