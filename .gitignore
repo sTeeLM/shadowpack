@@ -13,7 +13,13 @@
 *.suo
 *.exp
 *.bak
-*.lib
+*.def
 *.ilk
 *.pdb
+*.exe
+*.lib
+*.dll
+*.d
+*.o
 .vs
+!openssl/**

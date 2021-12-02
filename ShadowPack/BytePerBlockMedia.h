@@ -14,9 +14,9 @@ protected:
 #define BPB_MEDIA_HEADER_SIGN 0x54188FE1
 	typedef struct _BPB_MEDIA_HEADER_T
 	{
-		MEDIA_HEADER_T MediaHeader;
+		MEDIA_HEADER_T BPBHeader;
 		DWORD dwBPBMediaSign;
-		DWORD dwBlockPerByte;
+		DWORD dwBPBBlockPerByte;
 	}BPB_MEDIA_HEADER_T;
 
 	// 子类需要定义Block长啥样
