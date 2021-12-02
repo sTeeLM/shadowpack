@@ -37,7 +37,7 @@ void CPackCipher::GenerateKey(LPCTSTR szPassword)
 	MD5_Final(m_Key, &ctx);
 }
 
-BOOL CPackCipher::SetKeyType(pack_cipher_type_t type,LPCTSTR szPassword)
+BOOL CPackCipher::SetKeyType(PACK_CIPHER_TYPE_T type,LPCTSTR szPassword)
 {
 	if((NULL == szPassword || _tcslen(szPassword) == 0) && type != CIPHER_NONE)
 		return FALSE;

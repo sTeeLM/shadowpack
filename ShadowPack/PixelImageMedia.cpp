@@ -27,6 +27,16 @@ BOOL CPixelImageMedia::Alloc(UINT nBlocks, CPackErrors& Error)
 	m_nBlockBufferSize = nBlocks;
 }
 
+void CBytePerBlockMedia::Free()
+{
+	if (m_pBlockBuffer) {
+		CPixelImageMedia::CPixelBlock* p = dynamic_cast<CPixelImageMedia::CPixelBlock*>(m_pBlockBuffer);
+		delete[] p;
+		m_pBlockBuffer = NULL;
+		m_nBlockBufferSize = 0;
+	}
+}
+
 BOOL CPixelImageMedia::Alloc(UINT nWidth, UINT nHeight, CPackErrors& Error)
 {
 	UINT nBlocks = nWidth * nHeight;
@@ -44,11 +54,11 @@ void CPixelImageMedia::SetPixel(UINT nX, UINT nY, BYTE nRed, BYTE nGreen, BYTE n
 	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < m_nBlockBufferSize);
 	if (nIndex < m_nBlockBufferSize) {
-		pBlock = dynamic_cast<CPixelBlock*>(&m_pBlockBuffer[nIndex]);
-		pBlock->m_nRed   = nRed;
-		pBlock->m_nGreen = nGreen;
-		pBlock->m_nBlue  = nBlue;
-		pBlock->m_nAlpha = nAlpha;
+		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
+		pBlock[nIndex].m_nRed   = nRed;
+		pBlock[nIndex].m_nGreen = nGreen;
+		pBlock[nIndex].m_nBlue  = nBlue;
+		pBlock[nIndex].m_nAlpha = nAlpha;
 	}
 }
 
@@ -58,10 +68,10 @@ void CPixelImageMedia::SetPixel(UINT nX, UINT nY, BYTE nRed, BYTE nGreen, BYTE n
 	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < m_nBlockBufferSize);
 	if (nIndex < m_nBlockBufferSize) {
-		pBlock = dynamic_cast<CPixelBlock*>(&m_pBlockBuffer[nIndex]);
-		pBlock->m_nRed = nRed;
-		pBlock->m_nGreen = nGreen;
-		pBlock->m_nBlue = nBlue;;
+		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
+		pBlock[nIndex].m_nRed = nRed;
+		pBlock[nIndex].m_nGreen = nGreen;
+		pBlock[nIndex].m_nBlue = nBlue;;
 	}
 }
 
@@ -71,11 +81,11 @@ void CPixelImageMedia::GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE
 	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < m_nBlockBufferSize);
 	if (nIndex < m_nBlockBufferSize) {
-		pBlock = dynamic_cast<CPixelBlock*>(&m_pBlockBuffer[nIndex]);
-		nRed   = pBlock->m_nRed;
-		nGreen = pBlock->m_nGreen;
-		nBlue  = pBlock->m_nBlue;
-		nAlpha = pBlock->m_nAlpha;
+		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
+		nRed   = pBlock[nIndex].m_nRed;
+		nGreen = pBlock[nIndex].m_nGreen;
+		nBlue  = pBlock[nIndex].m_nBlue;
+		nAlpha = pBlock[nIndex].m_nAlpha;
 	}
 }
 
@@ -85,10 +95,10 @@ void CPixelImageMedia::GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE
 	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < m_nBlockBufferSize);
 	if (nIndex < m_nBlockBufferSize) {
-		pBlock = dynamic_cast<CPixelBlock*>(&m_pBlockBuffer[nIndex]);
-		nRed = pBlock->m_nRed;
-		nGreen = pBlock->m_nGreen;
-		nBlue = pBlock->m_nBlue;
+		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
+		nRed = pBlock[nIndex].m_nRed;
+		nGreen = pBlock[nIndex].m_nGreen;
+		nBlue = pBlock[nIndex].m_nBlue;
 	}
 }
 
@@ -217,10 +227,11 @@ BYTE CPixelImageMedia::CPixelBlock::F5RevLookupTable[8] = {
 	0,1,2,3,3,2,1,0
 };
 
-BYTE CPixelImageMedia::CPixelBlock::GetByteFromBlocks(CBlockBase* pBlock, UINT nBlockPerByte)
+BYTE CPixelImageMedia::CPixelBlock::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 {
 	ASSERT(nBlockPerByte <= 3 && nBlockPerByte >= 0);
-	CPixelBlock* pPixelBlock = dynamic_cast<CPixelBlock*>(pBlock);
+	CPixelBlock* pPixelBlock = this; // this always is first object!
+	pPixelBlock += nOffset;
 	BYTE nRet = 0;
 	BYTE nTarget = 0;
 	if (nBlockPerByte == 1) {          /* R: 3, G 2, B 3*/
@@ -278,10 +289,11 @@ BYTE CPixelImageMedia::CPixelBlock::GetByteFromBlocks(CBlockBase* pBlock, UINT n
 	return nRet;
 }
 
-void CPixelImageMedia::CPixelBlock::SetByteToBlocks(BYTE nData, CBlockBase* pBlock, UINT nBlockPerByte)
+void CPixelImageMedia::CPixelBlock::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte)
 {
 	ASSERT(nBlockPerByte <= 3 && nBlockPerByte >= 0);
-	CPixelBlock* pPixelBlock = dynamic_cast<CPixelBlock*>(pBlock);
+	CPixelBlock* pPixelBlock = this; // this always is first object!
+	pPixelBlock += nOffset;
 	BYTE nTarget = 0;
 	BYTE nRet = 0;
 	BYTE nRes;

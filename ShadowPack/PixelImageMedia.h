@@ -25,8 +25,8 @@ public:
 			m_nAlpha(0)
 		{};
 		virtual ~CPixelBlock() {}
-		BYTE GetByteFromBlocks(CBlockBase* pBlock, UINT nBlockPerByte);
-		void SetByteToBlocks(BYTE nData, CBlockBase* pBlock, UINT nBlockPerByte);
+		BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte);
+		void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);
 		void CopyFrom(const CBlockBase* pBlock);
 	protected:
 		static BYTE F5LookupTable[4][8];

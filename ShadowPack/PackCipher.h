@@ -11,35 +11,35 @@
 class CPackCipher
 {
 public:
-	typedef enum {
+	typedef enum _PACK_CIPHER_TYPE_T{
 		CIPHER_NONE,
 		CIPHER_AES,
 		CIPHER_SEED,
 		CIPHER_CAMELLIA,
 		CIPHER_CNT
 
-	}pack_cipher_type_t;
+	}PACK_CIPHER_TYPE_T;
 
 	typedef union {
 		AES_KEY aes_key;
 		SEED_KEY_SCHEDULE seed_key;
 		CAMELLIA_KEY camellia_key;
-	} cipher_key_t;
+	} PACK_CIPHER_KEY_T;
 public:
 	CPackCipher(void);
 	virtual ~CPackCipher(void);
-	BOOL SetKeyType(pack_cipher_type_t type,LPCTSTR szPassword);
+	BOOL SetKeyType(PACK_CIPHER_TYPE_T type,LPCTSTR szPassword);
 	void EncryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset);
 	void EncryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset);
 	void DecryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset);
 	void DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset);
-	pack_cipher_type_t GetCipherType(){return m_Type;}
+	PACK_CIPHER_TYPE_T GetCipherType(){return m_Type;}
 private:
 	void GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex);
 	void GenerateKey(LPCTSTR szPassword);
 	void Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL bIsEncrypt, ULONGLONG nOffset);
 private:
 	BYTE m_Key[CIPHER_BLOCK_SIZE];
-	pack_cipher_type_t m_Type;
-	cipher_key_t m_CipherKey;
+	PACK_CIPHER_TYPE_T m_Type;
+	PACK_CIPHER_KEY_T m_CipherKey;
 };

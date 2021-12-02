@@ -14,44 +14,51 @@ CBytePerBlockMedia::~CBytePerBlockMedia()
 
 }
 
-void CBytePerBlockMedia::Free()
-{
-	if (m_pBlockBuffer) {
-		delete[]m_pBlockBuffer;
-		m_pBlockBuffer = NULL;
-		m_nBlockBufferSize = 0;
-	}
-}
-
-void CBytePerBlockMedia::SetBlocks(UINT nBlockOffset, CBlockBase* pBlock, UINT nBlockCnt)
-{
-	ASSERT(nBlockOffset + nBlockCnt <= m_nBlockBufferSize);
-	for (INT i = 0; i < nBlockCnt; i++) {
-		m_pBlockBuffer[nBlockOffset + i].CopyFrom(pBlock + i);
-	}
-}
-
-void CBytePerBlockMedia::GetBlocks(UINT nBlockOffset, CBlockBase* pBlock, UINT nBlockCnt)
-{
-	ASSERT(nBlockOffset + nBlockCnt <= m_nBlockBufferSize);
-	for (INT i = 0; i < nBlockCnt; i++) {
-		pBlock[i].CopyFrom(m_pBlockBuffer + nBlockOffset + i);
-	}
-}
-
 BOOL CBytePerBlockMedia::TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader)
 {
-
+	if (pHeader->dwBPBMediaSign == BPB_MEDIA_HEADER_SIGN && pHeader->BPBHeader.dwSign == MEDIA_HEADER_SIGN) {
+		if (pHeader->dwBPBBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && pHeader->dwBPBBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE) {
+			if (pHeader->BPBHeader.dwDataSize <= m_nBlockBufferSize / pHeader->dwBPBBlockPerByte) {
+				if (pHeader->dwBPBCipher == m_Cipher.GetCipherType()) {
+					return TRUE;
+				}
+			}
+		}
+	}
+	return FALSE;
 }
 
-BOOL CBytePerBlockMedia::RawReadData(LPVOID pBuffer, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors)
+BOOL CBytePerBlockMedia::RawReadData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors)
 {
-
+	LPBYTE p = (LPBYTE)pBuffer;
+	ASSERT((nOffset + nSize) * nBPBBlockPerByte <= m_nBlockBufferSize);
+	if ((nOffset + nSize) * nBPBBlockPerByte <= m_nBlockBufferSize) {
+		for (INT i = 0; i < nSize; i++) {
+			p[i] = m_pBlockBuffer->GetByteFromBlocks(nOffset + i,nBPBBlockPerByte);
+		}
+		return TRUE;
+	} else {
+		Errors.SetError(CPackErrors::PE_INTERNAL);
+	}
+	return FALSE;
 }
 
-BOOL CBytePerBlockMedia::RawWriteData(LPVOID pBuffer, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors)
+BOOL CBytePerBlockMedia::RawWriteData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors)
 {
-	m_bIsDirty = TRUE;
+	LPBYTE p = (LPBYTE)pBuffer;
+	ASSERT((nOffset + nSize) * nBPBBlockPerByte <= m_nBlockBufferSize);
+	if ((nOffset + nSize) * nBPBBlockPerByte <= m_nBlockBufferSize) {
+		for (INT i = 0; i < nSize; i++) {
+			m_pBlockBuffer->SetByteToBlocks(p[i], nOffset + i, nBPBBlockPerByte);
+		}
+		m_bIsDirty = TRUE;
+		return TRUE;
+	}
+	else {
+		Errors.SetError(CPackErrors::PE_INTERNAL);
+	}
+	return FALSE;
+	
 }
 
 BOOL CBytePerBlockMedia::LoadMeta(CPasswordGetterBase& PasswordGetter, CPackErrors& Errors)
@@ -64,7 +71,7 @@ BOOL CBytePerBlockMedia::LoadMeta(CPasswordGetterBase& PasswordGetter, CPackErro
 	
 test_encrypt:
 	for (INT i = 1; i <= 4; i++) {
-		if (RawReadData(&Header, sizeof(Header), i, Errors)) {
+		if (RawReadData(&Header, 0, sizeof(Header), i, Errors)) {
 
 			if (!strPassword.GetLength()) {
 				if (m_Cipher.SetKeyType(CPackCipher::CIPHER_NONE, NULL)) {
@@ -148,7 +155,7 @@ BOOL CBytePerBlockMedia::SaveMeta(CPackErrors& Errors)
 	BPB_MEDIA_HEADER_T Header;
 	// save header
 	m_Cipher.EncryptBlock(&m_Header, &Header, sizeof(Header), 0);
-	if (!RawWriteData(&Header, sizeof(Header), m_Header.dwBPBBlockPerByte, Errors)) {
+	if (!RawWriteData(&Header, 0, sizeof(Header), m_Header.dwBPBBlockPerByte, Errors)) {
 		return FALSE;
 	}
 
@@ -164,7 +171,7 @@ BOOL CBytePerBlockMedia::Read(LPVOID pBuffer, UINT nSize, CProgressBase& Progres
 	if (nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL) {
 		while (nSize > 0) {
 			nRead = nSize > BPB_STREAM_BATCH_SIZE ? BPB_STREAM_BATCH_SIZE : nSize;
-			if (!RawReadData(p, nRead, m_Header.dwBPBBlockPerByte, Error)) {
+			if (!RawReadData(p, sizeof(m_Header) + GetOffset(), nRead, m_Header.dwBPBBlockPerByte, Error)) {
 				break;
 			}
 			m_Cipher.DecryptBlock(p, nRead, GetOffset() + sizeof(m_Header));
@@ -191,7 +198,7 @@ BOOL CBytePerBlockMedia::Write(const LPVOID pBuffer, UINT nSize, CProgressBase& 
 	if (nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL) {
 		while (nSize > 0) {
 			nWrite = nSize > BPB_STREAM_BATCH_SIZE ? BPB_STREAM_BATCH_SIZE : nSize;
-			if (!RawWriteData(p, nWrite, m_Header.dwBPBBlockPerByte, Error)) {
+			if (!RawWriteData(p, sizeof(m_Header) + GetOffset(), nWrite, m_Header.dwBPBBlockPerByte, Error)) {
 				break;
 			}
 			m_Cipher.EncryptBlock(p, nWrite, GetOffset() + sizeof(m_Header));

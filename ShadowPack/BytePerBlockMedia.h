@@ -18,6 +18,7 @@ protected:
 		MEDIA_HEADER_T BPBHeader;
 		DWORD dwBPBMediaSign;
 		DWORD dwBPBBlockPerByte;
+		DWORD dwBPBCipher;
 	}BPB_MEDIA_HEADER_T;
 
 #define MAX_BPB_MEDIA_BPB_SIZE 4
@@ -30,18 +31,16 @@ protected:
 		CBlockBase() {};
 		virtual ~CBlockBase() {};
 	public:
-		virtual BYTE GetByteFromBlocks(CBlockBase* pBlock, UINT nBlockPerByte) = 0;
-		virtual void SetByteToBlocks(BYTE nData, CBlockBase* pBlock, UINT nBlockPerByte) = 0;
+		virtual BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte) = 0;
+		virtual void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte) = 0;
 		virtual void CopyFrom(const CBlockBase * pBlock) = 0;
 	};
 	
 public:	
 
-	// 给子类调用的工具函数
+	// 给子类重载的工具函数
 	virtual BOOL Alloc(UINT nBlocks, CPackErrors& Error) = 0;
-	virtual void Free();
-	void SetBlocks(UINT nBlockOffset, CBlockBase* pBlock, UINT nBlockCnt);
-	void GetBlocks(UINT nBlockOffset, CBlockBase* pBlock, UINT nBlockCnt);
+	virtual void Free() = 0;
 
 	// 给子类调用的工具函数
 	BOOL LoadMeta(CPasswordGetterBase& PasswordGetter, CPackErrors& Errors);
@@ -66,8 +65,8 @@ public:
 
 protected:
 	BOOL TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader);
-	BOOL RawReadData(LPVOID pBuffer, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
-	BOOL RawWriteData(LPVOID pBuffer, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
+	BOOL RawReadData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
+	BOOL RawWriteData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
 
 protected:
 	BPB_MEDIA_HEADER_T m_Header;
