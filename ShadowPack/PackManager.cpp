@@ -78,7 +78,7 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 		Errors.SetError(CPackErrors::PE_INTERNAL);
 		goto err;
 	}
-	if (!pStream->Seek(0, 0, Errors)) {
+	if (!pStream->Seek(0, CStreamBase::STREAM_SEEK_SET, Errors)) {
 		goto err;
 	}
 
@@ -137,7 +137,7 @@ BOOL CPackManager::SaveMedia(CProgressBase& Progress, CPackErrors& Errors)
 		Errors.SetError(CPackErrors::PE_INTERNAL);
 		goto err;
 	}
-	if (!pStream->Seek(0, 0, Errors)) {
+	if (!pStream->Seek(0, CStreamBase::STREAM_SEEK_SET, Errors)) {
 		goto err;
 	}
 

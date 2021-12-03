@@ -31,7 +31,7 @@ public:
 	virtual void CloseMedia() = 0;
 
 // show options
-	virtual void ShowMediaOptionDlg() = 0;
+	virtual void ShowMediaOptionDlg();
 
 // stream read and write
 	virtual CStreamBase * GetStream() = 0;

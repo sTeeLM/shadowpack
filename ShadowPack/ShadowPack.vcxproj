@@ -76,14 +76,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\$(Configuration)\bin\</OutDir>
-    <IntDir>..\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>..\$(Configuration)\$(PlatformName)\bin\</OutDir>
+    <IntDir>..\$(Configuration)\$(PlatformName)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\$(Configuration)\$(PlatformName)\bin\</OutDir>
+    <IntDir>..\$(Configuration)\$(PlatformName)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -191,6 +193,7 @@
     <ClInclude Include="BMPFileMedia.h" />
     <ClInclude Include="BytePerBlockMedia.h" />
     <ClInclude Include="ChartControl.h" />
+    <ClInclude Include="MediaOptionDlg.h" />
     <ClInclude Include="PackCipher.h" />
     <ClInclude Include="PackManager.h" />
     <ClInclude Include="PackManagerBase.h" />
@@ -202,6 +205,7 @@
     <ClInclude Include="PasswordGetterBase.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PixelImageMedia.h" />
+    <ClInclude Include="PixelImageMediaOptionDlg.h" />
     <ClInclude Include="ProgressBase.h" />
     <ClInclude Include="ProgressControl.h" />
     <ClInclude Include="Resource.h" />
@@ -214,6 +218,8 @@
     <ClCompile Include="BMPFileMedia.cpp" />
     <ClCompile Include="BytePerBlockMedia.cpp" />
     <ClCompile Include="ChartControl.cpp" />
+    <ClCompile Include="MediaBase.cpp" />
+    <ClCompile Include="MediaOptionDlg.cpp" />
     <ClCompile Include="PackCipher.cpp" />
     <ClCompile Include="PackManager.cpp" />
     <ClCompile Include="MediaFactory.cpp" />
@@ -226,6 +232,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PixelImageMedia.cpp" />
+    <ClCompile Include="PixelImageMediaOptionDlg.cpp" />
     <ClCompile Include="ProgressControl.cpp" />
     <ClCompile Include="ShadowPack.cpp" />
     <ClCompile Include="ShadowPackDlg.cpp" />

@@ -132,19 +132,11 @@ void CPixelImageMedia::GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_F
 	}
 }
 
-BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
+UINT CPixelImageMedia::GetTotalBlocks()
 {
 	return m_nWidth * m_nHeight;
 }
 
-void CPixelImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte)
-{
-}
-
-UINT CPixelImageMedia::GetTotalBlocks()
-{
-	return 0;
-}
 
 /*
 // embed 2bit data into 3 bit target

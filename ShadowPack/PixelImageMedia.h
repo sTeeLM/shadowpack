@@ -47,6 +47,7 @@ public:
 	BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte);
 	void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);
 	UINT GetTotalBlocks();
+
 protected:
 	UINT m_nWidth;
 	UINT m_nHeight;

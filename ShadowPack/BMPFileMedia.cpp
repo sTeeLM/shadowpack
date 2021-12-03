@@ -186,9 +186,6 @@ void CBMPFileMedia::CloseMedia()
 	CPixelImageMedia::Free();
 }
 
-void CBMPFileMedia::ShowMediaOptionDlg()
-{
-}
 
 LPCTSTR CBMPFileMedia::m_szFilter = _T("BMP Files (*.bmp)|*.bmp|");
 LPCTSTR CBMPFileMedia::m_szExt = _T("BMP");

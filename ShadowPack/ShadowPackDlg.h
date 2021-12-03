@@ -6,7 +6,7 @@
 
 #include "ChartControl.h"
 #include "ProgressControl.h"
-#include "FileManager.h"
+#include "PackManager.h"
 #include "PasswordDlg.h"
 
 // CShadowPackDlg 对话框

@@ -69,13 +69,19 @@
     <ClInclude Include="StreamBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="PixelImageMedia.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="BytePerBlockMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="PackCipher.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaOptionDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelImageMediaOptionDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelImageMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -117,6 +123,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="PackCipher.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaOptionDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelImageMediaOptionDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaBase.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

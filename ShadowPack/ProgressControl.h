@@ -16,6 +16,10 @@ public:
 	void Initialize(CWnd* pParent, UINT nID);
 
 public:
+	void SetFullScale(UINT nVal);
+	void Increase(UINT nVal);
+	void Cancel(void);
+	BOOL IsCanceled(void);
 	void Reset();
 
 protected:

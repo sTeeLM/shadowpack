@@ -31,7 +31,7 @@ BOOL CBytePerBlockMedia::RawReadData(LPVOID pBuffer, UINT nOffset, UINT nSize, U
 	LPBYTE p = (LPBYTE)pBuffer;
 	ASSERT((nOffset + nSize) * nBPBBlockPerByte <= GetTotalBlocks());
 	if ((nOffset + nSize) * nBPBBlockPerByte <= GetTotalBlocks()) {
-		for (INT i = 0; i < nSize; i++) {
+		for (UINT i = 0; i < nSize; i++) {
 			p[i] = GetByteFromBlocks(nOffset + i,nBPBBlockPerByte);
 		}
 		return TRUE;
@@ -46,7 +46,7 @@ BOOL CBytePerBlockMedia::RawWriteData(LPVOID pBuffer, UINT nOffset, UINT nSize, 
 	LPBYTE p = (LPBYTE)pBuffer;
 	ASSERT((nOffset + nSize) * nBPBBlockPerByte <= GetTotalBlocks());
 	if ((nOffset + nSize) * nBPBBlockPerByte <= GetTotalBlocks()) {
-		for (INT i = 0; i < nSize; i++) {
+		for (UINT i = 0; i < nSize; i++) {
 			SetByteToBlocks(p[i], nOffset + i, nBPBBlockPerByte);
 		}
 		m_bIsDirty = TRUE;
@@ -121,6 +121,7 @@ test_encrypt:
 		}
 	}
 
+// ³¢ÊÔ»ñÈ¡ÃÜÂë
 	if (!strPassword.GetLength()) {
 		strPassword = PasswordGetter.GetPassword();
 		if (strPassword.GetLength())
@@ -256,5 +257,6 @@ UINT CBytePerBlockMedia::GetMediaTotalBytes()
 	ASSERT(GetTotalBlocks() / m_Header.dwBPBBlockPerByte >= sizeof(m_Header));
 	if(GetTotalBlocks() / m_Header.dwBPBBlockPerByte >= sizeof(m_Header))
 		return GetTotalBlocks() / m_Header.dwBPBBlockPerByte - sizeof(m_Header);
+	return 0;
 }
 

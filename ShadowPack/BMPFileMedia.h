@@ -18,9 +18,6 @@ public:
 	// free all buffers
 	void CloseMedia();
 
-	// show options
-	void ShowMediaOptionDlg();
-
 public:
 	// 实现CMediaFactory的接口
 	static BOOL TestExt(LPCTSTR szExt);

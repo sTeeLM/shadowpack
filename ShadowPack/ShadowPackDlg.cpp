@@ -282,11 +282,10 @@ void CShadowPackDlg::OnBnClickedBtnMediaSave()
 	}
 }
 
-
 void CShadowPackDlg::OnBnClickedBtnMediaOption()
 {
 	if(m_ctlFileManager.MediaAttached())
-		m_ctlFileManager.GetMedia()->ShowOptionDlg();
+		m_ctlFileManager.GetMedia()->ShowMediaOptionDlg();
 }
 
 void CShadowPackDlg::ThreadExportItem()

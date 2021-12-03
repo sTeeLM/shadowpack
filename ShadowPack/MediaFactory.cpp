@@ -1,4 +1,5 @@
 
+#include "pch.h"
 #include "MediaFactory.h"
 #include "BMPFileMedia.h"
 
