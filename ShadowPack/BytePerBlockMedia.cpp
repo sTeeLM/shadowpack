@@ -2,8 +2,6 @@
 #include "BytePerBlockMedia.h"
 
 CBytePerBlockMedia::CBytePerBlockMedia() :
-	m_pBlockBuffer(NULL),
-	m_nBlockBufferSize(0),
 	m_bIsDirty(FALSE)
 {
 	memset(&m_Header, 0, sizeof(m_Header));
@@ -18,7 +16,7 @@ BOOL CBytePerBlockMedia::TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader)
 {
 	if (pHeader->dwBPBMediaSign == BPB_MEDIA_HEADER_SIGN && pHeader->BPBHeader.dwSign == MEDIA_HEADER_SIGN) {
 		if (pHeader->dwBPBBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && pHeader->dwBPBBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE) {
-			if (pHeader->BPBHeader.dwDataSize <= m_nBlockBufferSize / pHeader->dwBPBBlockPerByte) {
+			if (pHeader->BPBHeader.dwDataSize <= GetTotalBlocks() / pHeader->dwBPBBlockPerByte) {
 				if (pHeader->dwBPBCipher == m_Cipher.GetCipherType()) {
 					return TRUE;
 				}
@@ -31,10 +29,10 @@ BOOL CBytePerBlockMedia::TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader)
 BOOL CBytePerBlockMedia::RawReadData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors)
 {
 	LPBYTE p = (LPBYTE)pBuffer;
-	ASSERT((nOffset + nSize) * nBPBBlockPerByte <= m_nBlockBufferSize);
-	if ((nOffset + nSize) * nBPBBlockPerByte <= m_nBlockBufferSize) {
+	ASSERT((nOffset + nSize) * nBPBBlockPerByte <= GetTotalBlocks());
+	if ((nOffset + nSize) * nBPBBlockPerByte <= GetTotalBlocks()) {
 		for (INT i = 0; i < nSize; i++) {
-			p[i] = m_pBlockBuffer->GetByteFromBlocks(nOffset + i,nBPBBlockPerByte);
+			p[i] = GetByteFromBlocks(nOffset + i,nBPBBlockPerByte);
 		}
 		return TRUE;
 	} else {
@@ -46,10 +44,10 @@ BOOL CBytePerBlockMedia::RawReadData(LPVOID pBuffer, UINT nOffset, UINT nSize, U
 BOOL CBytePerBlockMedia::RawWriteData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors)
 {
 	LPBYTE p = (LPBYTE)pBuffer;
-	ASSERT((nOffset + nSize) * nBPBBlockPerByte <= m_nBlockBufferSize);
-	if ((nOffset + nSize) * nBPBBlockPerByte <= m_nBlockBufferSize) {
+	ASSERT((nOffset + nSize) * nBPBBlockPerByte <= GetTotalBlocks());
+	if ((nOffset + nSize) * nBPBBlockPerByte <= GetTotalBlocks()) {
 		for (INT i = 0; i < nSize; i++) {
-			m_pBlockBuffer->SetByteToBlocks(p[i], nOffset + i, nBPBBlockPerByte);
+			SetByteToBlocks(p[i], nOffset + i, nBPBBlockPerByte);
 		}
 		m_bIsDirty = TRUE;
 		return TRUE;
@@ -130,7 +128,7 @@ test_encrypt:
 	}
 
 // 没有发现任何有效的头，作为空白文件处理
-	if (m_nBlockBufferSize >= sizeof(Header)) {
+	if (GetTotalBlocks() >= sizeof(Header)) {
 		HeaderPlain.dwBPBMediaSign = MEDIA_HEADER_SIGN;
 		HeaderPlain.dwBPBBlockPerByte = 1;
 		HeaderPlain.BPBHeader.dwSign = BPB_MEDIA_HEADER_SIGN;
@@ -255,8 +253,8 @@ UINT CBytePerBlockMedia::GetMediaUsedBytes()
 
 UINT CBytePerBlockMedia::GetMediaTotalBytes()
 {
-	ASSERT(m_nBlockBufferSize / m_Header.dwBPBBlockPerByte >= sizeof(m_Header));
-	if(m_nBlockBufferSize / m_Header.dwBPBBlockPerByte >= sizeof(m_Header))
-		return m_nBlockBufferSize / m_Header.dwBPBBlockPerByte - sizeof(m_Header);
+	ASSERT(GetTotalBlocks() / m_Header.dwBPBBlockPerByte >= sizeof(m_Header));
+	if(GetTotalBlocks() / m_Header.dwBPBBlockPerByte >= sizeof(m_Header))
+		return GetTotalBlocks() / m_Header.dwBPBBlockPerByte - sizeof(m_Header);
 }
 

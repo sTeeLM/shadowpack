@@ -24,25 +24,15 @@ protected:
 #define MAX_BPB_MEDIA_BPB_SIZE 4
 #define MIN_BPB_MEDIA_BPB_SIZE 1
 
-	// 子类需要定义Block长啥样
-	class CBlockBase
-	{
-	public:
-		CBlockBase() {};
-		virtual ~CBlockBase() {};
-	public:
-		virtual BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte) = 0;
-		virtual void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte) = 0;
-		virtual void CopyFrom(const CBlockBase * pBlock) = 0;
-	};
 	
 public:	
 
-	// 给子类重载的工具函数
-	virtual BOOL Alloc(UINT nBlocks, CPackErrors& Error) = 0;
-	virtual void Free() = 0;
+	// 子类需要实现的接口函数，我会调用
+	virtual BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte) = 0;
+	virtual void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte) = 0;
+	virtual UINT GetTotalBlocks() = 0;
 
-	// 给子类调用的工具函数
+	// 给子类调用的接口，子类会调
 	BOOL LoadMeta(CPasswordGetterBase& PasswordGetter, CPackErrors& Errors);
 	BOOL SaveMeta(CPackErrors& Errors);
 
@@ -70,8 +60,6 @@ protected:
 
 protected:
 	BPB_MEDIA_HEADER_T m_Header;
-	CBlockBase* m_pBlockBuffer;
-	UINT m_nBlockBufferSize;
 	CPackCipher m_Cipher;
 	BOOL m_bIsDirty;
 };

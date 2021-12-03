@@ -9,7 +9,8 @@ public:
 	CPixelImageMedia();
 	virtual ~CPixelImageMedia();
 
-	class CPixelBlock : public CBytePerBlockMedia::CBlockBase
+	// 定义究竟啥叫block
+	class CPixelBlock
 	{
 	public:
 		typedef enum {
@@ -25,12 +26,6 @@ public:
 			m_nAlpha(0)
 		{};
 		virtual ~CPixelBlock() {}
-		BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte);
-		void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);
-		void CopyFrom(const CBlockBase* pBlock);
-	protected:
-		static BYTE F5LookupTable[4][8];
-		static BYTE F5RevLookupTable[8];
 	protected:
 		BYTE m_nRed;
 		BYTE m_nGreen;
@@ -39,8 +34,8 @@ public:
 		friend CPixelImageMedia;
 	};
 public:
-	BOOL Alloc(UINT nBlocks, CPackErrors& Error);
 	BOOL Alloc(UINT nWidth, UINT nHeight, CPackErrors& Error);
+	void Free();
 	void SetPixel(UINT nX, UINT nY, BYTE nRed, BYTE nGreen, BYTE nBlue, BYTE nAlpha);
 	void GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE& nBlue, BYTE& nAlpha);
 	void SetPixel(UINT nX, UINT nY, BYTE nRed, BYTE nGreen, BYTE nBlue);
@@ -48,9 +43,16 @@ public:
 	void SetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
 	void GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
 
+	// 实现父类接口，实现这几个接口让父类调用
+	BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte);
+	void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);
+	UINT GetTotalBlocks();
 protected:
 	UINT m_nWidth;
 	UINT m_nHeight;
+	CPixelBlock * m_pBlockBuffer;
+	static BYTE F5LookupTable[4][8];
+	static BYTE F5RevLookupTable[8];
 
 };
 
