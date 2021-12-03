@@ -137,6 +137,11 @@ UINT CPixelImageMedia::GetTotalBlocks()
 	return m_nWidth * m_nHeight;
 }
 
+void CPixelImageMedia::AddOptPage()
+{
+	m_OptDlg.AddPage(&m_OptPagePixelImageMedia);
+}
+
 
 /*
 // embed 2bit data into 3 bit target

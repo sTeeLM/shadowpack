@@ -78,10 +78,13 @@
     <ClInclude Include="MediaOptionDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="PixelImageMediaOptionDlg.h">
+    <ClInclude Include="OptPagePixelImageMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="PixelImageMedia.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OptPageBMPFile.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -128,10 +131,13 @@
     <ClCompile Include="MediaOptionDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="PixelImageMediaOptionDlg.cpp">
+    <ClCompile Include="OptPagePixelImageMedia.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MediaBase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OptPageBMPFile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

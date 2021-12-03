@@ -3,13 +3,13 @@
 
 // CPixelImageMediaOptionDlg 对话框
 
-class CPixelImageMediaOptionDlg : public CMFCPropertyPage
+class COptPagePixelImageMedia : public CMFCPropertyPage
 {
-	DECLARE_DYNAMIC(CPixelImageMediaOptionDlg)
+	DECLARE_DYNAMIC(COptPagePixelImageMedia)
 
 public:
-	CPixelImageMediaOptionDlg(CWnd* pParent = nullptr);   // 标准构造函数
-	virtual ~CPixelImageMediaOptionDlg();
+	COptPagePixelImageMedia(CWnd* pParent = nullptr);   // 标准构造函数
+	virtual ~COptPagePixelImageMedia();
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -20,4 +20,6 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnCbnSelchangeComboCrypto();
 };

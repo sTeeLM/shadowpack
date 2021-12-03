@@ -186,6 +186,36 @@ void CBMPFileMedia::CloseMedia()
 	CPixelImageMedia::Free();
 }
 
+void CBMPFileMedia::AddOptPage()
+{
+	/*
+	CString m_strbfSize;
+	CString m_strbfOffBits;
+	CString m_strbiWidth;
+	CString m_strbiHeight;
+	CString m_strbiBitCount;
+	CString m_strbiCompression;
+	CString m_strbiXPelsPerMeter;
+	CString m_strbiYPelsPerMeter;
+	*/
+	LPBITMAPINFOHEADER  pinfoHeader;
+	if (m_pfileHeader != NULL) {
+		pinfoHeader = (LPBITMAPINFOHEADER)(((LPBYTE)m_pfileHeader) + sizeof(BITMAPFILEHEADER));
+		m_OptPageBMPFile.m_strbfOffBits.Format(_T("%d"),m_pfileHeader->bfOffBits);
+		m_OptPageBMPFile.m_strbfSize.Format(_T("%d"), m_pfileHeader->bfSize);
+		m_OptPageBMPFile.m_strbiHeight.Format(_T("%d"), pinfoHeader->biHeight);
+		m_OptPageBMPFile.m_strbiWidth.Format(_T("%d"), pinfoHeader->biWidth);
+		m_OptPageBMPFile.m_strbiBitCount.Format(_T("%d"), pinfoHeader->biBitCount);
+		m_OptPageBMPFile.m_strbiCompression.Format(_T("%d"), pinfoHeader->biCompression);
+		m_OptPageBMPFile.m_strbiXPelsPerMeter.Format(_T("%d"), pinfoHeader->biXPelsPerMeter);
+		m_OptPageBMPFile.m_strbiYPelsPerMeter.Format(_T("%d"), pinfoHeader->biYPelsPerMeter);
+	}
+
+	
+	m_OptDlg.AddPage(&m_OptPageBMPFile);
+	CPixelImageMedia::AddOptPage();
+}
+
 
 LPCTSTR CBMPFileMedia::m_szFilter = _T("BMP Files (*.bmp)|*.bmp|");
 LPCTSTR CBMPFileMedia::m_szExt = _T("BMP");

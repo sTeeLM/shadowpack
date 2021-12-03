@@ -194,6 +194,7 @@
     <ClInclude Include="BytePerBlockMedia.h" />
     <ClInclude Include="ChartControl.h" />
     <ClInclude Include="MediaOptionDlg.h" />
+    <ClInclude Include="OptPageBMPFile.h" />
     <ClInclude Include="PackCipher.h" />
     <ClInclude Include="PackManager.h" />
     <ClInclude Include="PackManagerBase.h" />
@@ -205,7 +206,7 @@
     <ClInclude Include="PasswordGetterBase.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PixelImageMedia.h" />
-    <ClInclude Include="PixelImageMediaOptionDlg.h" />
+    <ClInclude Include="OptPagePixelImageMedia.h" />
     <ClInclude Include="ProgressBase.h" />
     <ClInclude Include="ProgressControl.h" />
     <ClInclude Include="Resource.h" />
@@ -220,6 +221,7 @@
     <ClCompile Include="ChartControl.cpp" />
     <ClCompile Include="MediaBase.cpp" />
     <ClCompile Include="MediaOptionDlg.cpp" />
+    <ClCompile Include="OptPageBMPFile.cpp" />
     <ClCompile Include="PackCipher.cpp" />
     <ClCompile Include="PackManager.cpp" />
     <ClCompile Include="MediaFactory.cpp" />
@@ -232,7 +234,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PixelImageMedia.cpp" />
-    <ClCompile Include="PixelImageMediaOptionDlg.cpp" />
+    <ClCompile Include="OptPagePixelImageMedia.cpp" />
     <ClCompile Include="ProgressControl.cpp" />
     <ClCompile Include="ShadowPack.cpp" />
     <ClCompile Include="ShadowPackDlg.cpp" />

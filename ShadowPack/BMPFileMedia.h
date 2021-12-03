@@ -1,5 +1,7 @@
 #pragma once
 #include "PixelImageMedia.h"
+#include "OptPageBMPFile.h"
+
 class CBMPFileMedia :
     public CPixelImageMedia
 {
@@ -18,6 +20,9 @@ public:
 	// free all buffers
 	void CloseMedia();
 
+	// 添加opt page
+	virtual void AddOptPage();
+
 public:
 	// 实现CMediaFactory的接口
 	static BOOL TestExt(LPCTSTR szExt);
@@ -28,5 +33,6 @@ protected:
 	static LPCTSTR m_szExt;
 
 	LPBITMAPFILEHEADER m_pfileHeader;
+	COptPageBMPFile m_OptPageBMPFile;
 };
 

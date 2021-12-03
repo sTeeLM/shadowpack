@@ -10,6 +10,7 @@ class CMediaOptionDlg : public CMFCPropertySheet
 public:
 	CMediaOptionDlg();
 	virtual ~CMediaOptionDlg();
+	BOOL OnInitDialog();
 
 protected:
 	DECLARE_MESSAGE_MAP()

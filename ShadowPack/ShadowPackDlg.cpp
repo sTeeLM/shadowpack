@@ -282,10 +282,13 @@ void CShadowPackDlg::OnBnClickedBtnMediaSave()
 	}
 }
 
+#include "BMPFileMedia.h"
 void CShadowPackDlg::OnBnClickedBtnMediaOption()
 {
-	if(m_ctlFileManager.MediaAttached())
-		m_ctlFileManager.GetMedia()->ShowMediaOptionDlg();
+//	if(m_ctlFileManager.MediaAttached())
+//		m_ctlFileManager.GetMedia()->ShowMediaOptionDlg();
+	CBMPFileMedia media;
+	media.ShowMediaOptionDlg();
 }
 
 void CShadowPackDlg::ThreadExportItem()

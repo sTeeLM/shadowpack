@@ -5,6 +5,7 @@
 #include "PasswordGetterBase.h"
 #include "ProgressBase.h"
 #include "StreamBase.h"
+#include "MediaOptionDlg.h"
 
 class CMediaBase
 {
@@ -32,6 +33,7 @@ public:
 
 // show options
 	virtual void ShowMediaOptionDlg();
+	virtual void AddOptPage() = 0;
 
 // stream read and write
 	virtual CStreamBase * GetStream() = 0;
@@ -44,4 +46,6 @@ public:
 // misc
 	virtual BOOL IsMediaDirty() = 0;
 
+protected:
+	CMediaOptionDlg m_OptDlg;
 };

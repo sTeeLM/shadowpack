@@ -22,4 +22,6 @@
 *.d
 *.o
 .vs
+Debug
+Release
 !openssl/**

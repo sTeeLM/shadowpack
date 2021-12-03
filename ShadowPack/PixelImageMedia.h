@@ -1,6 +1,7 @@
 #pragma once
 #include "MediaBase.h"
 #include "BytePerBlockMedia.h"
+#include "OptPagePixelImageMedia.h"
 
 class CPixelImageMedia :
     public CBytePerBlockMedia
@@ -48,12 +49,16 @@ public:
 	void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);
 	UINT GetTotalBlocks();
 
+	// 实现CMediaBase接口
+	// 添加opt page
+	virtual void AddOptPage();
+
 protected:
 	UINT m_nWidth;
 	UINT m_nHeight;
 	CPixelBlock * m_pBlockBuffer;
 	static BYTE F5LookupTable[4][8];
 	static BYTE F5RevLookupTable[8];
-
+	COptPagePixelImageMedia m_OptPagePixelImageMedia;
 };
 

@@ -4,6 +4,7 @@
 #include "openssl\camellia.h"
 #include "openssl\seed.h"
 #include "openssl\md5.h"
+#include "openssl\cast.h"
 #include "openssl\modes.h"
 
 #define CIPHER_BLOCK_SIZE (16)
