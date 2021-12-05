@@ -21,7 +21,8 @@ public:
 	void CloseMedia();
 
 	// 添加opt page
-	virtual void AddOptPage();
+	virtual void AddOptPage(CMFCPropertySheet* pPropertySheet);
+	virtual void UpdateOpts(CMFCPropertySheet* pPropertySheet);
 
 public:
 	// 实现CMediaFactory的接口

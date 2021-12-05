@@ -51,7 +51,8 @@ public:
 
 	// 实现CMediaBase接口
 	// 添加opt page
-	virtual void AddOptPage();
+	virtual void AddOptPage(CMFCPropertySheet* pPropertySheet);
+	virtual void UpdateOpts(CMFCPropertySheet* pPropertySheet);
 
 protected:
 	UINT m_nWidth;

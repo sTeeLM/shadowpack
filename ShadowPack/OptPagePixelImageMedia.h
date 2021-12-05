@@ -30,4 +30,11 @@ public:
 	INT m_nBytePerPixel;
 	UINT m_nTotalBlocks;
 	UINT m_nUsedBytes;
+protected:
+	void SetBPPInfo();
+public:
+	afx_msg void OnBnClickedRadio1bp4p();
+	afx_msg void OnBnClickedRadio1bp3p();
+	afx_msg void OnBnClickedRadio1bp2p();
+	afx_msg void OnBnClickedRadio1bp1p();
 };

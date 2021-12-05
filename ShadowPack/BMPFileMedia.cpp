@@ -185,7 +185,7 @@ void CBMPFileMedia::CloseMedia()
 	CPixelImageMedia::Free();
 }
 
-void CBMPFileMedia::AddOptPage()
+void CBMPFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
 	/*
 	CString m_strbfSize;
@@ -211,8 +211,13 @@ void CBMPFileMedia::AddOptPage()
 	}
 
 	
-	m_OptDlg.AddPage(&m_OptPageBMPFile);
-	CPixelImageMedia::AddOptPage();
+	pPropertySheet->AddPage(&m_OptPageBMPFile);
+	CPixelImageMedia::AddOptPage(pPropertySheet);
+}
+
+void CBMPFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
+{
+	CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
 

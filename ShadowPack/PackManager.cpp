@@ -251,8 +251,7 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 		if (pPackItem->GetTotalSize() > (m_pMedia->GetMediaTotalBytes() - m_nTotalSize)) {
 			Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
 			CPackItem::Free(pPackItem);
-		}
-		if (!InsertPackItem(pPackItem, Errors)) {
+		} else if (!InsertPackItem(pPackItem, Errors)) {
 			CPackItem::Free(pPackItem);
 		} else {
 			m_nTotalSize += pPackItem->GetTotalSize();

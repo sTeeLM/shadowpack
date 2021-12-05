@@ -10,7 +10,7 @@
 class CMediaBase
 {
 public:
-	CMediaBase() {}
+	CMediaBase() : m_pOptDlg(NULL) {}
 	virtual ~CMediaBase() {}
 protected:
 #define MEDIA_HEADER_SIGN 0x12abcdef
@@ -33,7 +33,8 @@ public:
 
 // show options
 	virtual void ShowMediaOptionDlg();
-	virtual void AddOptPage() = 0;
+	virtual void AddOptPage(CMFCPropertySheet * pPropertySheet) = 0;
+	virtual void UpdateOpts(CMFCPropertySheet* pPropertySheet) = 0;
 
 // stream read and write
 	virtual CStreamBase * GetStream() = 0;
@@ -47,5 +48,5 @@ public:
 	virtual BOOL IsMediaDirty() = 0;
 
 protected:
-	CMediaOptionDlg m_OptDlg;
+	CMediaOptionDlg * m_pOptDlg;
 };

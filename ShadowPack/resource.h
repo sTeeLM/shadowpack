@@ -40,9 +40,9 @@
 #define IDC_STATIC_TOTAL_BYTE           1013
 #define IDC_EDIT_PASSWD1                1014
 #define IDC_PROGRESS                    1015
-#define IDC_STATIC_USED_BYTE            1015
 #define IDC_INFO_CAPICITY               1016
 #define IDC_STATICC_USED_BYTE           1016
+#define IDC_STATIC_USED_BYTE            1016
 #define IDC_INFO_FOOTER                 1017
 #define IDC_EDIT_PASSWD2                1018
 #define IDC_BTN_CANCEL                  1019

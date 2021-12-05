@@ -137,13 +137,32 @@ UINT CPixelImageMedia::GetTotalBlocks()
 	return m_nWidth * m_nHeight;
 }
 
-void CPixelImageMedia::AddOptPage()
+void CPixelImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
 	m_OptPagePixelImageMedia.m_nCrypto = m_Header.dwBPBCipher;
 	m_OptPagePixelImageMedia.m_nBytePerPixel = m_Header.dwBPBBlockPerByte - 1;
 	m_OptPagePixelImageMedia.m_strPasswd1 = m_OptPagePixelImageMedia.m_strPasswd2
 		= m_Cipher.GetPassword();
-	m_OptDlg.AddPage(&m_OptPagePixelImageMedia);
+	m_OptPagePixelImageMedia.m_nTotalBlocks = GetTotalBlocks();
+	m_OptPagePixelImageMedia.m_nUsedBytes = m_Header.BPBHeader.dwDataSize;
+	pPropertySheet->AddPage(&m_OptPagePixelImageMedia);
+}
+
+void CPixelImageMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
+{
+	if (m_OptPagePixelImageMedia.m_nCrypto != m_Header.dwBPBCipher) {
+		TRACE(_T("m_nCrypto change from %d to %d\n"), m_Header.dwBPBCipher, m_OptPagePixelImageMedia.m_nCrypto);
+		m_Header.dwBPBCipher = m_OptPagePixelImageMedia.m_nCrypto;
+		m_Cipher.SetKeyType((CPackCipher::PACK_CIPHER_TYPE_T)m_Header.dwBPBCipher, m_OptPagePixelImageMedia.m_strPasswd1);
+		m_bIsDirty = TRUE;
+	}
+
+	if (m_OptPagePixelImageMedia.m_nBytePerPixel >= 0 && m_OptPagePixelImageMedia.m_nBytePerPixel <= 3 &&
+			m_OptPagePixelImageMedia.m_nBytePerPixel != m_Header.dwBPBBlockPerByte - 1) {
+		TRACE(_T("m_nBytePerPixel change from %d to %d\n"), m_Header.dwBPBBlockPerByte, m_OptPagePixelImageMedia.m_nBytePerPixel + 1);
+		m_Header.dwBPBBlockPerByte = m_OptPagePixelImageMedia.m_nBytePerPixel + 1;
+	}
+
 }
 
 

@@ -166,15 +166,16 @@ BOOL CBytePerBlockMedia::Read(LPVOID pBuffer, UINT nSize, CProgressBase& Progres
 {
 	UINT nRead;
 	BOOL bRet = FALSE;
+	BYTE ReadBuffer[BPB_STREAM_BATCH_SIZE];
 	LPBYTE p = (LPBYTE)pBuffer;
 	ASSERT(nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL);
 	if (nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL) {
 		while (nSize > 0) {
 			nRead = nSize > BPB_STREAM_BATCH_SIZE ? BPB_STREAM_BATCH_SIZE : nSize;
-			if (!RawReadData(p, sizeof(m_Header) + GetOffset(), nRead, m_Header.dwBPBBlockPerByte, Error)) {
+			if (!RawReadData(ReadBuffer, sizeof(m_Header) + GetOffset(), nRead, m_Header.dwBPBBlockPerByte, Error)) {
 				break;
 			}
-			m_Cipher.DecryptBlock(p, nRead, GetOffset() + sizeof(m_Header));
+			m_Cipher.DecryptBlock(ReadBuffer, p, nRead, GetOffset() + sizeof(m_Header));
 			if (!Seek(nRead, STREAM_SEEK_CUR, Error)) {
 				break;
 			}
@@ -195,13 +196,14 @@ BOOL CBytePerBlockMedia::Write(const LPVOID pBuffer, UINT nSize, CProgressBase& 
 {
 	UINT nWrite;
 	BOOL bRet = FALSE;
+	BYTE WriteBuffer[BPB_STREAM_BATCH_SIZE];
 	LPBYTE p = (LPBYTE)pBuffer;
 	ASSERT(nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL);
 	if (nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL) {
 		while (nSize > 0) {
 			nWrite = nSize > BPB_STREAM_BATCH_SIZE ? BPB_STREAM_BATCH_SIZE : nSize;
-			m_Cipher.EncryptBlock(p, nWrite, GetOffset() + sizeof(m_Header));
-			if (!RawWriteData(p, sizeof(m_Header) + GetOffset(), nWrite, m_Header.dwBPBBlockPerByte, Error)) {
+			m_Cipher.EncryptBlock(p, WriteBuffer, nWrite, GetOffset() + sizeof(m_Header));
+			if (!RawWriteData(WriteBuffer, sizeof(m_Header) + GetOffset(), nWrite, m_Header.dwBPBBlockPerByte, Error)) {
 				break;
 			}
 			if (!Seek(nWrite, STREAM_SEEK_CUR, Error)) {
