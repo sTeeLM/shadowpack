@@ -26,7 +26,7 @@ public:
 		CProgressBase& Progress, CPackErrors& Errors) = 0;
 
 	// save changes to file
-	virtual BOOL SaveMedia(LPCTSTR szFilePath, UINT nDataSize, CProgressBase& Progress, CPackErrors& Errors) = 0;
+	virtual BOOL SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors) = 0;
 
 	// free all buffers
 	virtual void CloseMedia() = 0;

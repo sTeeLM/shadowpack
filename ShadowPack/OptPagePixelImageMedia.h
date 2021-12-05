@@ -10,6 +10,7 @@ class COptPagePixelImageMedia : public CMFCPropertyPage
 public:
 	COptPagePixelImageMedia(CWnd* pParent = nullptr);   // 标准构造函数
 	virtual ~COptPagePixelImageMedia();
+	BOOL OnInitDialog();
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -22,4 +23,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnCbnSelchangeComboCrypto();
+	CString m_strPasswd1;
+	CString m_strPasswd2;
+	CComboBox m_ctlCrypto;
+	INT m_nCrypto;
+	INT m_nBytePerPixel;
 };

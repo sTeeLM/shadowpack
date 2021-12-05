@@ -34,6 +34,7 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg void OnClose();
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnMediaOpen();
@@ -60,7 +61,8 @@ public:
 	CString m_szMediaPathName;
 	CString m_szItemPathName;
 	BOOL m_bCloseOnSave;
-	CMediaBase* m_pMedia;
+	BOOL m_bInProgress;
+	BOOL m_bQuitOnClose;
 
 protected:
 	typedef void (CShadowPackDlg::* FN_PACK_THREAD) ();
@@ -79,9 +81,12 @@ protected:
 	void CShadowPackDlg::StartThread(FN_PACK_THREAD fn);
 	static UINT __cdecl fnThread(LPVOID p);
 protected:
+	void UpdateUI();
 	void ThreadOpenMedia();
 	void ThreadSaveMedia();
 	void ThreadExportItem();
 	void ThreadAddItem();
 	
+public:
+	afx_msg void OnLvnItemChangedListData(NMHDR* pNMHDR, LRESULT* pResult);
 };

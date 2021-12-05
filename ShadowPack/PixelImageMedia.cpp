@@ -139,6 +139,10 @@ UINT CPixelImageMedia::GetTotalBlocks()
 
 void CPixelImageMedia::AddOptPage()
 {
+	m_OptPagePixelImageMedia.m_nCrypto = m_Header.dwBPBCipher;
+	m_OptPagePixelImageMedia.m_nBytePerPixel = m_Header.dwBPBBlockPerByte - 1;
+	m_OptPagePixelImageMedia.m_strPasswd1 = m_OptPagePixelImageMedia.m_strPasswd2
+		= m_Cipher.GetPassword();
 	m_OptDlg.AddPage(&m_OptPagePixelImageMedia);
 }
 
@@ -234,27 +238,27 @@ BYTE CPixelImageMedia::F5RevLookupTable[8] = {
 
 BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 {
-	ASSERT(nBlockPerByte <= 3 && nBlockPerByte >= 0);
+	ASSERT(nBlockPerByte <= 4 && nBlockPerByte >= 1);
 	CPixelBlock* pPixelBlock = m_pBlockBuffer; // this always is first object!
-	pPixelBlock += nOffset;
+	pPixelBlock += nOffset * nBlockPerByte;
 	BYTE nRet = 0;
 	BYTE nTarget = 0;
 	if (nBlockPerByte == 1) {          /* R: 3, G 2, B 3*/
 		nRet = pPixelBlock[0].m_nRed & 0x7;
-		nRet <<= 3;
-		nRet |= pPixelBlock[0].m_nGreen & 0x3;
 		nRet <<= 2;
+		nRet |= pPixelBlock[0].m_nGreen & 0x3;
+		nRet <<= 3;
 		nRet |= pPixelBlock[0].m_nBlue & 0x7;
 	} else if (nBlockPerByte == 2) {   /* R£º2£¬G 1£¬ B 1|R£º2£¬G 1£¬ B 1*/
 		nRet = pPixelBlock[0].m_nRed & 0x3;
-		nRet <<= 2;
+		nRet <<= 1;
 		nRet |= pPixelBlock[0].m_nGreen & 0x1;
 		nRet <<= 1;
 		nRet |= pPixelBlock[0].m_nBlue & 0x1;
-		nRet <<= 1;
+		nRet <<= 2;
 
 		nRet |= pPixelBlock[1].m_nRed & 0x3;
-		nRet <<= 2;
+		nRet <<= 1;
 		nRet |= pPixelBlock[1].m_nGreen & 0x1;
 		nRet <<= 1;
 		nRet |= pPixelBlock[1].m_nBlue & 0x1;
@@ -296,18 +300,18 @@ BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 
 void CPixelImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte)
 {
-	ASSERT(nBlockPerByte <= 3 && nBlockPerByte >= 0);
+	ASSERT(nBlockPerByte <= 4 && nBlockPerByte >= 1);
 	CPixelBlock* pPixelBlock = m_pBlockBuffer; // this always is first object!
-	pPixelBlock += nOffset;
+	pPixelBlock += nOffset * nBlockPerByte;
 	BYTE nTarget = 0;
 	BYTE nRet = 0;
 	BYTE nRes;
 	if (nBlockPerByte == 1) {          /* R: 3, G 2, B 3*/
 		pPixelBlock[0].m_nRed &= ~0x7;
-		pPixelBlock[0].m_nRed |= ((nData & 0xE0) >> 5);
+		pPixelBlock[0].m_nRed |= ((nData >> 5) & 0x7);
 
 		pPixelBlock[0].m_nGreen &= ~0x3;
-		pPixelBlock[0].m_nGreen |= ((nData & 0x18) >> 3);
+		pPixelBlock[0].m_nGreen |= ((nData >> 3) & 0x3);
 
 		pPixelBlock[0].m_nBlue &= ~0x7;
 		pPixelBlock[0].m_nBlue |= (nData & 0x7);

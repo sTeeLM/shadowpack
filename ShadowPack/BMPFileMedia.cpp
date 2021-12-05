@@ -108,9 +108,8 @@ err:
 }
 
 // save changes to file
-BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, UINT nDataSize, CProgressBase& Progress, CPackErrors& Errors)
+BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors)
 {
-	BITMAPFILEHEADER fileHeader;
 	LPBITMAPINFOHEADER  pinfoHeader = NULL;
 	BOOL bRet = FALSE;
 	FILE* pFile = NULL;
@@ -119,10 +118,6 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, UINT nDataSize, CProgressBase&
 
 	if (!m_pfileHeader) {
 		Errors.SetError(CPackErrors::PE_INTERNAL);
-		goto err;
-	}
-
-	if (!CPixelImageMedia::SetMediaUsedBytes(nDataSize,Errors)) {
 		goto err;
 	}
 
@@ -170,6 +165,10 @@ err:
 	if (pScanLine) {
 		free(pScanLine);
 		pScanLine = NULL;
+	}
+	if (pFile) {
+		fclose(pFile);
+		pFile = NULL;
 	}
 	return bRet;
 }

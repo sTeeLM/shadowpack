@@ -84,7 +84,7 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 
 	 // load item into list
 	 
-	while (1) {
+	while ((m_pMedia->GetMediaUsedBytes() - m_nTotalSize) > 0) {
 		if (Progress.IsCanceled()) {
 			Errors.SetError(CPackErrors::PE_CANCELED);
 			goto err;
@@ -95,22 +95,12 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 				goto err;
 			}
 			m_nTotalSize += pPackItem->GetTotalSize();
-		} else {
-			if (Errors.GetError() == CPackErrors::PE_EOF) {
-				 // 全部读取成功
-				break;
-			} else {
-				goto err;
-			}
 		}
 	}
 
 	ASSERT(m_nTotalSize == m_pMedia->GetMediaUsedBytes());
 
-	if (Errors.GetError() == CPackErrors::PE_EOF) {
-		Errors.SetError(CPackErrors::PE_OK);
-		return TRUE;
-	}
+	return TRUE;
  err:
 	ClearAllItems();
 	return FALSE;
@@ -160,9 +150,10 @@ BOOL CPackManager::SaveMedia(CProgressBase& Progress, CPackErrors& Errors)
 	Progress.Reset();
 
 	// save media
-	if (!m_pMedia->SaveMedia(m_strMediaPath, GetTotalSize(), Progress, Errors)) {
+	if (!m_pMedia->SaveMedia(m_strMediaPath, Progress, Errors)) {
 		goto err;
 	}
+	m_bDirty = FALSE;
 	return TRUE;
 err:
 	return FALSE;
@@ -237,6 +228,8 @@ BOOL CPackManager::ExportSelectedItemsToDir(LPCTSTR szItemPath, CProgressBase& P
 		pItem = (CPackItem*)CListCtrl::GetItemData(nItem);
 		if (pItem) {
 			strItemPath = szItemPath;
+			if (strItemPath.Right(1).Compare(_T("\\")))
+				strItemPath += _T("\\");
 			strItemPath += pItem->GetName();
 			if (!pItem->WriteItemToFile(strItemPath, Progress, Errors)) {
 				AfxMessageBox(Errors.ToString());
@@ -254,7 +247,7 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 	CPackItem* pPackItem = NULL;
 
 	pPackItem = CPackItem::CreateItemFromFile(szItemPath, Progress, Errors);
-	if (!pPackItem) {
+	if (pPackItem) {
 		if (pPackItem->GetTotalSize() > (m_pMedia->GetMediaTotalBytes() - m_nTotalSize)) {
 			Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
 			CPackItem::Free(pPackItem);
@@ -263,7 +256,8 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 			CPackItem::Free(pPackItem);
 		} else {
 			m_nTotalSize += pPackItem->GetTotalSize();
-			return TRUE;
+			m_bDirty = TRUE;
+			return m_pMedia->SetMediaUsedBytes(m_nTotalSize, Errors);
 		}
 	}
 	return FALSE;
@@ -274,17 +268,19 @@ void CPackManager::DeleteSelectedItems()
 	POSITION pos = CListCtrl::GetFirstSelectedItemPosition();
 	CPackItem* pItem = NULL;
 	INT nItem;
+	CPackErrors Errors;
 
 	while (pos != NULL) {
 		nItem = CListCtrl::GetNextSelectedItem(pos);
 		pItem = (CPackItem*)CListCtrl::GetItemData(nItem);
 		if (pItem) {
-			CPackItem::Free(pItem);
 			m_nTotalSize -= pItem->GetTotalSize();
+			CPackItem::Free(pItem);
 		} else {
 			ASSERT(FALSE);
 		}
 		m_bDirty = TRUE;
+		m_pMedia->SetMediaUsedBytes(m_nTotalSize, Errors);
 		CListCtrl::DeleteItem(nItem);
 	}
 
@@ -294,15 +290,17 @@ void CPackManager::ClearAllItems()
 {
 	CPackItem* pItem = NULL;
 	INT nItem = CListCtrl::GetItemCount();
-
-	for (INT i = 0; i < nItem; i++) {
-		pItem = (CPackItem*)CListCtrl::GetItemData(nItem);
+	CPackErrors Errors;
+	while (nItem) {
+		pItem = (CPackItem*)CListCtrl::GetItemData(nItem - 1);
 		if (pItem) {
 			CPackItem::Free(pItem);
 		}
+		nItem--;
 	}
 	m_nTotalSize = 0;
 	m_bDirty = TRUE;
+	m_pMedia->SetMediaUsedBytes(m_nTotalSize, Errors);
 	CListCtrl::DeleteAllItems();
 }
 
@@ -352,7 +350,10 @@ BOOL CPackManager::InsertPackItem(CPackItem* pItem, CPackErrors& Errors)
 		goto err;
 	}
 
-	m_bDirty = TRUE;
+	if (!SetItemData(nIndex, (DWORD_PTR)pItem)) {
+		DeleteItem(nIndex);
+		goto err;
+	}
 
 	return TRUE;
 err:
@@ -367,6 +368,7 @@ CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromStream(CStreamBa
 	CPackItem* pPackItem = NULL;
 	LPBYTE* pData = NULL;
 	CHAR NameBuffer[MAX_PATH];
+
 	// read header
 	if (pStream->Read((LPBYTE)&Header, sizeof(Header), Progress, Errors)) {
 		if (Header.dwSign == PACK_ITEM_SIGN && Header.nNameSize < MAX_PATH) {
@@ -504,10 +506,6 @@ BOOL CPackManager::CPackItem::WriteItemToFile(LPCTSTR szFilePath, CProgressBase&
 
 			try {
 				file.Write(pBuffer, nWrite);
-				{
-					Errors.SetError(CPackErrors::PE_IO);
-					break;
-				}
 			} catch (CFileException* e) {
 				Errors.SetError(CPackErrors::PE_IO);
 				break;

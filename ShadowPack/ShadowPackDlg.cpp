@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "framework.h"
+#include "PackUtils.h"
 #include "ShadowPack.h"
 #include "ShadowPackDlg.h"
 #include "afxdialogex.h"
@@ -51,8 +52,11 @@ END_MESSAGE_MAP()
 
 
 
-CShadowPackDlg::CShadowPackDlg(CWnd* pParent /*=nullptr*/)
-	: CDialog(IDD_SHADOWPACK_DIALOG, pParent)
+CShadowPackDlg::CShadowPackDlg(CWnd* pParent /*=nullptr*/):
+	m_bCloseOnSave(FALSE),
+	m_bQuitOnClose(FALSE),
+	m_bInProgress(NULL),
+	CDialog(IDD_SHADOWPACK_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -68,6 +72,7 @@ BEGIN_MESSAGE_MAP(CShadowPackDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_CLOSE()
 	ON_BN_CLICKED(IDC_BTN_MEDIA_OPEN, &CShadowPackDlg::OnBnClickedBtnMediaOpen)
 	ON_BN_CLICKED(IDC_BTN_MEDIA_CLOSE, &CShadowPackDlg::OnBnClickedBtnMediaClose)
 	ON_BN_CLICKED(IDC_BTN_MEDIA_SAVE, &CShadowPackDlg::OnBnClickedBtnMediaSave)
@@ -77,6 +82,7 @@ BEGIN_MESSAGE_MAP(CShadowPackDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_ITEM_CLEAR_ALL, &CShadowPackDlg::OnBnClickedBtnItemClearAll)
 	ON_BN_CLICKED(IDC_BTN_CANCEL, &CShadowPackDlg::OnBnClickedBtnCancel)
 	ON_BN_CLICKED(IDC_BTN_ITEM_DELETE, &CShadowPackDlg::OnBnClickedBtnItemDelete)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_DATA, &CShadowPackDlg::OnLvnItemChangedListData)
 END_MESSAGE_MAP()
 
 
@@ -117,7 +123,7 @@ BOOL CShadowPackDlg::OnInitDialog()
 	m_ctlCapicityChart.Initialize(this, IDC_IMAGE_CAPICITY);
 	m_ctlProgress.Initialize(this, IDC_PROGRESS);
 	m_ctlFileManager.Initialize(this, IDC_LIST_DATA);
-
+	UpdateUI();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -170,11 +176,21 @@ HCURSOR CShadowPackDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CShadowPackDlg::OnClose()
+{
+	m_bQuitOnClose = TRUE;
+	OnBnClickedBtnMediaClose();
+//	CDialog::OnClose();
+}
+
 
 UINT __cdecl CShadowPackDlg::fnThread(LPVOID p)
 {
 	CPackThreadParam* pParam = (CPackThreadParam*)p;
 	(pParam->m_pThis->*(pParam->m_pFn))();
+	pParam->m_pThis->m_bInProgress = FALSE;
+	if(!pParam->m_pThis->m_bQuitOnClose)
+		pParam->m_pThis->UpdateUI();
 	delete pParam;
 	return 0;
 }
@@ -182,6 +198,8 @@ UINT __cdecl CShadowPackDlg::fnThread(LPVOID p)
 void CShadowPackDlg::StartThread(FN_PACK_THREAD fn)
 {
 	CPackThreadParam* pParam = new CPackThreadParam(this, fn);
+
+	m_bInProgress = TRUE;
 	AfxBeginThread(fnThread, pParam);
 }
 
@@ -223,16 +241,17 @@ void CShadowPackDlg::ThreadOpenMedia()
 
 void CShadowPackDlg::OnBnClickedBtnMediaOpen()
 {
+	CMediaBase* pMedia;
 	CString szFilter = CMediaFactory::CreateExtTable();
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, 
 		szFilter, NULL, 0, TRUE);
 	if (!m_ctlFileManager.MediaAttached()) {
 		if (dlg.DoModal() == IDOK) {
 			m_szMediaPathName = dlg.GetPathName();
-			m_pMedia = CMediaFactory::CreateMediaFromExt(dlg.GetFileExt());
+			pMedia = CMediaFactory::CreateMediaFromExt(dlg.GetFileExt());
 			m_ctlProgress.Reset();
-			if(m_pMedia) {
-				m_ctlFileManager.AttachMedia(m_pMedia);
+			if(pMedia) {
+				m_ctlFileManager.AttachMedia(pMedia);
 				StartThread(&CShadowPackDlg::ThreadOpenMedia);
 			} 
 			else
@@ -254,11 +273,23 @@ void CShadowPackDlg::OnBnClickedBtnMediaClose()
 				OnBnClickedBtnMediaSave();
 			} else {
 				m_ctlFileManager.DettachMedia();
+				if (m_bQuitOnClose) {
+					CDialog::OnCancel();
+				}
 			}
 		} else {
 			m_ctlFileManager.DettachMedia();
+			if (m_bQuitOnClose) {
+				CDialog::OnCancel();
+			}
+		}
+	} else {
+		if (m_bQuitOnClose) {
+			CDialog::OnCancel();
 		}
 	}
+
+	UpdateUI();
 }
 
 void CShadowPackDlg::ThreadSaveMedia()
@@ -270,6 +301,9 @@ void CShadowPackDlg::ThreadSaveMedia()
 		if (m_bCloseOnSave) {
 			m_ctlFileManager.DettachMedia();
 			m_bCloseOnSave = FALSE;
+			if (m_bQuitOnClose) {
+				CDialog::OnCancel();
+			}
 		}
 	}
 }
@@ -282,13 +316,11 @@ void CShadowPackDlg::OnBnClickedBtnMediaSave()
 	}
 }
 
-#include "BMPFileMedia.h"
 void CShadowPackDlg::OnBnClickedBtnMediaOption()
 {
-//	if(m_ctlFileManager.MediaAttached())
-//		m_ctlFileManager.GetMedia()->ShowMediaOptionDlg();
-	CBMPFileMedia media;
-	media.ShowMediaOptionDlg();
+	if(m_ctlFileManager.MediaAttached())
+		m_ctlFileManager.GetMedia()->ShowMediaOptionDlg();
+	UpdateUI();
 }
 
 void CShadowPackDlg::ThreadExportItem()
@@ -326,6 +358,45 @@ void CShadowPackDlg::OnBnClickedBtnItemExport()
 	}
 }
 
+void CShadowPackDlg::UpdateUI()
+{
+	INT nPercent = 0;
+	CString strUsed, strTotal;
+	GetDlgItem(IDC_BTN_MEDIA_OPEN)->EnableWindow(!m_bInProgress && ! m_ctlFileManager.MediaAttached());
+	GetDlgItem(IDC_BTN_MEDIA_CLOSE)->EnableWindow(!m_bInProgress && m_ctlFileManager.MediaAttached());
+	GetDlgItem(IDC_BTN_MEDIA_SAVE)->EnableWindow(!m_bInProgress 
+		&& m_ctlFileManager.MediaAttached() 
+		&& (m_ctlFileManager.GetMedia()->IsMediaDirty() || m_ctlFileManager.IsDirty()));
+	GetDlgItem(IDC_BTN_MEDIA_OPTION)->EnableWindow(!m_bInProgress && m_ctlFileManager.MediaAttached());
+
+	GetDlgItem(IDC_BTN_ITEM_EXPORT)->EnableWindow(!m_bInProgress && m_ctlFileManager.MediaAttached()
+		&& m_ctlFileManager.GetSelectedCount() > 0);
+	GetDlgItem(IDC_BTN_ITEM_ADD)->EnableWindow(!m_bInProgress && m_ctlFileManager.MediaAttached()
+		&& m_ctlFileManager.GetTotalSize() < m_ctlFileManager.GetMedia()->GetMediaTotalBytes());
+	GetDlgItem(IDC_BTN_ITEM_DELETE)->EnableWindow(!m_bInProgress &&  m_ctlFileManager.MediaAttached()
+		&& m_ctlFileManager.GetSelectedCount() > 0);
+	GetDlgItem(IDC_BTN_ITEM_CLEAR_ALL)->EnableWindow(!m_bInProgress && m_ctlFileManager.MediaAttached()
+		&& m_ctlFileManager.GetItemCount() > 0);
+
+	GetDlgItem(IDC_BTN_CANCEL)->EnableWindow(m_bInProgress);
+
+	if (m_ctlFileManager.GetMedia() && m_ctlFileManager.GetMedia()->GetMediaTotalBytes() > 0) {
+		nPercent = (m_ctlFileManager.GetMedia()->GetMediaTotalBytes() - m_ctlFileManager.GetMedia()->GetMediaUsedBytes()) * 100 / m_ctlFileManager.GetMedia()->GetMediaTotalBytes();
+		CPackUtils::TranslateSize(m_ctlFileManager.GetMedia()->GetMediaTotalBytes(), strTotal);
+		CPackUtils::TranslateSize(m_ctlFileManager.GetMedia()->GetMediaUsedBytes(), strUsed);
+	} else {
+		nPercent = 0;
+		strTotal = strUsed = _T("");
+	}
+
+	m_ctlCapicityChart.SetFreePercent(nPercent,(m_ctlFileManager.GetMedia() && m_ctlFileManager.MediaAttached()));
+	CString strTemp;
+	strTemp.Format(_T("%s/%s"), (LPCTSTR)strUsed, (LPCTSTR)strTotal);
+	m_ctlCapicityInfo.SetWindowText(strTemp);
+
+	m_ctlProgress.ShowWindow(m_bInProgress);
+}
+
 void CShadowPackDlg::ThreadAddItem()
 {
 	CPackErrors Errors;
@@ -348,11 +419,13 @@ void CShadowPackDlg::OnBnClickedBtnItemAdd()
 void CShadowPackDlg::OnBnClickedBtnItemDelete()
 {
 	m_ctlFileManager.DeleteSelectedItems();
+	UpdateUI();
 }
 
 void CShadowPackDlg::OnBnClickedBtnItemClearAll()
 {
 	m_ctlFileManager.ClearAllItems();
+	UpdateUI();
 }
 
 
@@ -363,3 +436,11 @@ void CShadowPackDlg::OnBnClickedBtnCancel()
 
 
 
+void CShadowPackDlg::OnLvnItemChangedListData(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	*pResult = 0;
+	TRACE(_T("OnLvnItemChangedListData\n"));
+	UpdateUI();
+}

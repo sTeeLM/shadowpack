@@ -13,6 +13,14 @@ CPackCipher::~CPackCipher(void)
 
 }
 
+LPCTSTR CPackCipher::m_CiherNames[] =
+{
+	_T("≤ªº”√‹"),
+	_T("AES"),
+	_T("SEED"),
+	_T("CAMELLIA")
+};
+
 void CPackCipher::GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex)
 {
 	memcpy(iv, &nIndex, 8); // 8 byte
@@ -31,7 +39,7 @@ void CPackCipher::GenerateKey(LPCTSTR szPassword)
 	MD5_Init(&ctx);
 	CT2CA szPassA(szPassword);
 
-	::ZeroMemory(m_Key, sizeof(m_Key));
+	ZeroMemory(m_Key, sizeof(m_Key));
 
 	MD5_Update(&ctx, szPassA, strlen(szPassA));
 	MD5_Final(m_Key, &ctx);
@@ -46,6 +54,8 @@ BOOL CPackCipher::SetKeyType(PACK_CIPHER_TYPE_T type,LPCTSTR szPassword)
 		// generate key
 		GenerateKey(szPassword);
 	}
+
+	m_strPassword = (szPassword == NULL ? _T("") : szPassword);
 
 	m_Type = type;
 
@@ -90,6 +100,7 @@ void CPackCipher::Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL
 	}
 
 	if (block == NULL) {
+		CopyMemory(pBufferTo, pBufferFrom, nSize);
 		return; // CIPHER_NONE
 	}
 
@@ -100,6 +111,11 @@ void CPackCipher::Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL
 
 	CRYPTO_ctr128_encrypt((const unsigned char*)pBufferFrom, (unsigned char*)pBufferTo,
 		nSize, &m_CipherKey, iv, ecount_buf, &num, block);
+}
+
+CString CPackCipher::GetPassword()
+{
+	return m_strPassword;
 }
 
 void CPackCipher::EncryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset)
@@ -120,4 +136,17 @@ void CPackCipher::DecryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset)
 void CPackCipher::DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset)
 {
 	Crypt(pBufferFrom, pBufferTo, nSize, FALSE, nOffset);
+}
+
+UINT CPackCipher::GetCipherCount()
+{
+	return CIPHER_CNT;
+}
+
+LPCTSTR CPackCipher::GetCipherName(UINT nIndex)
+{
+	if (nIndex < CIPHER_CNT) {
+		return m_CiherNames[nIndex];
+	}
+	return _T("");
 }

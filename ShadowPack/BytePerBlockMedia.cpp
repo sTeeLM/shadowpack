@@ -5,6 +5,7 @@ CBytePerBlockMedia::CBytePerBlockMedia() :
 	m_bIsDirty(FALSE)
 {
 	memset(&m_Header, 0, sizeof(m_Header));
+	m_Header.dwBPBBlockPerByte = 1;
 }
 
 CBytePerBlockMedia::~CBytePerBlockMedia()
@@ -49,7 +50,6 @@ BOOL CBytePerBlockMedia::RawWriteData(LPVOID pBuffer, UINT nOffset, UINT nSize, 
 		for (UINT i = 0; i < nSize; i++) {
 			SetByteToBlocks(p[i], nOffset + i, nBPBBlockPerByte);
 		}
-		m_bIsDirty = TRUE;
 		return TRUE;
 	}
 	else {
@@ -130,10 +130,11 @@ test_encrypt:
 
 // 没有发现任何有效的头，作为空白文件处理
 	if (GetTotalBlocks() >= sizeof(Header)) {
-		HeaderPlain.dwBPBMediaSign = MEDIA_HEADER_SIGN;
+		HeaderPlain.dwBPBMediaSign = BPB_MEDIA_HEADER_SIGN;
 		HeaderPlain.dwBPBBlockPerByte = 1;
-		HeaderPlain.BPBHeader.dwSign = BPB_MEDIA_HEADER_SIGN;
+		HeaderPlain.BPBHeader.dwSign = MEDIA_HEADER_SIGN;
 		HeaderPlain.BPBHeader.dwDataSize = 0;
+		HeaderPlain.dwBPBCipher = CPackCipher::CIPHER_NONE;
 		m_Cipher.SetKeyType(CPackCipher::CIPHER_NONE, NULL);
 		goto success;
 	} else {
@@ -184,6 +185,8 @@ BOOL CBytePerBlockMedia::Read(LPVOID pBuffer, UINT nSize, CProgressBase& Progres
 		if (nSize == 0) {
 			bRet = TRUE;
 		}
+	} else {
+		Error.SetError(CPackErrors::PE_EOF);
 	}
 	return bRet;
 }
@@ -197,20 +200,23 @@ BOOL CBytePerBlockMedia::Write(const LPVOID pBuffer, UINT nSize, CProgressBase& 
 	if (nSize + GetOffset() <= GetMediaTotalBytes() && pBuffer != NULL) {
 		while (nSize > 0) {
 			nWrite = nSize > BPB_STREAM_BATCH_SIZE ? BPB_STREAM_BATCH_SIZE : nSize;
+			m_Cipher.EncryptBlock(p, nWrite, GetOffset() + sizeof(m_Header));
 			if (!RawWriteData(p, sizeof(m_Header) + GetOffset(), nWrite, m_Header.dwBPBBlockPerByte, Error)) {
 				break;
 			}
-			m_Cipher.EncryptBlock(p, nWrite, GetOffset() + sizeof(m_Header));
-			m_nOffset += nWrite;
 			if (!Seek(nWrite, STREAM_SEEK_CUR, Error)) {
 				break;
 			}
 			p += nWrite;
+			nSize -= nWrite;
 			Progress.Increase(nWrite);
 		}
 		if (nSize == 0) {
 			bRet = TRUE;
 		}
+	}
+	else {
+		Error.SetError(CPackErrors::PE_EOF);
 	}
 	return bRet;
 }
@@ -249,7 +255,7 @@ BOOL CBytePerBlockMedia::SetMediaUsedBytes(UINT nSize, CPackErrors& Error)
 
 UINT CBytePerBlockMedia::GetMediaUsedBytes()
 {
-	return GetMediaTotalBytes() - m_Header.BPBHeader.dwDataSize;
+	return m_Header.BPBHeader.dwDataSize;
 }
 
 UINT CBytePerBlockMedia::GetMediaTotalBytes()

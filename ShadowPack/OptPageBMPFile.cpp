@@ -38,6 +38,7 @@ void COptPageBMPFile::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(COptPageBMPFile, CMFCPropertyPage)
+
 END_MESSAGE_MAP()
 
 BOOL COptPageBMPFile::OnInitDialog()

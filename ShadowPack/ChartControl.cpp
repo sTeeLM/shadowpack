@@ -45,9 +45,9 @@ void CChartControl::SetFreePercent(INT nPercent, BOOL bEnable/*  = TRUE */)
 {
 	if(nPercent >= 0 && nPercent <= 100) {
 		m_nPercent = nPercent;
-		m_bEnable = bEnable;
-		Invalidate();
 	}
+	m_bEnable = bEnable;
+	Invalidate();
 }
 
 void CChartControl::OnPaint( )

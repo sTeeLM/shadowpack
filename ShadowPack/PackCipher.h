@@ -35,6 +35,9 @@ public:
 	void DecryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset);
 	void DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset);
 	PACK_CIPHER_TYPE_T GetCipherType(){return m_Type;}
+	CString GetPassword();
+	static UINT GetCipherCount();
+	static LPCTSTR GetCipherName(UINT nIndex);
 private:
 	void GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex);
 	void GenerateKey(LPCTSTR szPassword);
@@ -43,4 +46,6 @@ private:
 	BYTE m_Key[CIPHER_BLOCK_SIZE];
 	PACK_CIPHER_TYPE_T m_Type;
 	PACK_CIPHER_KEY_T m_CipherKey;
+	CString m_strPassword;
+	static LPCTSTR m_CiherNames[];
 };
