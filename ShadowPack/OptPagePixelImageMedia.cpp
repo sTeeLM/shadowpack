@@ -18,6 +18,8 @@ COptPagePixelImageMedia::COptPagePixelImageMedia(CWnd* pParent /*=nullptr*/)
 	, m_strPasswd2(_T(""))
 	, m_nCrypto(0)
 	, m_nBytePerPixel(0)
+	, m_nTotalBlocks(0)
+	, m_nUsedBytes(0)
 {
 
 }
@@ -33,6 +35,10 @@ void COptPagePixelImageMedia::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_PASSWD2, m_strPasswd2);
 	DDX_Control(pDX, IDC_COMBO_CRYPTO, m_ctlCrypto);
 	DDX_Radio(pDX, IDC_RADIO_1BP1P, m_nBytePerPixel);
+	if (m_strPasswd1.Compare(m_strPasswd2)) {
+		AfxMessageBox(_T("Not Match!"));
+		pDX->Fail();
+	}
 }
 
 
@@ -48,6 +54,15 @@ BOOL COptPagePixelImageMedia::OnInitDialog()
 			m_ctlCrypto.AddString(CPackCipher::GetCipherName(i));
 		}
 		m_ctlCrypto.SetCurSel(m_nCrypto);
+
+		GetDlgItem(IDC_EDIT_PASSWD1)->EnableWindow(m_nCrypto != CPackCipher::CIPHER_NONE);
+		GetDlgItem(IDC_EDIT_PASSWD2)->EnableWindow(m_nCrypto != CPackCipher::CIPHER_NONE);
+
+		GetDlgItem(IDC_RADIO_1BP1P)->EnableWindow(m_bBPP1);
+		GetDlgItem(IDC_RADIO_1BP1P)->EnableWindow(m_bBPP2);
+		GetDlgItem(IDC_RADIO_1BP1P)->EnableWindow(m_bBPP3);
+		GetDlgItem(IDC_RADIO_1BP1P)->EnableWindow(m_bBPP4);
+
 		return TRUE;
 	}
 	return FALSE;
@@ -57,5 +72,7 @@ BOOL COptPagePixelImageMedia::OnInitDialog()
 
 void COptPagePixelImageMedia::OnCbnSelchangeComboCrypto()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	CComboBox* p = dynamic_cast<CComboBox*> (GetDlgItem(IDC_COMBO_CRYPTO));
+	GetDlgItem(IDC_EDIT_PASSWD1)->EnableWindow(p->GetCurSel() != CPackCipher::CIPHER_NONE);
+	GetDlgItem(IDC_EDIT_PASSWD2)->EnableWindow(p->GetCurSel() != CPackCipher::CIPHER_NONE);
 }

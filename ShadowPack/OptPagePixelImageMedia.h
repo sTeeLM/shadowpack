@@ -28,4 +28,6 @@ public:
 	CComboBox m_ctlCrypto;
 	INT m_nCrypto;
 	INT m_nBytePerPixel;
+	UINT m_nTotalBlocks;
+	UINT m_nUsedBytes;
 };
