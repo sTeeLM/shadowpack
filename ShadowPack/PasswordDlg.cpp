@@ -13,6 +13,7 @@ IMPLEMENT_DYNAMIC(CPasswordDlg, CDialogEx)
 
 CPasswordDlg::CPasswordDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG_PASSWORD, pParent)
+	, m_strPassword(_T(""))
 {
 
 }
@@ -23,12 +24,17 @@ CPasswordDlg::~CPasswordDlg()
 
 CString CPasswordDlg::GetPassword()
 {
-	return CString();
+	if (DoModal() == IDOK) {
+		return m_strPassword;
+	} else {
+		return _T("");
+	}
 }
 
 void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_EDIT_PASSWORD, m_strPassword);
 }
 
 

@@ -33,18 +33,17 @@
 #define IDC_COMBO_CRYPTO                1008
 #define IDC_BTN_MEDIA_SAVE              1009
 #define IDC_RADIO_1BP1P                 1009
-#define IDC_BTN_MEDIA_OPTION            1010
-#define IDC_EDIT_PASSWD1                1010
-#define IDC_PROGRESS                    1011
-#define IDC_RADIO_1BP2P                 1011
-#define IDC_INFO_CAPICITY               1012
+#define IDC_RADIO_1BP2P                 1010
+#define IDC_RADIO_1BP3P                 1011
 #define IDC_RADIO_1BP4P                 1012
-#define IDC_INFO_FOOTER                 1013
-#define IDC_RADIO_1BP3P                 1013
-#define IDC_EDIT2                       1014
-#define IDC_EDIT_PASSWD2                1014
-#define IDC_BTN_CANCEL                  1015
-#define IDC_EDIT_PASSWORD               1017
+#define IDC_BTN_MEDIA_OPTION            1013
+#define IDC_EDIT_PASSWD1                1014
+#define IDC_PROGRESS                    1015
+#define IDC_INFO_CAPICITY               1016
+#define IDC_INFO_FOOTER                 1017
+#define IDC_EDIT_PASSWD2                1018
+#define IDC_BTN_CANCEL                  1019
+#define IDC_EDIT_PASSWORD               1020
 
 // Next default values for new objects
 // 
