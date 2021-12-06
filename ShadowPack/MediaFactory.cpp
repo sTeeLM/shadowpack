@@ -2,10 +2,11 @@
 #include "pch.h"
 #include "MediaFactory.h"
 #include "BMPFileMedia.h"
+#include "JPEGFileMedia.h"
 
 CMediaFactory::ExtTable CMediaFactory::m_ExtTable[] = {
 	{&CBMPFileMedia::TestExt, &CBMPFileMedia::GetExtFilter, &CBMPFileMedia::Factory},
-
+	{&CJPEGFileMedia::TestExt, &CJPEGFileMedia::GetExtFilter, &CJPEGFileMedia::Factory},
 };
 
 CMediaFactory::CMediaFactory(void)

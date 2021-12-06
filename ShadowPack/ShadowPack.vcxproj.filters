@@ -90,6 +90,12 @@
     <ClInclude Include="PackUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CorImageMedia.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="JPEGFileMedia.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShadowPack.cpp">
@@ -144,6 +150,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="PackUtils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CorImageMedia.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="JPEGFileMedia.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

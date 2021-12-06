@@ -97,12 +97,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libjpeg;..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\openssl\win32\static\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -193,6 +193,8 @@
     <ClInclude Include="BMPFileMedia.h" />
     <ClInclude Include="BytePerBlockMedia.h" />
     <ClInclude Include="ChartControl.h" />
+    <ClInclude Include="CorImageMedia.h" />
+    <ClInclude Include="JPEGFileMedia.h" />
     <ClInclude Include="MediaOptionDlg.h" />
     <ClInclude Include="OptPageBMPFile.h" />
     <ClInclude Include="PackCipher.h" />
@@ -220,6 +222,8 @@
     <ClCompile Include="BMPFileMedia.cpp" />
     <ClCompile Include="BytePerBlockMedia.cpp" />
     <ClCompile Include="ChartControl.cpp" />
+    <ClCompile Include="CorImageMedia.cpp" />
+    <ClCompile Include="JPEGFileMedia.cpp" />
     <ClCompile Include="MediaBase.cpp" />
     <ClCompile Include="MediaOptionDlg.cpp" />
     <ClCompile Include="OptPageBMPFile.cpp" />
