@@ -20,6 +20,7 @@
 #define IDS_PASSWORD_CAN_NOT_NULL       112
 #define IDS_PASSWORD_CAN_NOT_MATCH      113
 #define IDS_OPTIONS                     114
+#define IDS_EMPTY_PACK                  115
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_PASSWORD             129
 #define IDD_PROPPAGE_PIXELMEDIA         130

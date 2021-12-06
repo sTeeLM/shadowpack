@@ -254,7 +254,10 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 	CPackItem* pPackItem = NULL;
 	ULONGLONG nSize;
 	Progress.Reset(IDS_READ_FILE);
-	if (CPackUtils::GetFileSize(szItemPath, nSize)) {
+
+	if (ItemExist(CPackUtils::GetPathName(szItemPath))) {
+		Errors.SetError(CPackErrors::PE_EXISTED, CPackUtils::GetPathName(szItemPath));
+	} else if (CPackUtils::GetFileSize(szItemPath, nSize)) {
 		if (nSize <= m_pMedia->GetMediaTotalBytes() - m_pMedia->GetMediaUsedBytes()) {
 			Progress.SetFullScale(nSize);
 			pPackItem = CPackItem::CreateItemFromFile(szItemPath, Progress, Errors);
@@ -271,8 +274,6 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 					m_bDirty = TRUE;
 					return m_pMedia->SetMediaUsedBytes(m_nTotalSize, Errors);
 				}
-			} else {
-				Errors.SetError(CPackErrors::PE_NOMEM);
 			}
 		} else {
 			Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
@@ -380,6 +381,21 @@ err:
 	return FALSE;
 }
 
+BOOL CPackManager::ItemExist(LPCTSTR szItemName)
+{
+	CPackItem* pItem = NULL;
+	INT nItem = CListCtrl::GetItemCount();
+	for (INT i = 0; i < nItem; i++) {
+		pItem = (CPackItem*)CListCtrl::GetItemData(i);
+		if (pItem) {
+			if (!pItem->GetName().CompareNoCase(szItemName)) {
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+
 
 
 CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromStream(CStreamBase* pStream, CProgressBase& Progress, CPackErrors& Errors)
@@ -435,7 +451,7 @@ CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromFile(LPCTSTR szF
 	ULONG nRead;
 	CPackItem* pPackItem = NULL;
 	LPBYTE pBuffer = NULL;
-	if (file.Open(szFilePath, CFile::modeRead, &exFile)) {
+	if (file.Open(szFilePath, CFile::modeRead | CFile::shareDenyWrite, &exFile)) {
 		nLength = file.GetLength();
 		pPackItem = new (std::nothrow) CPackItem();
 		if (pPackItem) {
@@ -495,7 +511,7 @@ BOOL CPackManager::CPackItem::WriteItemToStream(CStreamBase* pStream, CProgressB
 	Header.dwSign = PACK_ITEM_SIGN;
 	Header.nDataSize = m_nSize;
 	Header.nNameSize = strlen((LPSTR)sza);
-	Header.nTime = mktime(m_Time.GetGmtTm(&Tm));
+	Header.nTime = mktime(m_Time.GetLocalTm(&Tm));
 	if (pStream->Write(&Header, sizeof(Header), Progress, Errors)) {
 		if (pStream->Write((LPSTR)sza, Header.nNameSize, Progress, Errors)) {
 			if (pStream->Write(m_pData, Header.nDataSize, Progress, Errors)) {

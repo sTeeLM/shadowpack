@@ -362,6 +362,8 @@ void CShadowPackDlg::UpdateUI()
 {
 	INT nPercent = 0;
 	CString strUsed, strTotal;
+	CMenu* pSysMenu;
+
 	GetDlgItem(IDC_BTN_MEDIA_OPEN)->EnableWindow(!m_bInProgress && ! m_ctlFileManager.MediaAttached());
 	GetDlgItem(IDC_BTN_MEDIA_CLOSE)->EnableWindow(!m_bInProgress && m_ctlFileManager.MediaAttached());
 	GetDlgItem(IDC_BTN_MEDIA_SAVE)->EnableWindow(!m_bInProgress 
@@ -395,6 +397,9 @@ void CShadowPackDlg::UpdateUI()
 	m_ctlCapicityInfo.SetWindowText(strTemp);
 
 	m_ctlProgress.Show(m_bInProgress);
+
+	if((pSysMenu = GetSystemMenu(FALSE)))
+		pSysMenu->EnableMenuItem(SC_CLOSE, m_bInProgress ? MF_DISABLED : MF_ENABLED);
 }
 
 void CShadowPackDlg::ThreadAddItem()

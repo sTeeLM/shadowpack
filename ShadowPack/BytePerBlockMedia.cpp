@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "BytePerBlockMedia.h"
 #include "PackUtils.h"
+#include "resource.h"
 
 CBytePerBlockMedia::CBytePerBlockMedia() :
 	m_bIsDirty(FALSE)
@@ -159,6 +160,7 @@ test_encrypt:
 		HeaderPlain.BPBHeader.dwDataSize = 0;
 		HeaderPlain.dwBPBCipher = CPackCipher::CIPHER_NONE;
 		m_Cipher.SetKeyType(CPackCipher::CIPHER_NONE, NULL);
+		AfxMessageBox(IDS_EMPTY_PACK, MB_ICONINFORMATION);
 		goto success;
 	} else {
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_PACK);
@@ -299,7 +301,6 @@ UINT CBytePerBlockMedia::GetMediaUsedBytes()
 
 UINT CBytePerBlockMedia::GetMediaTotalBytes()
 {
-	ASSERT(GetTotalBlocks() / m_Header.dwBPBBlockPerByte >= sizeof(m_Header));
 	if(GetTotalBlocks() / m_Header.dwBPBBlockPerByte >= sizeof(m_Header))
 		return GetTotalBlocks() / m_Header.dwBPBBlockPerByte - sizeof(m_Header);
 	return 0;

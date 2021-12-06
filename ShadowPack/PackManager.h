@@ -76,6 +76,7 @@ public:
 
 private:
 	BOOL InsertPackItem(CPackItem * pItem, CPackErrors& Errors);
+	BOOL ItemExist(LPCTSTR szItemName);
 private:
 	CMediaBase* m_pMedia;
 	CString m_strMediaPath;

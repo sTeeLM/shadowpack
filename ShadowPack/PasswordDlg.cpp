@@ -35,6 +35,10 @@ void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT_PASSWORD, m_strPassword);
+	if (pDX->m_bSaveAndValidate && m_strPassword.GetLength() == 0) {
+		AfxMessageBox(IDS_PASSWORD_CAN_NOT_NULL);
+		pDX->Fail();
+	}
 }
 
 
