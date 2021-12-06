@@ -5,7 +5,7 @@
 CBytePerBlockMedia::CBytePerBlockMedia() :
 	m_bIsDirty(FALSE)
 {
-	memset(&m_Header, 0, sizeof(m_Header));
+	ZeroMemory(&m_Header, sizeof(m_Header));
 	m_Header.dwBPBBlockPerByte = 1;
 }
 
@@ -103,7 +103,7 @@ test_encrypt:
 					}
 				}
 				else {
-					Errors.SetError(CPackErrors::PE_ENCRYPT);
+					Errors.SetError(CPackErrors::PE_CIPHER);
 					goto err;
 				}
 				continue;
@@ -116,7 +116,7 @@ test_encrypt:
 					goto success;
 				}
 			} else {
-				Errors.SetError(CPackErrors::PE_ENCRYPT);
+				Errors.SetError(CPackErrors::PE_CIPHER);
 				goto err;
 			}
 
@@ -127,7 +127,7 @@ test_encrypt:
 					goto success;
 				}
 			} else {
-				Errors.SetError(CPackErrors::PE_ENCRYPT);
+				Errors.SetError(CPackErrors::PE_CIPHER);
 				goto err;
 			}
 
@@ -138,7 +138,7 @@ test_encrypt:
 					goto success;
 				}
 			} else {
-				Errors.SetError(CPackErrors::PE_ENCRYPT);
+				Errors.SetError(CPackErrors::PE_CIPHER);
 				goto err;
 			}
 		}

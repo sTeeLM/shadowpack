@@ -278,7 +278,7 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 			Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
 		}
 	} else {
-		Errors.SetError(CPackErrors::PE_IO);
+		Errors.SetError(CPackErrors::PE_IO, szItemPath, CPackUtils::GetLastError());
 	}
 	return FALSE;
 }
@@ -455,7 +455,7 @@ CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromFile(LPCTSTR szF
 						nRead = READ_WRITE_BUFFER_SIZE;
 						nRead = nRead > nLength ? (ULONG)nLength : nRead;
 						if (file.Read(pBuffer, nRead) != nRead) {
-							Errors.SetError(CPackErrors::PE_IO);
+							Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastError());
 							break;
 						}
 						nLength -= nRead;
@@ -477,7 +477,7 @@ CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromFile(LPCTSTR szF
 		}
 		file.Close();
 	} else {
-		Errors.SetError(CPackErrors::PE_IO);
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastError());
 	}
 	return NULL;
 }
@@ -523,7 +523,7 @@ BOOL CPackManager::CPackItem::WriteItemToFile(LPCTSTR szFilePath, CProgressBase&
 			try {
 				file.Write(pBuffer, nWrite);
 			} catch (CFileException* e) {
-				Errors.SetError(CPackErrors::PE_IO);
+				Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastError());
 				break;
 			}
 			nLength -= nWrite;
@@ -534,7 +534,7 @@ BOOL CPackManager::CPackItem::WriteItemToFile(LPCTSTR szFilePath, CProgressBase&
 		if (nLength == 0)
 			return TRUE;
 	} else {
-		Errors.SetError(CPackErrors::PE_IO);
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastError());
 	}
 
 	return FALSE;

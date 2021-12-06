@@ -6,21 +6,17 @@ class CPackErrors
 {
 public:
 	typedef enum {
-			PE_OK = 0, // OK
-			PE_CANCELED,  // user canceled
-			PE_NEED_PASSWORD,  // need password
+			PE_OK = 0,         // OK
+			PE_CANCELED,       // user canceled
 			PE_IO,             // read file or write file
 			PE_CORRUPT_DATA,   // data corrupted
-			PE_DECRYPT,        // decrypt error
-			PE_ENCRYPT,		   // encrypt error
+			PE_CIPHER,         // decrypt error
 			PE_OVER_CAPICITY,  // over capcity
 			PE_UNSUPPORT_PACK, // unsupport pack format
 			PE_UNSUPPORT_MEDIA, // unsupport file
-			PE_DUP_ITEM,        // dup item
 			PE_EXISTED,        // item exist
 			PE_NOMEM,          // no memory
 			PE_EOF,            // end of file
-			PE_TOO_LARGE_FILE, // file is too large
 			PE_INTERNAL,       // other error, bug??
 			PE_COUNT
 	}PACK_ERROR_T;

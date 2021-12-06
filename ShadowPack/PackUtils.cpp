@@ -194,6 +194,10 @@ BOOL CPackUtils::RemoveDir(LPCTSTR szPath)
 	return ret == 0;
 }
 
+CString CPackUtils::GetLastError()
+{
+	return GetLastError(::GetLastError());
+}
 
 CString CPackUtils::GetLastError(DWORD dwError)
 {

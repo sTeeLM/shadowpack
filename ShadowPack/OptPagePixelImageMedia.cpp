@@ -37,7 +37,7 @@ void COptPagePixelImageMedia::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_CRYPTO, m_ctlCrypto);
 	DDX_Radio(pDX, IDC_RADIO_1BP1P, m_nBytePerPixel);
 	if (pDX->m_bSaveAndValidate && m_strPasswd1.Compare(m_strPasswd2)) {
-		AfxMessageBox(_T("Not Match!"));
+		AfxMessageBox(IDS_PASSWORD_CAN_NOT_MATCH);
 		pDX->Fail();
 	}
 
@@ -46,7 +46,7 @@ void COptPagePixelImageMedia::DoDataExchange(CDataExchange* pDX)
 	}
 
 	if (pDX->m_bSaveAndValidate && m_nCrypto != 0 && m_strPasswd1.GetLength() == 0) {
-		AfxMessageBox(_T("Password can not be null!"));
+		AfxMessageBox(IDS_PASSWORD_CAN_NOT_NULL);
 		pDX->Fail();
 	}
 }

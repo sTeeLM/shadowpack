@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "BMPFileMedia.h"
+#include "PackUtils.h"
 #include "stdlib.h"
 #include "resource.h"
 
@@ -30,17 +31,17 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 
 	// open file and read meta
 	if ((pFile = _tfsopen(szFilePath, _T("rb"), _SH_DENYWR)) == NULL) {
-		Errors.SetError(CPackErrors::PE_IO);
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 		goto err;
 	}
 
 	if (fread(&fileHeader, sizeof(fileHeader), 1, pFile) != 1) {
-		Errors.SetError(CPackErrors::PE_IO);
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 		goto err;
 	}
 
 	if (fileHeader.bfType != 0x4d42) {
-		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA);
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
 
@@ -50,7 +51,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	}
 
 	if (fseek(pFile, 0, SEEK_SET) != 0 || fread(m_pfileHeader, fileHeader.bfOffBits, 1, pFile) != 1) {
-		Errors.SetError(CPackErrors::PE_IO);
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 		goto err;
 	}
 
@@ -58,7 +59,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 
 	if (pinfoHeader->biPlanes != 1 || (pinfoHeader->biBitCount != 24)
 		|| pinfoHeader->biCompression != BI_RGB) {
-		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA);
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
 
@@ -81,7 +82,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	// load scanline
 	for (INT i = 0; i < pinfoHeader->biHeight; i++) {
 		if (fread(pScanLine, nScanLineSize, 1, pFile) != 1) {
-			Errors.SetError(CPackErrors::PE_IO);
+			Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 			goto err;
 		}
 		CPixelImageMedia::SetScanline(i, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
@@ -138,12 +139,12 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 
 	// open file and write header
 	if ((pFile = _tfsopen(szFilePath, _T("wb"), _SH_DENYNO)) == NULL) {
-		Errors.SetError(CPackErrors::PE_IO);
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 		goto err;
 	}
 
 	if (fwrite(m_pfileHeader, m_pfileHeader->bfOffBits, 1, pFile) != 1) {
-		Errors.SetError(CPackErrors::PE_IO);
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 		goto err;
 	}
 
@@ -162,7 +163,7 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 	for (INT i = 0; i < pinfoHeader->biHeight; i++) {
 		CPixelImageMedia::GetScanline(i, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
 		if (fwrite(pScanLine, nScanLineSize, 1, pFile) != 1) {
-			Errors.SetError(CPackErrors::PE_IO);
+			Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 			goto err;
 		}
 		Progress.Increase(1);

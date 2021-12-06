@@ -66,7 +66,7 @@ void CProgressControl::Increase(ULONGLONG nVal)
 		CProgressCtrl::SetPos(nProgressNew);
 	}
 
-	TRACE("Increase %d, progress %ld\n", nVal, nProgressNew);
+	TRACE("Progress %d\n", nProgressNew);
 }
 
 void CProgressControl::Cancel(void)

@@ -17,13 +17,10 @@ CPackErrors::~CPackErrors()
 void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPath /* = NULL*/, LPCTSTR szReason /* = 0*/)
 {
 	m_eErrorCode = eErrorCode;
-/*
+
 	switch (m_eErrorCode) {
 	case PE_CANCELED:  // user canceled
 		m_eString.Format(IDS_PE_CANCELED);
-		break;
-	case PE_NEED_PASSWORD:  // need password
-		m_eString.Format(IDS_PE_NEED_PASSWORD);
 		break;
 	case PE_IO:             // read file or write file
 		m_eString.Format(IDS_PE_IO, szPath, szReason);
@@ -31,11 +28,8 @@ void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPat
 	case PE_CORRUPT_DATA:   // data corrupted
 		m_eString.Format(IDS_PE_CORRUPT_DATA);
 		break;
-	case PE_DECRYPT:        // decrypt error
-		m_eString.Format(IDS_PE_DECRYPT);
-		break;
-	case PE_ENCRYPT:		   // encrypt error
-		m_eString.Format(IDS_PE_ENCRYPT);
+	case PE_CIPHER:        // decrypt error
+		m_eString.Format(IDS_PE_CIPHER);
 		break;
 	case PE_OVER_CAPICITY:  // over capcity
 		m_eString.Format(IDS_PE_OVER_CAPICITY);
@@ -45,9 +39,6 @@ void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPat
 		break;
 	case PE_UNSUPPORT_MEDIA: // unsupport file
 		m_eString.Format(IDS_PE_UNSUPPORT_MEDIA);
-		break;
-	case PE_DUP_ITEM:        // dup item
-		m_eString.Format(IDS_PE_DUP_ITEM, szPath);
 		break;
 	case PE_EXISTED:        // item exist
 		m_eString.Format(IDS_PE_EXISTED, szPath);
@@ -60,7 +51,6 @@ void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPat
 		break;
 	default: m_eString = _T("ERROR!");
 	}
-	*/
 }
 
  CPackErrors::PACK_ERROR_T  CPackErrors::GetError()

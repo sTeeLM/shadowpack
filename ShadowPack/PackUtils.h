@@ -20,6 +20,7 @@ public:
 	static CString CreateTempPath();
 	static BOOL RemoveDir(LPCTSTR szPath);
 	static CString GetLastError(DWORD dwError);
+	static CString GetLastError();
 	static CString GetLastStdError(int err);
 	static void FillBufferRand(LPBYTE pBuffer, UINT nSize);
 };

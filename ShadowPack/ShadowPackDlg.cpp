@@ -266,7 +266,7 @@ void CShadowPackDlg::OnBnClickedBtnMediaClose()
 {
 	if (m_ctlFileManager.MediaAttached()) {
 		if (m_ctlFileManager.IsDirty()) {
-			if (AfxMessageBox(_T("Save?"), MB_YESNO) == IDYES) {
+			if (AfxMessageBox(IDS_CHANGED_SAVE, MB_YESNO) == IDYES) {
 				m_bCloseOnSave = TRUE;
 				OnBnClickedBtnMediaSave();
 			} else {

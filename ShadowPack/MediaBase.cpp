@@ -1,13 +1,16 @@
 #include "pch.h"
+#include "resource.h"
 #include "MediaBase.h"
 
 BOOL CMediaBase::ShowMediaOptionDlg(CPackErrors& Errors)
 {
 	CMediaOptionDlg* pDlg = new CMediaOptionDlg();
 	BOOL bRet;
+	CString strText;
 	if (pDlg) {
 		AddOptPage(pDlg);
-		pDlg->SetTitle(_T("ÉèÖÃ"));
+		strText.LoadString(IDS_OPTIONS);
+		pDlg->SetTitle(strText);
 		if (pDlg->DoModal() == IDOK) {
 			if (UpdateOpts(pDlg)) {
 				SetMediaDirty();
