@@ -65,7 +65,6 @@ void CShadowPackDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_INFO_CAPICITY, m_ctlCapicityInfo);
-	DDX_Control(pDX, IDC_INFO_FOOTER, m_ctlFooterInfo);
 }
 
 BEGIN_MESSAGE_MAP(CShadowPackDlg, CDialog)
@@ -121,7 +120,7 @@ BOOL CShadowPackDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	m_ctlCapicityChart.Initialize(this, IDC_IMAGE_CAPICITY);
-	m_ctlProgress.Initialize(this, IDC_PROGRESS);
+	m_ctlProgress.Initialize(this, IDC_PROGRESS, IDC_INFO_FOOTER);
 	m_ctlFileManager.Initialize(this, IDC_LIST_DATA);
 	UpdateUI();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -249,7 +248,6 @@ void CShadowPackDlg::OnBnClickedBtnMediaOpen()
 		if (dlg.DoModal() == IDOK) {
 			m_szMediaPathName = dlg.GetPathName();
 			pMedia = CMediaFactory::CreateMediaFromExt(dlg.GetFileExt());
-			m_ctlProgress.Reset();
 			if(pMedia) {
 				m_ctlFileManager.AttachMedia(pMedia);
 				StartThread(&CShadowPackDlg::ThreadOpenMedia);
@@ -311,15 +309,18 @@ void CShadowPackDlg::ThreadSaveMedia()
 void CShadowPackDlg::OnBnClickedBtnMediaSave()
 {
 	if (m_ctlFileManager.MediaAttached() && m_ctlFileManager.IsDirty()) {
-		m_ctlProgress.Reset();
 		StartThread(&CShadowPackDlg::ThreadSaveMedia);
 	}
 }
 
 void CShadowPackDlg::OnBnClickedBtnMediaOption()
 {
-	if(m_ctlFileManager.MediaAttached())
-		m_ctlFileManager.GetMedia()->ShowMediaOptionDlg();
+	CPackErrors Errors;
+	if (m_ctlFileManager.MediaAttached()) {
+		if (!m_ctlFileManager.GetMedia()->ShowMediaOptionDlg(Errors)) {
+			AfxMessageBox(Errors.ToString());
+		}
+	}
 	UpdateUI();
 }
 
@@ -341,7 +342,6 @@ void CShadowPackDlg::ThreadExportItem()
 void CShadowPackDlg::OnBnClickedBtnItemExport()
 {
 	if (m_ctlFileManager.MediaAttached() && m_ctlFileManager.GetSelectedItemCnt()) {
-		m_ctlProgress.Reset();
 		if (m_ctlFileManager.GetSelectedItemCnt() == 1) {
 			CFileDialog dlg(FALSE, NULL, m_ctlFileManager.GetFirstSelectedItemName(),
 				OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, NULL, 0, TRUE);
@@ -394,7 +394,7 @@ void CShadowPackDlg::UpdateUI()
 	strTemp.Format(_T("%s/%s"), (LPCTSTR)strUsed, (LPCTSTR)strTotal);
 	m_ctlCapicityInfo.SetWindowText(strTemp);
 
-	m_ctlProgress.ShowWindow(m_bInProgress);
+	m_ctlProgress.Show(m_bInProgress);
 }
 
 void CShadowPackDlg::ThreadAddItem()

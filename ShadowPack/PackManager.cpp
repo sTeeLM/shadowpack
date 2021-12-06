@@ -2,8 +2,10 @@
 //
 
 #include "pch.h"
+#include "resource.h"
 #include "ShadowPack.h"
 #include "PackManager.h"
+#include "PackUtils.h"
 
 // CPackManager
 
@@ -65,8 +67,8 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 	Errors.SetError(CPackErrors::PE_OK);
 
 	if (!m_pMedia || !m_pMedia->LoadMedia(szFilePath, Password, Progress, Errors)) {
-	if (!m_pMedia)
-		Errors.SetError(CPackErrors::PE_INTERNAL);
+		if (!m_pMedia)
+			Errors.SetError(CPackErrors::PE_INTERNAL);
 		goto err;
 	}
 
@@ -83,7 +85,9 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 	}
 
 	 // load item into list
-	 
+	Progress.Reset(IDS_LOAD_DATA);
+	Progress.SetFullScale(m_pMedia->GetMediaUsedBytes());
+
 	while ((m_pMedia->GetMediaUsedBytes() - m_nTotalSize) > 0) {
 		if (Progress.IsCanceled()) {
 			Errors.SetError(CPackErrors::PE_CANCELED);
@@ -114,8 +118,6 @@ BOOL CPackManager::SaveMedia(CProgressBase& Progress, CPackErrors& Errors)
 
 	Errors.SetError(CPackErrors::PE_OK);
 
-	Progress.SetFullScale(GetTotalSize());
-
 	// write media
 	if (!m_pMedia) {
 		Errors.SetError(CPackErrors::PE_INTERNAL);
@@ -130,6 +132,9 @@ BOOL CPackManager::SaveMedia(CProgressBase& Progress, CPackErrors& Errors)
 	if (!pStream->Seek(0, CStreamBase::STREAM_SEEK_SET, Errors)) {
 		goto err;
 	}
+
+	Progress.Reset(IDS_SAVE_DATA);
+	Progress.SetFullScale(GetTotalSize());
 
 	nItems = CListCtrl::GetItemCount();
 	for (INT i = 0; i < nItems; i++) {
@@ -146,8 +151,6 @@ BOOL CPackManager::SaveMedia(CProgressBase& Progress, CPackErrors& Errors)
 			goto err;
 		}
 	}
-	
-	Progress.Reset();
 
 	// save media
 	if (!m_pMedia->SaveMedia(m_strMediaPath, Progress, Errors)) {
@@ -195,8 +198,11 @@ BOOL CPackManager::ExportFirstSelectedItemToFile(LPCTSTR szItemPath, CProgressBa
 	if (pos != NULL) {
 		nItem = CListCtrl::GetNextSelectedItem(pos);
 		pItem = (CPackItem*)CListCtrl::GetItemData(nItem);
-		if (pItem)
+		if (pItem) {
+			Progress.Reset(IDS_EXPORT_DATA);
+			Progress.SetFullScale(pItem->GetTotalSize());
 			return pItem->WriteItemToFile(szItemPath, Progress, Errors);
+		}
 	}
 	return FALSE;
 }
@@ -219,6 +225,7 @@ BOOL CPackManager::ExportSelectedItemsToDir(LPCTSTR szItemPath, CProgressBase& P
 			ASSERT(FALSE);
 		}
 	}
+	Progress.Reset(IDS_EXPORT_DATA);
 	Progress.SetFullScale(nSize);
 
 	pos = CListCtrl::GetFirstSelectedItemPosition();
@@ -245,19 +252,33 @@ BOOL CPackManager::ExportSelectedItemsToDir(LPCTSTR szItemPath, CProgressBase& P
 BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, CPackErrors& Errors)
 {
 	CPackItem* pPackItem = NULL;
-
-	pPackItem = CPackItem::CreateItemFromFile(szItemPath, Progress, Errors);
-	if (pPackItem) {
-		if (pPackItem->GetTotalSize() > (m_pMedia->GetMediaTotalBytes() - m_nTotalSize)) {
-			Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
-			CPackItem::Free(pPackItem);
-		} else if (!InsertPackItem(pPackItem, Errors)) {
-			CPackItem::Free(pPackItem);
+	ULONGLONG nSize;
+	Progress.Reset(IDS_READ_FILE);
+	if (CPackUtils::GetFileSize(szItemPath, nSize)) {
+		if (nSize <= m_pMedia->GetMediaTotalBytes() - m_pMedia->GetMediaUsedBytes()) {
+			Progress.SetFullScale(nSize);
+			pPackItem = CPackItem::CreateItemFromFile(szItemPath, Progress, Errors);
+			if (pPackItem) {
+				if (pPackItem->GetTotalSize() > (m_pMedia->GetMediaTotalBytes() - m_nTotalSize)) {
+					Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
+					CPackItem::Free(pPackItem);
+				}
+				else if (!InsertPackItem(pPackItem, Errors)) {
+					CPackItem::Free(pPackItem);
+				}
+				else {
+					m_nTotalSize += pPackItem->GetTotalSize();
+					m_bDirty = TRUE;
+					return m_pMedia->SetMediaUsedBytes(m_nTotalSize, Errors);
+				}
+			} else {
+				Errors.SetError(CPackErrors::PE_NOMEM);
+			}
 		} else {
-			m_nTotalSize += pPackItem->GetTotalSize();
-			m_bDirty = TRUE;
-			return m_pMedia->SetMediaUsedBytes(m_nTotalSize, Errors);
+			Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
 		}
+	} else {
+		Errors.SetError(CPackErrors::PE_IO);
 	}
 	return FALSE;
 }
@@ -416,47 +437,43 @@ CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromFile(LPCTSTR szF
 	LPBYTE pBuffer = NULL;
 	if (file.Open(szFilePath, CFile::modeRead, &exFile)) {
 		nLength = file.GetLength();
-		if (nLength <= MAX_PACK_FILE_SIZE) {
-			pPackItem = new (std::nothrow) CPackItem();
-			if (pPackItem) {
-				pPackItem->m_strFileName = file.GetFileName();
-				pPackItem->m_nSize = (ULONG)nLength;
-				pPackItem->m_Time = CTime::GetCurrentTime();
-				if (pPackItem->m_nSize) {
-					// read data
-					pPackItem->m_pData = new (std::nothrow) BYTE[pPackItem->m_nSize];
-					if (pPackItem->m_pData) {
-						pBuffer = pPackItem->m_pData;
-						while (nLength) {
-							if (Progress.IsCanceled()) {
-								Errors.SetError(CPackErrors::PE_CANCELED);
-								break;
-							}
-							nRead = READ_WRITE_BUFFER_SIZE;
-							nRead = nRead > nLength ? (ULONG)nLength : nRead;
-							if (file.Read(pBuffer, nRead) != nRead) {
-								Errors.SetError(CPackErrors::PE_IO);
-								break;
-							}
-							nLength -= nRead;
-							pBuffer += nRead;
-							Progress.Increase(nRead);
+		pPackItem = new (std::nothrow) CPackItem();
+		if (pPackItem) {
+			pPackItem->m_strFileName = file.GetFileName();
+			pPackItem->m_nSize = (ULONG)nLength;
+			pPackItem->m_Time = CTime::GetCurrentTime();
+			if (pPackItem->m_nSize) {
+				// read data
+				pPackItem->m_pData = new (std::nothrow) BYTE[pPackItem->m_nSize];
+				if (pPackItem->m_pData) {
+					pBuffer = pPackItem->m_pData;
+					while (nLength) {
+						if (Progress.IsCanceled()) {
+							Errors.SetError(CPackErrors::PE_CANCELED);
+							break;
 						}
-						if (nLength == 0) {
-							return pPackItem;
+						nRead = READ_WRITE_BUFFER_SIZE;
+						nRead = nRead > nLength ? (ULONG)nLength : nRead;
+						if (file.Read(pBuffer, nRead) != nRead) {
+							Errors.SetError(CPackErrors::PE_IO);
+							break;
 						}
-					} else {
-						Errors.SetError(CPackErrors::PE_NOMEM);
+						nLength -= nRead;
+						pBuffer += nRead;
+						Progress.Increase(nRead);
+					}
+					if (nLength == 0) {
+						return pPackItem;
 					}
 				} else {
-					return pPackItem;
+					Errors.SetError(CPackErrors::PE_NOMEM);
 				}
-				CPackItem::Free(pPackItem);
 			} else {
-				Errors.SetError(CPackErrors::PE_NOMEM);
+				return pPackItem;
 			}
+			CPackItem::Free(pPackItem);
 		} else {
-			Errors.SetError(CPackErrors::PE_TOO_LARGE_FILE);
+			Errors.SetError(CPackErrors::PE_NOMEM);
 		}
 		file.Close();
 	} else {
@@ -511,6 +528,7 @@ BOOL CPackManager::CPackItem::WriteItemToFile(LPCTSTR szFilePath, CProgressBase&
 			}
 			nLength -= nWrite;
 			pBuffer += nWrite;
+			Progress.Increase(nWrite);
 		}
 		file.Close();
 		if (nLength == 0)

@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "PackUtils.h"
+#include <stdlib.h>
+
 
 CPackUtils::CPackUtils(void)
 {
@@ -225,4 +227,21 @@ CString CPackUtils::GetLastStdError(int err)
 		strMessage.Format( _T("UNKNOWN Std Error Code %d"), err);
 	}
 	return strMessage;
+}
+
+void CPackUtils::FillBufferRand(LPBYTE pBuffer, UINT nSize)
+{
+	int out;
+	int* p = NULL;
+	LPBYTE p1 = NULL;
+	srand((unsigned)time(NULL));
+	p = (int*)pBuffer;
+	for (INT i = 0; i < nSize / sizeof(int); i++) {
+		*p = rand();
+		p++;
+	}
+	p1 = (LPBYTE)p;
+	for (INT i = 0; i < nSize % sizeof(int); i++) {
+		p1[i] = rand();
+	}
 }

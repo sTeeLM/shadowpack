@@ -148,21 +148,24 @@ void CPixelImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 	pPropertySheet->AddPage(&m_OptPagePixelImageMedia);
 }
 
-void CPixelImageMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
+BOOL CPixelImageMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 {
+	BOOL bDirty = FALSE;
 	if (m_OptPagePixelImageMedia.m_nCrypto != m_Header.dwBPBCipher) {
 		TRACE(_T("m_nCrypto change from %d to %d\n"), m_Header.dwBPBCipher, m_OptPagePixelImageMedia.m_nCrypto);
 		m_Header.dwBPBCipher = m_OptPagePixelImageMedia.m_nCrypto;
 		m_Cipher.SetKeyType((CPackCipher::PACK_CIPHER_TYPE_T)m_Header.dwBPBCipher, m_OptPagePixelImageMedia.m_strPasswd1);
-		m_bIsDirty = TRUE;
+		bDirty = TRUE;
 	}
 
 	if (m_OptPagePixelImageMedia.m_nBytePerPixel >= 0 && m_OptPagePixelImageMedia.m_nBytePerPixel <= 3 &&
 			m_OptPagePixelImageMedia.m_nBytePerPixel != m_Header.dwBPBBlockPerByte - 1) {
 		TRACE(_T("m_nBytePerPixel change from %d to %d\n"), m_Header.dwBPBBlockPerByte, m_OptPagePixelImageMedia.m_nBytePerPixel + 1);
 		m_Header.dwBPBBlockPerByte = m_OptPagePixelImageMedia.m_nBytePerPixel + 1;
+		bDirty = TRUE;
 	}
 
+	return bDirty;
 }
 
 
@@ -244,7 +247,7 @@ data = 3, target = 7, res = 3, res ^ target = 4, ext = 3
 */
 
 BYTE CPixelImageMedia::F5LookupTable[4][8] = {
-	{0,1,2,4,4,2,2,1},
+	{0,1,2,4,4,2,1,0},
 	{1,0,4,2,2,4,0,1},
 	{2,4,0,1,1,0,4,2},
 	{4,2,1,0,0,1,2,4},
@@ -298,7 +301,7 @@ BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 		nRet <<= 1;
 
 		nRet |= pPixelBlock[2].m_nRed & 0x1;
-		nRet <<= 2;
+		nRet <<= 1;
 		nRet |= pPixelBlock[2].m_nBlue & 0x1;
 	} else if (nBlockPerByte == 4) {  
 		/* F5 algo , every pixel offer 3 bits as target hide 2 bits data, max 1 bit of target changed */
@@ -338,45 +341,45 @@ void CPixelImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerB
 	} else if (nBlockPerByte == 2) {   /* R£º2£¬G 1£¬ B 1|R£º2£¬G 1£¬ B 1*/
 
 		pPixelBlock[0].m_nRed &= ~0x3;
-		pPixelBlock[0].m_nRed |= ((nData & 0xC0) >> 6);
+		pPixelBlock[0].m_nRed |= ((nData >> 6 ) & 0x3);
 
 		pPixelBlock[0].m_nGreen &= ~0x1;
-		pPixelBlock[0].m_nGreen |= ((nData & 0x20) >> 5);
+		pPixelBlock[0].m_nGreen |= ((nData >> 5) & 0x1);
 
 		pPixelBlock[0].m_nBlue &= ~0x1;
-		pPixelBlock[0].m_nBlue |= ((nData & 0x10) >> 4);
+		pPixelBlock[0].m_nBlue |= ((nData >> 4) & 0x1);
 
 
 		pPixelBlock[1].m_nRed &= ~0x3;
-		pPixelBlock[1].m_nRed |= ((nData & 0xC) >> 2);
+		pPixelBlock[1].m_nRed |= ((nData >> 2) & 0x3);
 
 		pPixelBlock[1].m_nGreen &= ~0x1;
-		pPixelBlock[1].m_nGreen |= ((nData & 0x2) >> 1);
+		pPixelBlock[1].m_nGreen |= ((nData >> 1) & 0x1 );
 
 		pPixelBlock[1].m_nBlue &= ~0x1;
 		pPixelBlock[1].m_nBlue |= (nData & 0x1);
 	} else if (nBlockPerByte == 3) {   /* R£º1£¬G 1£¬ B 1|R£º1£¬G 1£¬ B 1|R£º1£¬G 0£¬ B 1*/
 
 		pPixelBlock[0].m_nRed &= ~0x1;
-		pPixelBlock[0].m_nRed |= ((nData & 0x80) >> 7);
+		pPixelBlock[0].m_nRed |= ((nData >> 7) & 0x1);
 		 
 		pPixelBlock[0].m_nGreen &= ~0x1;
-		pPixelBlock[0].m_nGreen |= ((nData & 0x40) >> 6);
+		pPixelBlock[0].m_nGreen |= ((nData >> 6) & 0x1);
 
 		pPixelBlock[0].m_nBlue &= ~0x1;
-		pPixelBlock[0].m_nBlue |= ((nData & 0x20) >> 5);
+		pPixelBlock[0].m_nBlue |= ((nData >> 5) & 0x1);
 
 		pPixelBlock[1].m_nRed &= ~0x1;
-		pPixelBlock[1].m_nRed |= ((nData & 0x10) >> 4);
+		pPixelBlock[1].m_nRed |= ((nData >> 4) & 0x1);
 
 		pPixelBlock[1].m_nGreen &= ~0x1;
-		pPixelBlock[1].m_nGreen |= ((nData & 0x8) >> 3);
+		pPixelBlock[1].m_nGreen |= ((nData >> 3) & 0x1);
 
 		pPixelBlock[1].m_nBlue &= ~0x1;
-		pPixelBlock[1].m_nBlue |= ((nData & 0x4) >> 2);
+		pPixelBlock[1].m_nBlue |= ((nData >> 2) & 0x1);
 
 		pPixelBlock[2].m_nRed &= ~0x1;
-		pPixelBlock[2].m_nRed |= ((nData & 0x2) >> 1);
+		pPixelBlock[2].m_nRed |= ((nData >> 1) & 0x1);
 
 		pPixelBlock[2].m_nBlue &= ~0x1;
 		pPixelBlock[2].m_nBlue |= (nData & 0x1);

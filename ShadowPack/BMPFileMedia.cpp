@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "BMPFileMedia.h"
 #include "stdlib.h"
+#include "resource.h"
 
 CBMPFileMedia::CBMPFileMedia() :
 	m_pfileHeader(NULL)
@@ -74,6 +75,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		goto err;
 	}
 
+	Progress.Reset(IDS_READ_FILE);
 	Progress.SetFullScale(pinfoHeader->biHeight);
 
 	// load scanline
@@ -125,6 +127,13 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto err;
 	}
 
+	Progress.Reset(IDS_FILL_EMPTY_SPACE);
+	Progress.SetFullScale(GetMediaTotalBytes() - GetMediaUsedBytes());
+
+	if (!CPixelImageMedia::FillEmptySpace(Progress, Errors)) {
+		goto err;
+	}
+
 	pinfoHeader = (LPBITMAPINFOHEADER)(((LPBYTE)m_pfileHeader) + sizeof(BITMAPFILEHEADER));
 
 	// open file and write header
@@ -146,6 +155,9 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto err;
 	}
 
+	Progress.Reset(IDS_WRITE_FILE);
+	Progress.SetFullScale(pinfoHeader->biHeight);
+
 	// write scanline
 	for (INT i = 0; i < pinfoHeader->biHeight; i++) {
 		CPixelImageMedia::GetScanline(i, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
@@ -157,7 +169,7 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 	}
 	
 	// done!
-	m_bIsDirty = FALSE;
+	ClearMediaDirty();
 
 	bRet = TRUE;
 
@@ -215,9 +227,9 @@ void CBMPFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 	CPixelImageMedia::AddOptPage(pPropertySheet);
 }
 
-void CBMPFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
+BOOL CBMPFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 {
-	CPixelImageMedia::UpdateOpts(pPropertySheet);
+	return CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
 

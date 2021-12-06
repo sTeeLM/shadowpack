@@ -10,6 +10,13 @@
 #define IDS_COLUMN_NAME                 102
 #define IDS_COLUMN_TIME                 103
 #define IDS_COLUMN_SIZE                 104
+#define IDS_READ_FILE                   105
+#define IDS_LOAD_DATA                   106
+#define IDS_SAVE_DATA                   107
+#define IDS_FILL_EMPTY_SPACE            108
+#define IDS_WRITE_FILE                  109
+#define IDS_EXPORT_FILE                 110
+#define IDS_EXPORT_DATA                 110
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_PASSWORD             129
 #define IDD_PROPPAGE_PIXELMEDIA         130

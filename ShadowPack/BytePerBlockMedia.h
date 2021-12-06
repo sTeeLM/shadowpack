@@ -37,7 +37,7 @@ public:
 	BOOL SaveMeta(CPackErrors& Errors);
 
 	// 实现了CStreamBase的接口
-#define BPB_STREAM_BATCH_SIZE 4096
+
 	BOOL Read(LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Error);
 	BOOL Write(const LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Error);
 	BOOL Seek(INT nOffset, CStreamBase::SEEK_TYPE_T Org, CPackErrors& Error);
@@ -52,11 +52,21 @@ public:
 
 	// misc
 	BOOL IsMediaDirty() { return m_bIsDirty; }
+	void SetMediaDirty() { m_bIsDirty = TRUE; }
+	void ClearMediaDirty() { m_bIsDirty = FALSE; }
 
+	BOOL FillEmptySpace(CProgressBase& Progress, CPackErrors& Errors);
 protected:
 	BOOL TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader);
 	BOOL RawReadData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
 	BOOL RawWriteData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
+
+protected:
+#define BPB_STREAM_BATCH_SIZE 4096
+static BYTE ReadWriteBuffer[BPB_STREAM_BATCH_SIZE];
+#ifdef DEBUG
+	void DumpHeader(CString strWhen, BPB_MEDIA_HEADER_T& Header);
+#endif
 
 protected:
 	BPB_MEDIA_HEADER_T m_Header;

@@ -24,7 +24,6 @@ protected:
 		virtual ~CPackItem() { if(m_pData) delete[] m_pData; }
 	private:
 #define PACK_ITEM_SIGN 0x12345678
-#define MAX_PACK_FILE_SIZE (1024*1024*1024) // 1GB
 #define READ_WRITE_BUFFER_SIZE (4096)
 		typedef struct _PACK_ITEM_T {
 			DWORD dwSign;

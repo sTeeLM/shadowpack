@@ -52,7 +52,6 @@ public:
 public:
 	CChartControl m_ctlCapicityChart;
 	CStatic m_ctlCapicityInfo;
-	CStatic m_ctlFooterInfo;
 	CProgressControl m_ctlProgress;
 	CPackManager m_ctlFileManager;
 	CPasswordDlg m_dlgPassword;

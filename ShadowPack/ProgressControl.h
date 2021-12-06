@@ -13,17 +13,23 @@ public:
 	virtual ~CProgressControl();
 
 public:
-	void Initialize(CWnd* pParent, UINT nID);
+	void Initialize(CWnd* pParent, UINT nID, UINT nInfoID);
 
 public:
-	void SetFullScale(UINT nVal);
-	void Increase(UINT nVal);
+	void SetFullScale(ULONGLONG nVal);
+	void Increase(ULONGLONG nVal);
 	void Cancel(void);
 	BOOL IsCanceled(void);
-	void Reset();
+	void Reset(UINT nIDS = 0);
+	void Show(BOOL bShow = TRUE);
 
 protected:
 	DECLARE_MESSAGE_MAP()
+
+	CStatic m_ctlFooterInfo;
+	ULONGLONG m_nFullScale;
+	ULONGLONG m_nCurrent;
+	BOOL m_bCancel;
 };
 
 

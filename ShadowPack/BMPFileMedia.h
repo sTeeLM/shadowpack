@@ -22,7 +22,7 @@ public:
 
 	// 添加opt page
 	virtual void AddOptPage(CMFCPropertySheet* pPropertySheet);
-	virtual void UpdateOpts(CMFCPropertySheet* pPropertySheet);
+	virtual BOOL UpdateOpts(CMFCPropertySheet* pPropertySheet);
 
 public:
 	// 实现CMediaFactory的接口

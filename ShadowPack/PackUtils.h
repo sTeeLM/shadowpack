@@ -21,5 +21,6 @@ public:
 	static BOOL RemoveDir(LPCTSTR szPath);
 	static CString GetLastError(DWORD dwError);
 	static CString GetLastStdError(int err);
+	static void FillBufferRand(LPBYTE pBuffer, UINT nSize);
 };
 
