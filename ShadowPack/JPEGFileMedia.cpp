@@ -65,7 +65,7 @@ BOOL CJPEGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Password
 
     jpeg_read_header(&cinfo, TRUE);
 
-    jpeg_start_decompress(&cinfo);
+ //   jpeg_start_decompress(&cinfo);
 
 
     TRACE(_T("output_width = %d, output_height = %d\n"), 
@@ -74,11 +74,13 @@ BOOL CJPEGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Password
         );
 
     TRACE(_T("estmate blocks: %d\n"), cinfo.MCUs_per_row * cinfo.MCU_rows_in_scan * cinfo.blocks_in_MCU * 64);
-
+    jvirt_barray_ptr* p = jpeg_read_coefficients(&cinfo);
+   /*
     if (cinfo.output_components != 3) {
         Errors.SetError(CPackErrors::PE_UNSUPPORT_PACK);
         goto err;
     }
+    
 
     row_stride = cinfo.output_width * cinfo.output_components;
 
@@ -89,6 +91,7 @@ BOOL CJPEGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Password
         jpeg_read_scanlines(&cinfo, row_buffer, 1);
         //if(!bmp.SetBufferData((cinfo.output_scanline-1)*row_stride, row_stride, buffer[0]))
     }
+*/
     jpeg_finish_decompress(&cinfo);
 
     jpeg_destroy_decompress(&cinfo);
