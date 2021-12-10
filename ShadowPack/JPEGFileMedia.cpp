@@ -13,38 +13,24 @@ CJPEGFileMedia::~CJPEGFileMedia()
 
 }
 
-INT nReadCnt;
-INT nWriteCnt;
-
 void CJPEGFileMedia::JStegErrorExit(j_common_ptr cinfo)
 {
+    char buffer[JMSG_LENGTH_MAX];
+    (*cinfo->err->format_message) (cinfo, buffer);
 
+//    TRACE(_T("%s\n"), LPCTSTR(CA2CT(buffer)));
+    throw "FUCK";
 }
 
-void CJPEGFileMedia::JStegReadData(j_common_ptr cinfo, JCOEF data)
-{
-//    TRACE(_T("JCOEF %04hx\n"), data);
-    nReadCnt++;
-}
-
-JCOEF CJPEGFileMedia::JStegWriteData(j_common_ptr cinfo, JCOEF data)
-{
-    nWriteCnt++;
-    return data;
-}
 
 BOOL CJPEGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordGetter, CProgressBase& Progress, CPackErrors& Errors)
 {
-    struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
-    struct jpeg_steg_mgr jsteg;
     FILE* pFile = NULL;
     INT row_stride;
     JSAMPARRAY row_buffer = NULL;
 
-    ZeroMemory(&cinfo, sizeof(cinfo));
-
-    nReadCnt = nWriteCnt = 0;
+    ZeroMemory(&m_Decinfo, sizeof(m_Decinfo));
 
     // open file
     if ((pFile = _tfsopen(szFilePath, _T("rb"), _SH_DENYWR)) == NULL) {
@@ -52,53 +38,31 @@ BOOL CJPEGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Password
         goto err;
     }
 
-    cinfo.err = jpeg_std_error(&jerr);
+    m_Decinfo.err = jpeg_std_error(&jerr);
     jerr.error_exit = JStegErrorExit;
 
-    jpeg_create_decompress(&cinfo);
+    jpeg_create_decompress(&m_Decinfo);
 
-    cinfo.steg = &jsteg;
-    jsteg.steg_read = JStegReadData;
-    jsteg.steg_write = JStegWriteData;
+    try {
+        jpeg_stdio_src(&m_Decinfo, pFile);
 
-    jpeg_stdio_src(&cinfo, pFile);
+        jpeg_read_header(&m_Decinfo, TRUE);
 
-    jpeg_read_header(&cinfo, TRUE);
-
- //   jpeg_start_decompress(&cinfo);
-
-
-    TRACE(_T("output_width = %d, output_height = %d\n"), 
-        cinfo.output_width,
-        cinfo.output_height
-        );
-
-    TRACE(_T("estmate blocks: %d\n"), cinfo.MCUs_per_row * cinfo.MCU_rows_in_scan * cinfo.blocks_in_MCU * 64);
-    jvirt_barray_ptr* p = jpeg_read_coefficients(&cinfo);
-   /*
-    if (cinfo.output_components != 3) {
-        Errors.SetError(CPackErrors::PE_UNSUPPORT_PACK);
-        goto err;
     }
-    
-
-    row_stride = cinfo.output_width * cinfo.output_components;
-
-    row_buffer = (*cinfo.mem->alloc_sarray)
-        ((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
-
-    while (cinfo.output_scanline < cinfo.output_height) {
-        jpeg_read_scanlines(&cinfo, row_buffer, 1);
-        //if(!bmp.SetBufferData((cinfo.output_scanline-1)*row_stride, row_stride, buffer[0]))
+    catch (char * perr) {
+        TRACE(_T("%s\n"), LPCTSTR(CA2CT(perr)));;
     }
-*/
-    jpeg_finish_decompress(&cinfo);
 
-    jpeg_destroy_decompress(&cinfo);
+    jvirt_barray_ptr* p = jpeg_read_coefficients(&m_Decinfo);
+
+
+
+
+    jpeg_finish_decompress(&m_Decinfo);
+
+    jpeg_destroy_decompress(&m_Decinfo);
 
     fclose(pFile);
-
-    TRACE(_T("read cnt %d, write cnt %d\n"), nReadCnt, nWriteCnt);
 
     return TRUE;
 err:

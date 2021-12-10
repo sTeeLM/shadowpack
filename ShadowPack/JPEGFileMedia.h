@@ -30,10 +30,9 @@ public:
 	static CMediaBase* Factory();
 protected:
 	static void JStegErrorExit(j_common_ptr cinfo);
-	static void JStegReadData(j_common_ptr cinfo, JCOEF data);
-	static JCOEF JStegWriteData(j_common_ptr cinfo, JCOEF data);
 protected:
 	static LPCTSTR m_szFilter;
 	static LPCTSTR m_szExt;
+	struct jpeg_decompress_struct m_Decinfo;
 };
 
