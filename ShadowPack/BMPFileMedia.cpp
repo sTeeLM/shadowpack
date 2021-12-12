@@ -59,7 +59,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 
 	if (pinfoHeader->biPlanes != 1 || (pinfoHeader->biBitCount != 24)
 		|| pinfoHeader->biCompression != BI_RGB) {
-		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_PACK, szFilePath);
 		goto err;
 	}
 
@@ -90,7 +90,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	}
 
 	// test format
-	if (!CPixelImageMedia::LoadMeta(PasswordGetter, Errors)) {
+	if (!CBytePerBlockMedia::LoadMeta(PasswordGetter, Errors)) {
 		goto err;
 	}
 	bRet = TRUE;
@@ -107,6 +107,8 @@ err:
 		free(pScanLine);
 		pScanLine = NULL;
 	}
+	if(!bRet)
+		CPixelImageMedia::Free();
 	return bRet;
 }
 
@@ -124,14 +126,14 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto err;
 	}
 
-	if (!CPixelImageMedia::SaveMeta(Errors)) {
+	if (!CBytePerBlockMedia::SaveMeta(Errors)) {
 		goto err;
 	}
 
 	Progress.Reset(IDS_FILL_EMPTY_SPACE);
 	Progress.SetFullScale(GetMediaTotalBytes() - GetMediaUsedBytes());
 
-	if (!CPixelImageMedia::FillEmptySpace(Progress, Errors)) {
+	if (!CBytePerBlockMedia::FillEmptySpace(Progress, Errors)) {
 		goto err;
 	}
 

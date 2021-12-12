@@ -14,6 +14,8 @@ CPackErrors::~CPackErrors()
 
 }
 
+
+
 void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPath /* = NULL*/, LPCTSTR szReason /* = 0*/)
 {
 	m_eErrorCode = eErrorCode;
@@ -35,10 +37,10 @@ void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPat
 		m_eString.Format(IDS_PE_OVER_CAPICITY);
 		break;
 	case PE_UNSUPPORT_PACK: // unsupport pack format
-		m_eString.Format(IDS_PE_UNSUPPORT_PACK);
+		m_eString.Format(IDS_PE_UNSUPPORT_PACK, szPath);
 		break;
 	case PE_UNSUPPORT_MEDIA: // unsupport file
-		m_eString.Format(IDS_PE_UNSUPPORT_MEDIA);
+		m_eString.Format(IDS_PE_UNSUPPORT_MEDIA, szPath);
 		break;
 	case PE_EXISTED:        // item exist
 		m_eString.Format(IDS_PE_EXISTED, szPath);
@@ -57,6 +59,13 @@ void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPat
 {
 	return m_eErrorCode;
 }
+
+ CPackErrors& CPackErrors::operator=(const CPackErrors& Errors)
+ {
+	 m_eErrorCode = Errors.m_eErrorCode;
+	 m_eString = Errors.m_eString;
+	 return *this;
+ }
 
 CString & CPackErrors::ToString()
 {

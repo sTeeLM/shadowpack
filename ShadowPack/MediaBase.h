@@ -17,6 +17,7 @@ protected:
 	typedef struct _MEDIA_HEADER_T
 	{
 		DWORD dwSign;
+		DWORD dwHeaderSize;
 		DWORD dwDataSize;
 	}MEDIA_HEADER_T;
 public:
@@ -48,5 +49,7 @@ public:
 	virtual BOOL IsMediaDirty() = 0;
 	virtual void SetMediaDirty() = 0;
 	virtual void ClearMediaDirty() = 0;
+
+	virtual BOOL TestHeaderValid(const MEDIA_HEADER_T* pHeader);
 
 };

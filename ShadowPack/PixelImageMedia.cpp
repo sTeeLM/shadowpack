@@ -260,7 +260,7 @@ BYTE CPixelImageMedia::F5RevLookupTable[8] = {
 
 BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 {
-	ASSERT(nBlockPerByte <= 4 && nBlockPerByte >= 1);
+	ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
 	CPixelBlock* pPixelBlock = m_pBlockBuffer; // this always is first object!
 	pPixelBlock += nOffset * nBlockPerByte;
 	BYTE nRet = 0;
@@ -322,7 +322,7 @@ BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 
 void CPixelImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte)
 {
-	ASSERT(nBlockPerByte <= 4 && nBlockPerByte >= 1);
+	ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
 	CPixelBlock* pPixelBlock = m_pBlockBuffer; // this always is first object!
 	pPixelBlock += nOffset * nBlockPerByte;
 	BYTE nTarget = 0;

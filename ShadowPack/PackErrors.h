@@ -27,6 +27,7 @@ public:
 	CString & ToString();
 	void SetError(PACK_ERROR_T eErrorCode, LPCTSTR szPath = NULL, LPCTSTR szReason = NULL);
 	PACK_ERROR_T GetError();
+	CPackErrors& operator=(const CPackErrors& Errors);
 private:
 	PACK_ERROR_T m_eErrorCode;
 	CString m_eString;

@@ -25,3 +25,15 @@ BOOL CMediaBase::ShowMediaOptionDlg(CPackErrors& Errors)
 	}
 	return bRet;
 }
+
+BOOL CMediaBase::TestHeaderValid(const MEDIA_HEADER_T* pHeader)
+{
+	if (pHeader) {
+		if (pHeader->dwSign == MEDIA_HEADER_SIGN) {
+			if (pHeader->dwHeaderSize >= sizeof(MEDIA_HEADER_T)) {
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}

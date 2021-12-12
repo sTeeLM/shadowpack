@@ -199,6 +199,7 @@ void CShadowPackDlg::StartThread(FN_PACK_THREAD fn)
 	CPackThreadParam* pParam = new CPackThreadParam(this, fn);
 
 	m_bInProgress = TRUE;
+	UpdateUI();
 	AfxBeginThread(fnThread, pParam);
 }
 

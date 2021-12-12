@@ -8,20 +8,19 @@ public:
     virtual ~CCorImageMedia();
 
 public:
-	// 定义究竟啥叫block
-	class CCorBlock
-	{
-	public:
-		CCorBlock() 
-		{};
-		virtual ~CCorBlock() {}
-	protected:
-		friend CCorImageMedia;
-	};
+	BOOL Alloc(UINT nWidth, UINT nHeight, UINT nComponents, CPackErrors& Error);
+	void Free();
+	UINT GetTotalCoeffs();
+	UINT GetHeightInBlocks(UINT nComponents);
+	UINT GetWidthInBlocks(UINT nComponents);
+	UINT GetCoeffPerBlock();
+	void AddCoeff(UINT nComponents, UINT nX, UINT nY, UINT nCoeff, SHORT nData);
+	SHORT GetCoeff(UINT nComponents, UINT nX, UINT nY, UINT nCoeff);
 
 public:
-	BOOL Alloc(UINT nWidth, UINT nHeight, CPackErrors& Error);
-	void Free();
+	// 子类实现接口，我要调用
+	virtual UINT GetVSampleFactor(UINT nComponents) = 0;
+	virtual UINT GetHSampleFactor(UINT nComponents) = 0;
 
 public:
 	// 实现父类接口，实现这几个接口让父类调用
@@ -33,5 +32,44 @@ public:
 	// 添加opt page
 	virtual void AddOptPage(CMFCPropertySheet* pPropertySheet);
 	virtual BOOL UpdateOpts(CMFCPropertySheet* pPropertySheet);
+
+private:
+	UINT DivRoundup(UINT a, UINT b);
+	SHORT& GetCorFromIndex(UINT nIndex);
+private:
+	UINT m_nComponents;
+	UINT m_nTotalCoeffs;
+	INT* m_pHeightInBlocks;
+	INT* m_pWidthInBlocks;
+	SHORT ** m_pCoeffBuffer;
+	class CCoeffIndex {
+	public:
+		CCoeffIndex(UINT nComponents = 0, UINT nX = 0, UINT nY = 0, UINT nCoeff = 0) :
+			m_nComponents(nComponents),
+			m_nX(nX),
+			m_nY(nY),
+			m_nCoeff(nCoeff) {
+			TRACE(_T("CCoeffIndex %d %d %d %d Alloced!\n"), m_nComponents, m_nX, m_nY, m_nCoeff);
+		};
+		virtual ~CCoeffIndex() {
+			TRACE(_T("CCoeffIndex %d %d %d %d Freed!\n"), m_nComponents, m_nX, m_nY, m_nCoeff);
+		}
+		CCoeffIndex& operator=(const CCoeffIndex& cls) {
+			TRACE(_T("CCoeffIndex operator= called\n"));
+			m_nComponents = cls.m_nComponents;
+			m_nX = cls.m_nX;
+			m_nY = cls.m_nY;
+			m_nCoeff = cls.m_nCoeff;
+			return *this;
+		}
+	public:
+		UINT m_nComponents;
+		UINT m_nX;
+		UINT m_nY;
+		UINT m_nCoeff;
+	};
+protected:
+	
+	CArray<CCoeffIndex, CCoeffIndex> m_CoeffIndex;
 };
 

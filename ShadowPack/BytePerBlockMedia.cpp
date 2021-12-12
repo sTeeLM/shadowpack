@@ -34,13 +34,18 @@ BOOL CBytePerBlockMedia::FillEmptySpace(CProgressBase& Progress, CPackErrors& Er
 	return TRUE;
 }
 
-BOOL CBytePerBlockMedia::TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader)
+BOOL CBytePerBlockMedia::TestHeaderValid(const MEDIA_HEADER_T* pH)
 {
-	if (pHeader->dwBPBMediaSign == BPB_MEDIA_HEADER_SIGN && pHeader->BPBHeader.dwSign == MEDIA_HEADER_SIGN) {
-		if (pHeader->dwBPBBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && pHeader->dwBPBBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE) {
-			if (pHeader->BPBHeader.dwDataSize <= GetTotalBlocks() / pHeader->dwBPBBlockPerByte) {
-				if (pHeader->dwBPBCipher == m_Cipher.GetCipherType()) {
-					return TRUE;
+	const BPB_MEDIA_HEADER_T* pHeader = (const BPB_MEDIA_HEADER_T*)pH;
+	if (CMediaBase::TestHeaderValid(pH)) {
+		if (pHeader->dwBPBMediaSign == BPB_MEDIA_HEADER_SIGN) {
+			if (pHeader->dwBPBBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && pHeader->dwBPBBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE) {
+				if (pHeader->BPBHeader.dwHeaderSize == sizeof(BPB_MEDIA_HEADER_T)) {
+					if (pHeader->BPBHeader.dwDataSize <= GetTotalBlocks() / pHeader->dwBPBBlockPerByte) {
+						if (pHeader->dwBPBCipher < CPackCipher::GetCipherCount()) {
+							return TRUE;
+						}
+					}
 				}
 			}
 		}
@@ -89,7 +94,7 @@ BOOL CBytePerBlockMedia::LoadMeta(CPasswordGetterBase& PasswordGetter, CPackErro
 	// try header with crypt
 	
 test_encrypt:
-	for (INT i = 1; i <= 4; i++) {
+	for (INT i = MIN_BPB_MEDIA_BPB_SIZE; i <= MAX_BPB_MEDIA_BPB_SIZE; i++) {
 		if (RawReadData(&Header, 0, sizeof(Header), i, Errors)) {
 #ifdef DEBUG
 			TRACE(_T("m_Header.dwBPBBlockPerByte = %d\n"), i);
@@ -98,7 +103,7 @@ test_encrypt:
 			if (!strPassword.GetLength()) {
 				if (m_Cipher.SetKeyType(CPackCipher::CIPHER_NONE, NULL)) {
 					m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
-					if (TestHeaderValid(&HeaderPlain)) {
+					if (TestHeaderValid((const MEDIA_HEADER_T *)&HeaderPlain)) {
 						bRet = TRUE;
 						goto success;
 					}
@@ -112,7 +117,7 @@ test_encrypt:
 
 			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_AES, (LPCTSTR)strPassword)) {
 				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
-				if (TestHeaderValid(&HeaderPlain)) {
+				if (TestHeaderValid((const MEDIA_HEADER_T*)&HeaderPlain)) {
 					bRet = TRUE;
 					goto success;
 				}
@@ -123,7 +128,7 @@ test_encrypt:
 
 			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_SEED, (LPCTSTR)strPassword)) {
 				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
-				if (TestHeaderValid(&HeaderPlain)) {
+				if (TestHeaderValid((const MEDIA_HEADER_T*)&HeaderPlain)) {
 					bRet = TRUE;
 					goto success;
 				}
@@ -134,7 +139,7 @@ test_encrypt:
 
 			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_CAMELLIA, (LPCTSTR)strPassword)) {
 				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
-				if (TestHeaderValid(&HeaderPlain)) {
+				if (TestHeaderValid((const MEDIA_HEADER_T*)&HeaderPlain)) {
 					bRet = TRUE;
 					goto success;
 				}
@@ -158,6 +163,7 @@ test_encrypt:
 		HeaderPlain.dwBPBBlockPerByte = 1;
 		HeaderPlain.BPBHeader.dwSign = MEDIA_HEADER_SIGN;
 		HeaderPlain.BPBHeader.dwDataSize = 0;
+		HeaderPlain.BPBHeader.dwHeaderSize = sizeof(BPB_MEDIA_HEADER_T);
 		HeaderPlain.dwBPBCipher = CPackCipher::CIPHER_NONE;
 		m_Cipher.SetKeyType(CPackCipher::CIPHER_NONE, NULL);
 		AfxMessageBox(IDS_EMPTY_PACK, MB_ICONINFORMATION);

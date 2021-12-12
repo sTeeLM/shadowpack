@@ -23,6 +23,11 @@ public:
 	// 添加opt page
 	virtual void AddOptPage(CMFCPropertySheet* pPropertySheet);
 	virtual BOOL UpdateOpts(CMFCPropertySheet* pPropertySheet);
+
+	// 实现CCorImageMedia的接口
+	UINT GetVSampleFactor(UINT nComponents);
+	UINT GetHSampleFactor(UINT nComponents);
+
 public:
 	// 实现CMediaFactory的接口
 	static BOOL TestExt(LPCTSTR szExt);
@@ -34,5 +39,8 @@ protected:
 	static LPCTSTR m_szFilter;
 	static LPCTSTR m_szExt;
 	struct jpeg_decompress_struct m_Decinfo;
+	jvirt_barray_ptr* m_virt_p;
+	CString m_strLastError;
+	BOOL m_bError;
 };
 

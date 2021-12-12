@@ -56,8 +56,10 @@ public:
 	void ClearMediaDirty() { m_bIsDirty = FALSE; }
 
 	BOOL FillEmptySpace(CProgressBase& Progress, CPackErrors& Errors);
+
+	virtual BOOL TestHeaderValid(const MEDIA_HEADER_T* pHeader);
+
 protected:
-	BOOL TestHeaderValid(const BPB_MEDIA_HEADER_T* pHeader);
 	BOOL RawReadData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
 	BOOL RawWriteData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
 
