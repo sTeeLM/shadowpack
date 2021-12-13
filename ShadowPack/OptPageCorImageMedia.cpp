@@ -31,7 +31,26 @@ COptPageCorImageMedia::~COptPageCorImageMedia()
 
 BOOL COptPageCorImageMedia::OnInitDialog()
 {
-	return 0;
+	if (CMFCPropertyPage::OnInitDialog()) {
+		for (INT i = 0; i < CPackCipher::GetCipherCount(); i++) {
+			m_ctlCrypto.AddString(CPackCipher::GetCipherName(i));
+		}
+		m_ctlCrypto.SetCurSel(m_nCrypto);
+
+
+		GetDlgItem(IDC_EDIT_PASSWD1)->EnableWindow(m_nCrypto != CPackCipher::CIPHER_NONE);
+		GetDlgItem(IDC_EDIT_PASSWD2)->EnableWindow(m_nCrypto != CPackCipher::CIPHER_NONE);
+
+		GetDlgItem(IDC_RADIO_1BP2C)->EnableWindow(m_nTotalBlocks / 2 >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP4C)->EnableWindow(m_nTotalBlocks / 4 >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP6C)->EnableWindow(m_nTotalBlocks / 6 >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP8C)->EnableWindow(m_nTotalBlocks / 8 >= m_nUsedBytes);
+
+		SetBPCInfo();
+
+		return TRUE;
+	}
+	return FALSE;
 }
 
 void COptPageCorImageMedia::DoDataExchange(CDataExchange* pDX)

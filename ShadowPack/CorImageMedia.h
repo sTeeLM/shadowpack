@@ -52,13 +52,13 @@ private:
 			m_nX(nX),
 			m_nY(nY),
 			m_nCoeff(nCoeff) {
-			TRACE(_T("CCoeffIndex %d %d %d %d Alloced!\n"), m_nComponents, m_nX, m_nY, m_nCoeff);
+			//TRACE(_T("CCoeffIndex %d %d %d %d Alloced!\n"), m_nComponents, m_nX, m_nY, m_nCoeff);
 		};
 		virtual ~CCoeffIndex() {
-			TRACE(_T("CCoeffIndex %d %d %d %d Freed!\n"), m_nComponents, m_nX, m_nY, m_nCoeff);
+			//TRACE(_T("CCoeffIndex %d %d %d %d Freed!\n"), m_nComponents, m_nX, m_nY, m_nCoeff);
 		}
 		CCoeffIndex& operator=(const CCoeffIndex& cls) {
-			TRACE(_T("CCoeffIndex operator= called\n"));
+			//TRACE(_T("CCoeffIndex operator= called\n"));
 			m_nComponents = cls.m_nComponents;
 			m_nX = cls.m_nX;
 			m_nY = cls.m_nY;

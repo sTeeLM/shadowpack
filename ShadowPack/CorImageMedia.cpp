@@ -141,7 +141,8 @@ void CCorImageMedia::AddCoeff(UINT nComponents, UINT nX, UINT nY, UINT nCoeff, S
             m_pCoeffBuffer[nComponents][
                 (nY * GetWidthInBlocks(nComponents) + nX) * GetCoeffPerBlock() + nCoeff
             ] = nData;
-            if (nData) {
+            if (nData & 0xF0) {
+                TRACE(_T("AddCoeff %d,%d,%d,%d=>0x%04hx\n"), nComponents, nX, nY, nCoeff, nData);
                 m_CoeffIndex.Add(CCoeffIndex(nComponents, nX, nY, nCoeff));
             }
         }
@@ -169,6 +170,7 @@ SHORT& CCorImageMedia::GetCorFromIndex(UINT nIndex)
 {
     UINT nComponents, nX, nY, nCoeff;
     ASSERT(nIndex < (UINT)m_CoeffIndex.GetCount());
+    
     if (nIndex < (UINT)m_CoeffIndex.GetCount()) {
         nComponents = m_CoeffIndex[nIndex].m_nComponents;
         nX = m_CoeffIndex[nIndex].m_nX;
@@ -182,7 +184,9 @@ SHORT& CCorImageMedia::GetCorFromIndex(UINT nIndex)
             && m_pHeightInBlocks && nY < m_pHeightInBlocks[nComponents]
             && m_pWidthInBlocks && nX < m_pWidthInBlocks[nComponents]
             && nCoeff < GetCoeffPerBlock()) {
-            return m_pCoeffBuffer[nComponents][(nY * m_pHeightInBlocks[nComponents] + nX) * GetCoeffPerBlock() + nCoeff];
+            TRACE(_T("GetCorFromIndex %d=>%d,%d,%d,%d=>0x%04hx\n"), nIndex, nComponents, nX, nY, nCoeff,
+                m_pCoeffBuffer[nComponents][(nY * m_pWidthInBlocks[nComponents] + nX) * GetCoeffPerBlock() + nCoeff]);
+            return m_pCoeffBuffer[nComponents][(nY * m_pWidthInBlocks[nComponents] + nX) * GetCoeffPerBlock() + nCoeff];
         }
     }
     return m_nDummy;
@@ -196,6 +200,7 @@ BYTE CCorImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
         for (INT i = 0; i < 2; i++) {
             nRet <<= 4;
             nRet |= (GetCorFromIndex((nOffset * 2) + i) & 0xF);
+            TRACE(_T("GetByteToBlocks %d is 0x%04hx\n"), (nOffset * 2) + i, GetCorFromIndex((nOffset * 2) + i));
         }
     } else if (nBlockPerByte == 2) {  /* 1 byte in 4 cor, 2 | 2 | 2 | 2 */
         for (INT i = 0; i < 4; i++) {
@@ -238,6 +243,7 @@ void CCorImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByt
         for (INT i = 0; i < 2; i++) {
             GetCorFromIndex((nOffset * 2) + i) &= ~0xF;
             GetCorFromIndex((nOffset * 2) + i) |= ((nData >> (4 - i * 4)) & 0xF);
+            TRACE(_T("SetByteToBlocks %d is 0x%04hx\n"), (nOffset * 2) + i, GetCorFromIndex((nOffset * 2) + i));
         }
     }
     else if (nBlockPerByte == 2) {  /* 1 byte in 4 cor, 2 | 2 | 2 | 2 */

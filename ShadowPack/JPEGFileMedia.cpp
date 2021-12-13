@@ -187,6 +187,10 @@ BOOL CJPEGFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPac
     jpeg_destroy_compress(&Cominfo);
     fclose(pFile);
     pFile = NULL;
+
+    // done!
+    ClearMediaDirty();
+
     return TRUE;
 err:
     if (pFile) {

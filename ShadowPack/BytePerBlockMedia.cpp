@@ -95,6 +95,8 @@ BOOL CBytePerBlockMedia::LoadMeta(CPasswordGetterBase& PasswordGetter, CPackErro
 	
 test_encrypt:
 	for (INT i = MIN_BPB_MEDIA_BPB_SIZE; i <= MAX_BPB_MEDIA_BPB_SIZE; i++) {
+		ZeroMemory(&Header, sizeof(Header));
+		ZeroMemory(&HeaderPlain, sizeof(HeaderPlain));
 		if (RawReadData(&Header, 0, sizeof(Header), i, Errors)) {
 #ifdef DEBUG
 			TRACE(_T("m_Header.dwBPBBlockPerByte = %d\n"), i);
