@@ -142,7 +142,7 @@ void CCorImageMedia::AddCoeff(UINT nComponents, UINT nX, UINT nY, UINT nCoeff, S
                 (nY * GetWidthInBlocks(nComponents) + nX) * GetCoeffPerBlock() + nCoeff
             ] = nData;
             if (nData & 0xF0) {
-                TRACE(_T("AddCoeff %d,%d,%d,%d=>0x%04hx\n"), nComponents, nX, nY, nCoeff, nData);
+                //TRACE(_T("AddCoeff %d,%d,%d,%d=>0x%04hx\n"), nComponents, nX, nY, nCoeff, nData);
                 m_CoeffIndex.Add(CCoeffIndex(nComponents, nX, nY, nCoeff));
             }
         }
@@ -184,8 +184,8 @@ SHORT& CCorImageMedia::GetCorFromIndex(UINT nIndex)
             && m_pHeightInBlocks && nY < m_pHeightInBlocks[nComponents]
             && m_pWidthInBlocks && nX < m_pWidthInBlocks[nComponents]
             && nCoeff < GetCoeffPerBlock()) {
-            TRACE(_T("GetCorFromIndex %d=>%d,%d,%d,%d=>0x%04hx\n"), nIndex, nComponents, nX, nY, nCoeff,
-                m_pCoeffBuffer[nComponents][(nY * m_pWidthInBlocks[nComponents] + nX) * GetCoeffPerBlock() + nCoeff]);
+            //TRACE(_T("GetCorFromIndex %d=>%d,%d,%d,%d=>0x%04hx\n"), nIndex, nComponents, nX, nY, nCoeff,
+            //    m_pCoeffBuffer[nComponents][(nY * m_pWidthInBlocks[nComponents] + nX) * GetCoeffPerBlock() + nCoeff]);
             return m_pCoeffBuffer[nComponents][(nY * m_pWidthInBlocks[nComponents] + nX) * GetCoeffPerBlock() + nCoeff];
         }
     }
@@ -200,7 +200,6 @@ BYTE CCorImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
         for (INT i = 0; i < 2; i++) {
             nRet <<= 4;
             nRet |= (GetCorFromIndex((nOffset * 2) + i) & 0xF);
-            TRACE(_T("GetByteToBlocks %d is 0x%04hx\n"), (nOffset * 2) + i, GetCorFromIndex((nOffset * 2) + i));
         }
     } else if (nBlockPerByte == 2) {  /* 1 byte in 4 cor, 2 | 2 | 2 | 2 */
         for (INT i = 0; i < 4; i++) {
@@ -209,20 +208,20 @@ BYTE CCorImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
         }
     } else if (nBlockPerByte == 3) {  /* 1 byte in 6 cor, 2 | 1 | 2 | 1 | 1 | 1 */
         nRet = (GetCorFromIndex((nOffset * 6)) & 0x3);
-        nRet <<= 2;
 
+        nRet <<= 1;
         nRet |= (GetCorFromIndex((nOffset * 6) + 1) & 0x1);
-        nRet <<= 1;
 
-        nRet |= (GetCorFromIndex((nOffset * 6) + 2) & 0x3);
         nRet <<= 2;
+        nRet |= (GetCorFromIndex((nOffset * 6) + 2) & 0x3);
 
+        nRet <<= 1;
         nRet |= (GetCorFromIndex((nOffset * 6) + 3) & 0x1);
-        nRet <<= 1;
 
+        nRet <<= 1;
         nRet |= (GetCorFromIndex((nOffset * 6) + 4) & 0x1);
-        nRet <<= 1;
 
+        nRet <<= 1;
         nRet |= (GetCorFromIndex((nOffset * 6) + 5) & 0x1);
 
     } else if (nBlockPerByte == 4) {  /* 1 byte in 8 cor, 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 */
@@ -243,7 +242,6 @@ void CCorImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByt
         for (INT i = 0; i < 2; i++) {
             GetCorFromIndex((nOffset * 2) + i) &= ~0xF;
             GetCorFromIndex((nOffset * 2) + i) |= ((nData >> (4 - i * 4)) & 0xF);
-            TRACE(_T("SetByteToBlocks %d is 0x%04hx\n"), (nOffset * 2) + i, GetCorFromIndex((nOffset * 2) + i));
         }
     }
     else if (nBlockPerByte == 2) {  /* 1 byte in 4 cor, 2 | 2 | 2 | 2 */
@@ -283,7 +281,7 @@ void CCorImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByt
 
 UINT CCorImageMedia::GetTotalBlocks()
 {
-    return m_CoeffIndex.GetCount() / (m_Header.dwBPBBlockPerByte * 2);
+    return m_CoeffIndex.GetCount() / (2);
 }
 
 void CCorImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
@@ -293,6 +291,7 @@ void CCorImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
     m_OptPageCorImageMedia.m_strPasswd1 = m_OptPageCorImageMedia.m_strPasswd2
         = m_Cipher.GetPassword();
     m_OptPageCorImageMedia.m_nTotalBlocks = GetTotalBlocks();
+    m_OptPageCorImageMedia.m_nHeaderSize = sizeof(m_Header);
     m_OptPageCorImageMedia.m_nUsedBytes = m_Header.BPBHeader.dwDataSize;
     pPropertySheet->AddPage(&m_OptPageCorImageMedia);
 }

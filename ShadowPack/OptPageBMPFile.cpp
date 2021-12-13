@@ -13,8 +13,6 @@ IMPLEMENT_DYNAMIC(COptPageBMPFile, CMFCPropertyPage)
 
 COptPageBMPFile::COptPageBMPFile(CWnd* pParent /*=nullptr*/)
 	: CMFCPropertyPage(IDD_PROPPAGE_BMP_FILE)
-	, m_strbfSize(_T(""))
-	, m_strbiYPelsPerMeter(_T(""))
 {
 
 }

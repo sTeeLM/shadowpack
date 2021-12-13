@@ -47,7 +47,7 @@ public:
 	CStreamBase* GetStream();
 	// size
 	UINT GetMediaUsedBytes();
-	UINT GetMediaTotalBytes();
+	virtual UINT GetMediaTotalBytes();
 	BOOL SetMediaUsedBytes(UINT nSize, CPackErrors& Error);
 
 	// misc

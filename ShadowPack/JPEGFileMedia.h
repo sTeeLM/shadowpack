@@ -1,6 +1,8 @@
 #pragma once
 #include "CorImageMedia.h"
+#include "OptPageJPEGFile.h"
 #include "jpeglib.h"
+
 
 class CJPEGFileMedia :
     public CCorImageMedia
@@ -35,6 +37,8 @@ public:
 	static CMediaBase* Factory();
 protected:
 	static void JStegErrorExit(j_common_ptr cinfo);
+	static LPCTSTR szJPEGColorSpace[];
+	static LPCTSTR szJFIFDensityUnit[];
 protected:
 	static LPCTSTR m_szFilter;
 	static LPCTSTR m_szExt;
@@ -42,5 +46,7 @@ protected:
 	jvirt_barray_ptr* m_virt_p;
 	CString m_strLastError;
 	BOOL m_bError;
+	COptPageJPEGFile m_OptPageJPEGFile;
+
 };
 

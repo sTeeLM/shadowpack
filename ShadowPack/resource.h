@@ -26,8 +26,8 @@
 #define IDD_DIALOG_PASSWORD             129
 #define IDD_PROPPAGE_PIXELMEDIA         130
 #define IDD_PROPPAGE_BMP_FILE           131
-#define IDD_PROPPAGE_PIXELMEDIA1        132
 #define IDD_PROPPAGE_CORMEDIA           132
+#define IDD_PROPPAGE_JPEG_FILE          133
 #define IDS_PE_CANCELED                 400
 #define IDS_PE_IO                       401
 #define IDS_PE_CORRUPT_DATA             402
@@ -65,7 +65,6 @@
 #define IDC_EDIT_PASSWD1                1014
 #define IDC_PROGRESS                    1015
 #define IDC_INFO_CAPICITY               1016
-#define IDC_STATICC_USED_BYTE           1016
 #define IDC_STATIC_USED_BYTE            1016
 #define IDC_INFO_FOOTER                 1017
 #define IDC_MFCLINK1                    1017
@@ -77,6 +76,15 @@
 #define IDC_RADIO_1BP4C                 1022
 #define IDC_RADIO_1BP6C                 1023
 #define IDC_RADIO_1BP8C                 1024
+#define IDC_JPEG_IMAGE_WIDTH            1025
+#define IDC_JPEG_IMAGE_HEIGHT           1026
+#define IDC_JPEG_NUM_COMP               1027
+#define IDC_JPEG_COLOR_SPACE            1028
+#define IDC_JPEG_JFIF_MAJOR             1029
+#define IDC_JPEG_JFIF_MINOR             1030
+#define IDC_JPEG_DENSITY_UNIT           1031
+#define IDC_JPEG_X_DENSITY              1032
+#define IDC_JPEG_Y_DENSITY              1033
 
 // Next default values for new objects
 // 
@@ -84,7 +92,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1023
+#define _APS_NEXT_CONTROL_VALUE         1032
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -68,7 +68,7 @@ void COptPagePixelImageMedia::SetBPPInfo()
 	if (nID != 0) {
 		nBPP = (nID - IDC_RADIO_1BP1P) + 1;
 		TRACE(_T("SetBPPEnable nBPP = %d\n"), nBPP);
-		CPackUtils::TranslateSize(m_nTotalBlocks / nBPP, strTotal);
+		CPackUtils::TranslateSize(m_nTotalBlocks / nBPP - m_nHeaderSize, strTotal);
 		CPackUtils::TranslateSize(m_nUsedBytes, strUsed);
 		GetDlgItem(IDC_STATIC_TOTAL_BYTE)->SetWindowText(strTotal);
 		GetDlgItem(IDC_STATIC_USED_BYTE)->SetWindowText(strUsed);
@@ -87,10 +87,10 @@ BOOL COptPagePixelImageMedia::OnInitDialog()
 		GetDlgItem(IDC_EDIT_PASSWD1)->EnableWindow(m_nCrypto != CPackCipher::CIPHER_NONE);
 		GetDlgItem(IDC_EDIT_PASSWD2)->EnableWindow(m_nCrypto != CPackCipher::CIPHER_NONE);
 
-		GetDlgItem(IDC_RADIO_1BP1P)->EnableWindow(m_nTotalBlocks >= m_nUsedBytes);
-		GetDlgItem(IDC_RADIO_1BP2P)->EnableWindow(m_nTotalBlocks / 2 >= m_nUsedBytes);
-		GetDlgItem(IDC_RADIO_1BP3P)->EnableWindow(m_nTotalBlocks / 3 >= m_nUsedBytes);
-		GetDlgItem(IDC_RADIO_1BP4P)->EnableWindow(m_nTotalBlocks / 4 >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP1P)->EnableWindow(m_nTotalBlocks - m_nHeaderSize >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP2P)->EnableWindow(m_nTotalBlocks / 2 - m_nHeaderSize >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP3P)->EnableWindow(m_nTotalBlocks / 3 - m_nHeaderSize >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP4P)->EnableWindow(m_nTotalBlocks / 4 - m_nHeaderSize >= m_nUsedBytes);
 
 		SetBPPInfo();
 

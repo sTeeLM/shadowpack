@@ -392,7 +392,7 @@ void CShadowPackDlg::UpdateUI()
 		strTotal = strUsed = _T("");
 	}
 
-	m_ctlCapicityChart.SetFreePercent(nPercent,(m_ctlFileManager.GetMedia() && m_ctlFileManager.MediaAttached()));
+	m_ctlCapicityChart.SetFreePercent(nPercent,!m_bInProgress && (m_ctlFileManager.GetMedia() && m_ctlFileManager.MediaAttached()));
 	CString strTemp;
 	strTemp.Format(_T("%s/%s"), (LPCTSTR)strUsed, (LPCTSTR)strTotal);
 	m_ctlCapicityInfo.SetWindowText(strTemp);

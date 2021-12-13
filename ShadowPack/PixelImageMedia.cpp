@@ -144,6 +144,7 @@ void CPixelImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 	m_OptPagePixelImageMedia.m_strPasswd1 = m_OptPagePixelImageMedia.m_strPasswd2
 		= m_Cipher.GetPassword();
 	m_OptPagePixelImageMedia.m_nTotalBlocks = GetTotalBlocks();
+	m_OptPagePixelImageMedia.m_nHeaderSize = sizeof(m_Header);
 	m_OptPagePixelImageMedia.m_nUsedBytes = m_Header.BPBHeader.dwDataSize;
 	pPropertySheet->AddPage(&m_OptPagePixelImageMedia);
 }

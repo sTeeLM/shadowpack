@@ -210,8 +210,56 @@ void CJPEGFileMedia::CloseMedia()
     CCorImageMedia::Free();
 }
 
+// JCS_UNKNOWN,		/* error/unspecified */
+// JCS_GRAYSCALE,		/* monochrome */
+// JCS_RGB,		/* red/green/blue */
+// JCS_YCbCr,		/* Y/Cb/Cr (also known as YUV) */
+// JCS_CMYK,		/* C/M/Y/K */
+// JCS_YCCK		/* Y/Cb/Cr/K */
+LPCTSTR CJPEGFileMedia::szJPEGColorSpace[] =
+{
+    _T("JCS_UNKNOWN"),
+    _T("JCS_GRAYSCALE"),
+    _T("JCS_RGB"),
+    _T("JCS_YCbCr"),
+    _T("JCS_CMYK"),
+    _T("JCS_YCCK"),
+};
+
+/* into the JFIF APP0 marker.  density_unit can be 0 for unknown, */
+/* 1 for dots/inch, or 2 for dots/cm.  Note that the pixel aspect */
+LPCTSTR CJPEGFileMedia::szJFIFDensityUnit[] =
+{
+    _T("unknown"),
+    _T("dots/inch"),
+    _T("dots/cm"),
+};
 void CJPEGFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
+/*
+    CString m_strImageWidth;
+    CString m_strImageHeight;
+    CString m_strJFIFMajor;
+    CString m_strJFIFMinor;
+    CString m_strDensityUnit;
+    CString m_strNumComp;
+    CString m_strColorSpace;
+    CString m_strXDensity;
+    CString m_strYDensity;
+*/
+    m_OptPageJPEGFile.m_strImageWidth.Format(_T("%d"), m_Decinfo.image_width);
+    m_OptPageJPEGFile.m_strImageHeight.Format(_T("%d"), m_Decinfo.image_height);
+    m_OptPageJPEGFile.m_strJFIFMajor.Format(_T("%d"), m_Decinfo.JFIF_major_version);
+    m_OptPageJPEGFile.m_strJFIFMinor.Format(_T("%d"), m_Decinfo.JFIF_minor_version);
+    m_OptPageJPEGFile.m_strDensityUnit.Format(_T("%s"), m_Decinfo.density_unit < 3 ? 
+        szJFIFDensityUnit[m_Decinfo.density_unit] : _T("UNKNOWN"));
+    m_OptPageJPEGFile.m_strNumComp.Format(_T("%d"), m_Decinfo.num_components);
+    m_OptPageJPEGFile.m_strColorSpace.Format(_T("%s"), m_Decinfo.jpeg_color_space < 6 ? 
+        szJPEGColorSpace[m_Decinfo.jpeg_color_space] : _T("UNKNOWN"));
+    m_OptPageJPEGFile.m_strXDensity.Format(_T("%d"), m_Decinfo.X_density);
+    m_OptPageJPEGFile.m_strYDensity.Format(_T("%d"), m_Decinfo.Y_density);
+
+    pPropertySheet->AddPage(&m_OptPageJPEGFile);
     CCorImageMedia::AddOptPage(pPropertySheet);
 }
 

@@ -99,6 +99,9 @@
     <ClInclude Include="OptPageCorImageMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="OptPageJPEGFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShadowPack.cpp">
@@ -162,6 +165,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="OptPageCorImageMedia.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OptPageJPEGFile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

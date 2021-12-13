@@ -41,10 +41,10 @@ BOOL COptPageCorImageMedia::OnInitDialog()
 		GetDlgItem(IDC_EDIT_PASSWD1)->EnableWindow(m_nCrypto != CPackCipher::CIPHER_NONE);
 		GetDlgItem(IDC_EDIT_PASSWD2)->EnableWindow(m_nCrypto != CPackCipher::CIPHER_NONE);
 
-		GetDlgItem(IDC_RADIO_1BP2C)->EnableWindow(m_nTotalBlocks / 2 >= m_nUsedBytes);
-		GetDlgItem(IDC_RADIO_1BP4C)->EnableWindow(m_nTotalBlocks / 4 >= m_nUsedBytes);
-		GetDlgItem(IDC_RADIO_1BP6C)->EnableWindow(m_nTotalBlocks / 6 >= m_nUsedBytes);
-		GetDlgItem(IDC_RADIO_1BP8C)->EnableWindow(m_nTotalBlocks / 8 >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP2C)->EnableWindow(m_nTotalBlocks / 1 - m_nHeaderSize >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP4C)->EnableWindow(m_nTotalBlocks / 2 - m_nHeaderSize >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP6C)->EnableWindow(m_nTotalBlocks / 3 - m_nHeaderSize >= m_nUsedBytes);
+		GetDlgItem(IDC_RADIO_1BP8C)->EnableWindow(m_nTotalBlocks / 4 - m_nHeaderSize >= m_nUsedBytes);
 
 		SetBPCInfo();
 
@@ -101,7 +101,7 @@ void COptPageCorImageMedia::SetBPCInfo()
 	if (nID != 0) {
 		nBPC = (nID - IDC_RADIO_1BP2C) + 1;
 		TRACE(_T("SetBPCEnable nBPC = %d\n"), nBPC);
-		CPackUtils::TranslateSize(m_nTotalBlocks / nBPC / 2, strTotal);
+		CPackUtils::TranslateSize(m_nTotalBlocks / nBPC - m_nHeaderSize, strTotal);
 		CPackUtils::TranslateSize(m_nUsedBytes, strUsed);
 		GetDlgItem(IDC_STATIC_TOTAL_BYTE)->SetWindowText(strTotal);
 		GetDlgItem(IDC_STATIC_USED_BYTE)->SetWindowText(strUsed);

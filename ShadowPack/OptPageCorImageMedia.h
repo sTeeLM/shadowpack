@@ -24,6 +24,7 @@ public:
 	INT m_nBytePer2Cor;
 	UINT m_nTotalBlocks;
 	UINT m_nUsedBytes;
+	UINT m_nHeaderSize;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持

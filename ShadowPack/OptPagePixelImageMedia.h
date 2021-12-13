@@ -29,6 +29,7 @@ public:
 	INT m_nBytePerPixel;
 	UINT m_nTotalBlocks;
 	UINT m_nUsedBytes;
+	UINT m_nHeaderSize;
 protected:
 	void SetBPPInfo();
 public:
