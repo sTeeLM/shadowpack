@@ -26,6 +26,8 @@
 #define IDD_DIALOG_PASSWORD             129
 #define IDD_PROPPAGE_PIXELMEDIA         130
 #define IDD_PROPPAGE_BMP_FILE           131
+#define IDD_PROPPAGE_PIXELMEDIA1        132
+#define IDD_PROPPAGE_CORMEDIA           132
 #define IDS_PE_CANCELED                 400
 #define IDS_PE_IO                       401
 #define IDS_PE_CORRUPT_DATA             402
@@ -71,6 +73,10 @@
 #define IDC_EDIT_PASSWD2                1018
 #define IDC_BTN_CANCEL                  1019
 #define IDC_EDIT_PASSWORD               1020
+#define IDC_RADIO_1BP2C                 1021
+#define IDC_RADIO_1BP4C                 1022
+#define IDC_RADIO_1BP6C                 1023
+#define IDC_RADIO_1BP8C                 1024
 
 // Next default values for new objects
 // 
@@ -78,7 +84,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1018
+#define _APS_NEXT_CONTROL_VALUE         1023
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

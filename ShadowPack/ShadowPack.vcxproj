@@ -197,6 +197,7 @@
     <ClInclude Include="JPEGFileMedia.h" />
     <ClInclude Include="MediaOptionDlg.h" />
     <ClInclude Include="OptPageBMPFile.h" />
+    <ClInclude Include="OptPageCorImageMedia.h" />
     <ClInclude Include="PackCipher.h" />
     <ClInclude Include="PackManager.h" />
     <ClInclude Include="PackManagerBase.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="MediaBase.cpp" />
     <ClCompile Include="MediaOptionDlg.cpp" />
     <ClCompile Include="OptPageBMPFile.cpp" />
+    <ClCompile Include="OptPageCorImageMedia.cpp" />
     <ClCompile Include="PackCipher.cpp" />
     <ClCompile Include="PackManager.cpp" />
     <ClCompile Include="MediaFactory.cpp" />

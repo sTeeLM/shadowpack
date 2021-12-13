@@ -74,7 +74,7 @@ BOOL CJPEGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Password
         goto err;
     }
 
-    if (!CCorImageMedia::Alloc(m_Decinfo.image_height, m_Decinfo.image_width,
+    if (!CCorImageMedia::Alloc(m_Decinfo.image_width, m_Decinfo.image_height,
         m_Decinfo.num_components, Errors)) {
         goto err;
     }
@@ -208,7 +208,7 @@ void CJPEGFileMedia::CloseMedia()
 
 void CJPEGFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
-
+    CCorImageMedia::AddOptPage(pPropertySheet);
 }
 
 BOOL CJPEGFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)

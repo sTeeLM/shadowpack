@@ -1,5 +1,7 @@
 #pragma once
 #include "BytePerBlockMedia.h"
+#include "OptPageCorImageMedia.h"
+
 class CCorImageMedia :
     public CBytePerBlockMedia
 {
@@ -39,9 +41,10 @@ private:
 private:
 	UINT m_nComponents;
 	UINT m_nTotalCoeffs;
-	INT* m_pHeightInBlocks;
-	INT* m_pWidthInBlocks;
+	UINT* m_pHeightInBlocks;
+	UINT* m_pWidthInBlocks;
 	SHORT ** m_pCoeffBuffer;
+	SHORT m_nDummy;
 	class CCoeffIndex {
 	public:
 		CCoeffIndex(UINT nComponents = 0, UINT nX = 0, UINT nY = 0, UINT nCoeff = 0) :
@@ -68,8 +71,9 @@ private:
 		UINT m_nY;
 		UINT m_nCoeff;
 	};
+
 protected:
-	
 	CArray<CCoeffIndex, CCoeffIndex> m_CoeffIndex;
+	COptPageCorImageMedia m_OptPageCorImageMedia;
 };
 

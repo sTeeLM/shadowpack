@@ -100,6 +100,9 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 			}
 			m_nTotalSize += pPackItem->GetTotalSize();
 		}
+		else {
+			goto err;
+		}
 	}
 
 	ASSERT(m_nTotalSize == m_pMedia->GetMediaUsedBytes());

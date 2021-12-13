@@ -22,7 +22,6 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnCbnSelchangeComboCrypto();
 	CString m_strPasswd1;
 	CString m_strPasswd2;
 	CComboBox m_ctlCrypto;
@@ -33,6 +32,7 @@ public:
 protected:
 	void SetBPPInfo();
 public:
+	afx_msg void OnCbnSelchangeComboCrypto();
 	afx_msg void OnBnClickedRadio1bp4p();
 	afx_msg void OnBnClickedRadio1bp3p();
 	afx_msg void OnBnClickedRadio1bp2p();
