@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CorImageMedia.h"
+#include "resource.h"
 
 CCorImageMedia::CCorImageMedia() :
     m_pHeightInBlocks(NULL),
@@ -7,7 +8,8 @@ CCorImageMedia::CCorImageMedia() :
     m_pCoeffBuffer(NULL),
     m_nDummy(0),
     m_nComponents(0),
-    m_nTotalCoeffs(0)
+    m_nTotalCoeffs(0),
+    m_OptPageCorImageMedia(NULL, IDS_OPT_COFF_MEDIA)
 {
 }
 
@@ -287,12 +289,13 @@ UINT CCorImageMedia::GetTotalBlocks()
 void CCorImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
     m_OptPageCorImageMedia.m_nCrypto = m_Header.dwBPBCipher;
-    m_OptPageCorImageMedia.m_nBytePer2Cor = m_Header.dwBPBBlockPerByte - 1;
+    m_OptPageCorImageMedia.m_nBytePerBlock = m_Header.dwBPBBlockPerByte - 1;
     m_OptPageCorImageMedia.m_strPasswd1 = m_OptPageCorImageMedia.m_strPasswd2
         = m_Cipher.GetPassword();
     m_OptPageCorImageMedia.m_nTotalBlocks = GetTotalBlocks();
     m_OptPageCorImageMedia.m_nHeaderSize = sizeof(m_Header);
     m_OptPageCorImageMedia.m_nUsedBytes = m_Header.BPBHeader.dwDataSize;
+    m_OptPageCorImageMedia.m_strBlockUnit.LoadString(IDS_OPT_COFF_MEDIA_BLOCK_UNIT);
     pPropertySheet->AddPage(&m_OptPageCorImageMedia);
 }
 
@@ -306,10 +309,10 @@ BOOL CCorImageMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
         bDirty = TRUE;
     }
 
-    if (m_OptPageCorImageMedia.m_nBytePer2Cor >= 0 && m_OptPageCorImageMedia.m_nBytePer2Cor <= 3 &&
-        m_OptPageCorImageMedia.m_nBytePer2Cor != m_Header.dwBPBBlockPerByte - 1) {
-        TRACE(_T("m_nBytePerPixel change from %d to %d\n"), m_Header.dwBPBBlockPerByte, m_OptPageCorImageMedia.m_nBytePer2Cor + 1);
-        m_Header.dwBPBBlockPerByte = m_OptPageCorImageMedia.m_nBytePer2Cor + 1;
+    if (m_OptPageCorImageMedia.m_nBytePerBlock >= 0 && m_OptPageCorImageMedia.m_nBytePerBlock <= 3 &&
+        m_OptPageCorImageMedia.m_nBytePerBlock != m_Header.dwBPBBlockPerByte - 1) {
+        TRACE(_T("m_nBytePerPixel change from %d to %d\n"), m_Header.dwBPBBlockPerByte, m_OptPageCorImageMedia.m_nBytePerBlock + 1);
+        m_Header.dwBPBBlockPerByte = m_OptPageCorImageMedia.m_nBytePerBlock + 1;
         bDirty = TRUE;
     }
 

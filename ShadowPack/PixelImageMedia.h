@@ -1,7 +1,7 @@
 #pragma once
 #include "MediaBase.h"
 #include "BytePerBlockMedia.h"
-#include "OptPagePixelImageMedia.h"
+#include "OptPageBPBMedia.h"
 
 class CPixelImageMedia :
     public CBytePerBlockMedia
@@ -60,6 +60,6 @@ protected:
 	CPixelBlock * m_pBlockBuffer;
 	static BYTE F5LookupTable[4][8];
 	static BYTE F5RevLookupTable[8];
-	COptPagePixelImageMedia m_OptPagePixelImageMedia;
+	COptPageBPBMedia m_OptPagePixelImageMedia;
 };
 

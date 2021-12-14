@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "PixelImageMedia.h"
+#include "resource.h"
 
 CPixelImageMedia::CPixelImageMedia() :
 	m_nWidth(0),
 	m_nHeight(0),
-	m_pBlockBuffer(NULL)
+	m_pBlockBuffer(NULL),
+	m_OptPagePixelImageMedia(NULL, IDS_OPT_PIXEL_MEDIA)
 {
 
 }
@@ -140,12 +142,13 @@ UINT CPixelImageMedia::GetTotalBlocks()
 void CPixelImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
 	m_OptPagePixelImageMedia.m_nCrypto = m_Header.dwBPBCipher;
-	m_OptPagePixelImageMedia.m_nBytePerPixel = m_Header.dwBPBBlockPerByte - 1;
+	m_OptPagePixelImageMedia.m_nBytePerBlock = m_Header.dwBPBBlockPerByte - 1;
 	m_OptPagePixelImageMedia.m_strPasswd1 = m_OptPagePixelImageMedia.m_strPasswd2
 		= m_Cipher.GetPassword();
 	m_OptPagePixelImageMedia.m_nTotalBlocks = GetTotalBlocks();
 	m_OptPagePixelImageMedia.m_nHeaderSize = sizeof(m_Header);
 	m_OptPagePixelImageMedia.m_nUsedBytes = m_Header.BPBHeader.dwDataSize;
+	m_OptPagePixelImageMedia.m_strBlockUnit.LoadString(IDS_OPT_PIXEL_MEDIA_BLOCK_UNIT);
 	pPropertySheet->AddPage(&m_OptPagePixelImageMedia);
 }
 
@@ -159,10 +162,10 @@ BOOL CPixelImageMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 		bDirty = TRUE;
 	}
 
-	if (m_OptPagePixelImageMedia.m_nBytePerPixel >= 0 && m_OptPagePixelImageMedia.m_nBytePerPixel <= 3 &&
-			m_OptPagePixelImageMedia.m_nBytePerPixel != m_Header.dwBPBBlockPerByte - 1) {
-		TRACE(_T("m_nBytePerPixel change from %d to %d\n"), m_Header.dwBPBBlockPerByte, m_OptPagePixelImageMedia.m_nBytePerPixel + 1);
-		m_Header.dwBPBBlockPerByte = m_OptPagePixelImageMedia.m_nBytePerPixel + 1;
+	if (m_OptPagePixelImageMedia.m_nBytePerBlock >= 0 && m_OptPagePixelImageMedia.m_nBytePerBlock <= 3 &&
+			m_OptPagePixelImageMedia.m_nBytePerBlock != m_Header.dwBPBBlockPerByte - 1) {
+		TRACE(_T("m_nBytePerPixel change from %d to %d\n"), m_Header.dwBPBBlockPerByte, m_OptPagePixelImageMedia.m_nBytePerBlock + 1);
+		m_Header.dwBPBBlockPerByte = m_OptPagePixelImageMedia.m_nBytePerBlock + 1;
 		bDirty = TRUE;
 	}
 

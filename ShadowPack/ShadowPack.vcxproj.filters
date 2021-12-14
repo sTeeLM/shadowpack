@@ -78,9 +78,6 @@
     <ClInclude Include="MediaOptionDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="OptPagePixelImageMedia.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="PixelImageMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -96,10 +93,10 @@
     <ClInclude Include="JPEGFileMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="OptPageCorImageMedia.h">
+    <ClInclude Include="OptPageJPEGFile.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="OptPageJPEGFile.h">
+    <ClInclude Include="OptPageBPBMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -146,9 +143,6 @@
     <ClCompile Include="MediaOptionDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="OptPagePixelImageMedia.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="MediaBase.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -164,10 +158,10 @@
     <ClCompile Include="JPEGFileMedia.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="OptPageCorImageMedia.cpp">
+    <ClCompile Include="OptPageJPEGFile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="OptPageJPEGFile.cpp">
+    <ClCompile Include="OptPageBPBMedia.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

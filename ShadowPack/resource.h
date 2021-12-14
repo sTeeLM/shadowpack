@@ -22,12 +22,18 @@
 #define IDS_OPTIONS                     114
 #define IDS_EMPTY_PACK                  115
 #define IDS_INVALID_HEADER              116
+#define IDS_BPB                         116
+#define IDS_OPT_PIXEL_MEDIA             117
+#define IDS_OPT_PIXEL_MEDIA_BLOCK_UNIT  118
+#define IDS_OPT_COFF_MEDIA              119
+#define IDS_OPT_COFF_MEDIA_BLOCK_UNIT   120
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_PASSWORD             129
 #define IDD_PROPPAGE_PIXELMEDIA         130
 #define IDD_PROPPAGE_BMP_FILE           131
 #define IDD_PROPPAGE_CORMEDIA           132
 #define IDD_PROPPAGE_JPEG_FILE          133
+#define IDD_PROPPAGE_BYTE_PER_BLOCK_MEDIA 134
 #define IDS_PE_CANCELED                 400
 #define IDS_PE_IO                       401
 #define IDS_PE_CORRUPT_DATA             402
@@ -85,6 +91,10 @@
 #define IDC_JPEG_DENSITY_UNIT           1031
 #define IDC_JPEG_X_DENSITY              1032
 #define IDC_JPEG_Y_DENSITY              1033
+#define IDC_RADIO_1BP1B                 1034
+#define IDC_RADIO_1BP2B                 1035
+#define IDC_RADIO_1BP3B                 1036
+#define IDC_RADIO_1BP4B                 1037
 
 // Next default values for new objects
 // 
@@ -92,7 +102,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1032
+#define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
