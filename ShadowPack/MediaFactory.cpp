@@ -3,10 +3,12 @@
 #include "MediaFactory.h"
 #include "BMPFileMedia.h"
 #include "JPEGFileMedia.h"
+#include "PNGFileMedia.h"
 
 CMediaFactory::ExtTable CMediaFactory::m_ExtTable[] = {
 	{&CBMPFileMedia::TestExt, &CBMPFileMedia::GetExtFilter, &CBMPFileMedia::Factory},
 	{&CJPEGFileMedia::TestExt, &CJPEGFileMedia::GetExtFilter, &CJPEGFileMedia::Factory},
+	{&CPNGFileMedia::TestExt, &CPNGFileMedia::GetExtFilter, &CPNGFileMedia::Factory},
 };
 
 CMediaFactory::CMediaFactory(void)

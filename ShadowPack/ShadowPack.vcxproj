@@ -97,12 +97,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libjpeg;..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libpng;..\libjpeg;..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -211,6 +211,7 @@
     <ClInclude Include="PasswordGetterBase.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PixelImageMedia.h" />
+    <ClInclude Include="PNGFileMedia.h" />
     <ClInclude Include="ProgressBase.h" />
     <ClInclude Include="ProgressControl.h" />
     <ClInclude Include="Resource.h" />
@@ -243,6 +244,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PixelImageMedia.cpp" />
+    <ClCompile Include="PNGFileMedia.cpp" />
     <ClCompile Include="ProgressControl.cpp" />
     <ClCompile Include="ShadowPack.cpp" />
     <ClCompile Include="ShadowPackDlg.cpp" />
