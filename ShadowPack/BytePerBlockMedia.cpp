@@ -171,7 +171,7 @@ test_encrypt:
 		AfxMessageBox(IDS_EMPTY_PACK, MB_ICONINFORMATION);
 		goto success;
 	} else {
-		Errors.SetError(CPackErrors::PE_UNSUPPORT_PACK);
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA);
 	}
 
 err:

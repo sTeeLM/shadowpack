@@ -12,7 +12,6 @@ public:
 			PE_CORRUPT_DATA,   // data corrupted
 			PE_CIPHER,         // decrypt error
 			PE_OVER_CAPICITY,  // over capcity
-			PE_UNSUPPORT_PACK, // unsupport pack format
 			PE_UNSUPPORT_MEDIA, // unsupport file
 			PE_EXISTED,        // item exist
 			PE_NOMEM,          // no memory

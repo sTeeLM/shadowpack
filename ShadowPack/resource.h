@@ -29,11 +29,10 @@
 #define IDS_OPT_COFF_MEDIA_BLOCK_UNIT   120
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_PASSWORD             129
-#define IDD_PROPPAGE_PIXELMEDIA         130
 #define IDD_PROPPAGE_BMP_FILE           131
-#define IDD_PROPPAGE_CORMEDIA           132
-#define IDD_PROPPAGE_JPEG_FILE          133
+#define IDD_PROPPAGE_PNG_FILE           133
 #define IDD_PROPPAGE_BYTE_PER_BLOCK_MEDIA 134
+#define IDD_PROPPAGE_JPEG_FILE          135
 #define IDS_PE_CANCELED                 400
 #define IDS_PE_IO                       401
 #define IDS_PE_CORRUPT_DATA             402
@@ -62,10 +61,6 @@
 #define IDC_BTN_MEDIA_CLOSE             1008
 #define IDC_COMBO_CRYPTO                1008
 #define IDC_BTN_MEDIA_SAVE              1009
-#define IDC_RADIO_1BP1P                 1009
-#define IDC_RADIO_1BP2P                 1010
-#define IDC_RADIO_1BP3P                 1011
-#define IDC_RADIO_1BP4P                 1012
 #define IDC_BTN_MEDIA_OPTION            1013
 #define IDC_STATIC_TOTAL_BYTE           1013
 #define IDC_EDIT_PASSWD1                1014
@@ -78,10 +73,6 @@
 #define IDC_EDIT_PASSWD2                1018
 #define IDC_BTN_CANCEL                  1019
 #define IDC_EDIT_PASSWORD               1020
-#define IDC_RADIO_1BP2C                 1021
-#define IDC_RADIO_1BP4C                 1022
-#define IDC_RADIO_1BP6C                 1023
-#define IDC_RADIO_1BP8C                 1024
 #define IDC_JPEG_IMAGE_WIDTH            1025
 #define IDC_JPEG_IMAGE_HEIGHT           1026
 #define IDC_JPEG_NUM_COMP               1027
@@ -95,14 +86,23 @@
 #define IDC_RADIO_1BP2B                 1035
 #define IDC_RADIO_1BP3B                 1036
 #define IDC_RADIO_1BP4B                 1037
+#define IDC_PNG_WIDTH                   1038
+#define IDC_PNG_HEIGHT                  1039
+#define IDC_PNG_BIT_DEPTH               1040
+#define IDC_PNG_COLOR_TYPE              1041
+#define IDC_PNG_INTERLACE_TYPE          1042
+#define IDC_PNG_COMPRESSION_TYPE        1043
+#define IDC_PNG_FILTER_TYPE             1044
+#define IDC_PNG_BIT_DEPTH2              1045
+#define IDC_PNG_CHANNELS                1046
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        136
+#define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1036
+#define _APS_NEXT_CONTROL_VALUE         1043
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

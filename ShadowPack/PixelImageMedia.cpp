@@ -135,7 +135,17 @@ void CPixelImageMedia::GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_F
 			for (INT x = 0; x < m_nWidth; x++) {
 				GetPixel(x, nY, pBuffer[x * 3 + 2], pBuffer[x * 3 + 1], pBuffer[x * 3]);
 			}
-			break;
+		break;
+		case CPixelBlock::PIXEL_FORMAT_RGB:
+			for (INT x = 0; x < m_nWidth; x++) {
+				GetPixel(x, nY, pBuffer[x * 3], pBuffer[x * 3 + 1], pBuffer[x * 3 + 2]);
+			}
+		break;
+		case CPixelBlock::PIXEL_FORMAT_RGBA:
+			for (INT x = 0; x < m_nWidth; x++) {
+				GetPixel(x, nY, pBuffer[x * 4], pBuffer[x * 4 + 1], pBuffer[x * 4 + 2], pBuffer[x * 4 + 3]);
+			}
+		break;
 		default:
 			ASSERT(FALSE);
 			break;

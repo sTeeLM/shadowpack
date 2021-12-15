@@ -59,7 +59,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 
 	if (pinfoHeader->biPlanes != 1 || (pinfoHeader->biBitCount != 24)
 		|| pinfoHeader->biCompression != BI_RGB) {
-		Errors.SetError(CPackErrors::PE_UNSUPPORT_PACK, szFilePath);
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
 

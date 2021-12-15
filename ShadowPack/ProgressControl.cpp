@@ -58,9 +58,15 @@ void CProgressControl::Increase(ULONGLONG nVal)
 {
 	INT nProgressOld, nProgressNew;
 
-	nProgressOld = (INT)(m_nCurrent * 100 / m_nFullScale);
+	if ((nProgressOld = (INT)(m_nCurrent * 100 / m_nFullScale)) > 100) {
+		TRACE(_T("PROGRESS  %d > 100\n"), nProgressOld);
+		nProgressOld = 100;
+	}
 	m_nCurrent += nVal;
-	nProgressNew = (INT)(m_nCurrent * 100 / m_nFullScale);
+	if ((nProgressNew = (INT)(m_nCurrent * 100 / m_nFullScale)) > 100) {
+		TRACE(_T("PROGRESS  %d > 100\n"), nProgressNew);
+		nProgressNew = 100;
+	}
 
 	if (nProgressNew != nProgressOld) {
 		CProgressCtrl::SetPos(nProgressNew);
@@ -68,6 +74,25 @@ void CProgressControl::Increase(ULONGLONG nVal)
 	}
 }
 
+void CProgressControl::SetScale(ULONGLONG nVal)
+{
+	INT nProgressOld, nProgressNew;
+
+	if ((nProgressOld = (INT)(m_nCurrent * 100 / m_nFullScale)) > 100) {
+		TRACE(_T("PROGRESS  %d > 100\n"), nProgressOld);
+		nProgressOld = 100;
+	}
+	m_nCurrent = nVal;
+	if ((nProgressNew = (INT)(m_nCurrent * 100 / m_nFullScale)) > 100) {
+		TRACE(_T("PROGRESS  %d > 100\n"), nProgressNew);
+		nProgressNew = 100;
+	}
+
+	if (nProgressNew != nProgressOld) {
+		CProgressCtrl::SetPos(nProgressNew);
+		TRACE("Progress %d\n", nProgressNew);
+	}
+}
 void CProgressControl::Cancel(void)
 {
 	m_bCancel = TRUE;

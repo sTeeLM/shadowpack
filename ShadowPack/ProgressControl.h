@@ -21,6 +21,7 @@ public:
 	void Cancel(void);
 	BOOL IsCanceled(void);
 	void Reset(UINT nIDS = 0);
+	void SetScale(ULONGLONG nVal);
 	void Show(BOOL bShow = TRUE);
 
 protected:

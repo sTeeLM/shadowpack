@@ -36,9 +36,6 @@ void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPat
 	case PE_OVER_CAPICITY:  // over capcity
 		m_eString.Format(IDS_PE_OVER_CAPICITY);
 		break;
-	case PE_UNSUPPORT_PACK: // unsupport pack format
-		m_eString.Format(IDS_PE_UNSUPPORT_PACK, szPath);
-		break;
 	case PE_UNSUPPORT_MEDIA: // unsupport file
 		m_eString.Format(IDS_PE_UNSUPPORT_MEDIA, szPath);
 		break;

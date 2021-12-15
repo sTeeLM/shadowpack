@@ -1,6 +1,7 @@
 #pragma once
 #include "PixelImageMedia.h"
 #include "png.h"
+#include "OptPagePNGFile.h"
 
 class CPNGFileMedia :
     public CPixelImageMedia
@@ -36,15 +37,21 @@ protected:
 protected:
 	typedef struct _PNGInfo {
 		UINT nChannels;
-		UINT nColorType;
-		UINT nBitDepth;
+		INT nColorType;
+		INT  nBitDepth;
 		UINT nWidth;
 		UINT nHeight;
 		UINT nRowBytes;
+		INT nInterlaceType;
+		INT nCompressionType;
+		INT nFilterType;
 	}PNGInfo;
 	PNGInfo m_PNGInfo;
+	BOOL m_bError;
+	CString m_strLastError;
 	static LPCTSTR m_szFilter;
 	static LPCTSTR m_szExt;
-
+	CProgressBase* pProgress;
+	COptPagePNGFile m_OptPagePNGFile;
 };
 
