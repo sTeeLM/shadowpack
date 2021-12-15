@@ -21,7 +21,8 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	LPBITMAPINFOHEADER  pinfoHeader = NULL;
 	BOOL bRet = FALSE;
 	FILE* pFile = NULL;
-	INT nPadding, nScanLineSize;
+//	INT nPadding;
+	INT nScanLineSize;
 	LPBYTE pScanLine = NULL;
 
 	if (m_pfileHeader) {
@@ -68,9 +69,10 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		goto err;
 	}
 
-	nPadding = (pinfoHeader->biWidth % 4);
-	nPadding = nPadding != 0 ? 4 - nPadding : 0;
-	nScanLineSize = (pinfoHeader->biWidth + nPadding) * 3;
+//	nPadding = (pinfoHeader->biWidth % 4);
+//	nPadding = nPadding != 0 ? 4 - nPadding : 0;
+//	nScanLineSize = (pinfoHeader->biWidth ) * 3 + nPadding;
+	nScanLineSize = (pinfoHeader->biWidth * 3 + 3) / 4 * 4;
 	if ((pScanLine = (LPBYTE)malloc(nScanLineSize)) == NULL) {
 		Errors.SetError(CPackErrors::PE_NOMEM);
 		goto err;
@@ -118,7 +120,8 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 	LPBITMAPINFOHEADER  pinfoHeader = NULL;
 	BOOL bRet = FALSE;
 	FILE* pFile = NULL;
-	INT nPadding, nScanLineSize;
+//	INT nPadding;
+	INT nScanLineSize;
 	LPBYTE pScanLine = NULL;
 
 	if (!m_pfileHeader) {
@@ -150,9 +153,10 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto err;
 	}
 
-	nPadding = (pinfoHeader->biWidth % 4);
-	nPadding = nPadding != 0 ? 4 - nPadding : 0;
-	nScanLineSize = (pinfoHeader->biWidth + nPadding) * 3;
+//	nPadding = (pinfoHeader->biWidth % 4);
+//	nPadding = nPadding != 0 ? 4 - nPadding : 0;
+//	nScanLineSize = (pinfoHeader->biWidth) * 3 + nPadding;
+	nScanLineSize = (pinfoHeader->biWidth * 3 + 3) / 4 * 4;
 	if ((pScanLine = (LPBYTE)malloc(nScanLineSize)) == NULL) {
 		Errors.SetError(CPackErrors::PE_NOMEM);
 		goto err;

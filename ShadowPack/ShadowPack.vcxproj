@@ -97,12 +97,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libpng;..\libjpeg;..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjpeg;..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -220,6 +220,7 @@
     <ClInclude Include="ShadowPackDlg.h" />
     <ClInclude Include="StreamBase.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TIFFileMedia.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BMPFileMedia.cpp" />
@@ -250,6 +251,7 @@
     <ClCompile Include="ProgressControl.cpp" />
     <ClCompile Include="ShadowPack.cpp" />
     <ClCompile Include="ShadowPackDlg.cpp" />
+    <ClCompile Include="TIFFileMedia.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ShadowPack.rc" />
