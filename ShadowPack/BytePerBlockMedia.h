@@ -35,6 +35,7 @@ public:
 	// 给子类调用的接口，子类会调
 	BOOL LoadMeta(CPasswordGetterBase& PasswordGetter, CPackErrors& Errors);
 	BOOL SaveMeta(CPackErrors& Errors);
+	BOOL FillEmptySpace(CProgressBase& Progress, CPackErrors& Errors);
 
 	// 实现了CStreamBase的接口
 
@@ -42,7 +43,7 @@ public:
 	BOOL Write(const LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Error);
 	BOOL Seek(INT nOffset, CStreamBase::SEEK_TYPE_T Org, CPackErrors& Error);
 
-// 实现CMediaBase接口
+	// 实现CMediaBase接口
 	// stream read and write
 	CStreamBase* GetStream();
 	// size
@@ -55,9 +56,7 @@ public:
 	void SetMediaDirty() { m_bIsDirty = TRUE; }
 	void ClearMediaDirty() { m_bIsDirty = FALSE; }
 
-	BOOL FillEmptySpace(CProgressBase& Progress, CPackErrors& Errors);
-
-	virtual BOOL TestHeaderValid(const MEDIA_HEADER_T* pHeader);
+	BOOL TestHeaderValid(const MEDIA_HEADER_T* pHeader);
 
 protected:
 	BOOL RawReadData(LPVOID pBuffer, UINT nOffset, UINT nSize, UINT nBPBBlockPerByte, CPackErrors& Errors);
