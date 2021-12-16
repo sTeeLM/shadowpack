@@ -38,5 +38,19 @@ protected:
 	static LPCTSTR m_szExt;
 	TIFF* m_pTiff;
 	CString m_strLastError;
+	typedef struct _TIFFInfo {
+		UINT nWidth;
+		UINT nHeight;
+		USHORT nCompression;
+		USHORT nSamplesPerPixel;
+		USHORT nBitPerSample;
+		USHORT nPhotoMatric;
+		USHORT nPlanarConfig;
+		FLOAT  fXResolution;
+		FLOAT  fYResolution;
+		USHORT nResolutionUnit;
+		USHORT nExtraSamples;
+	}TIFFInfo;
+	TIFFInfo m_TIFFInfo;
 };
 

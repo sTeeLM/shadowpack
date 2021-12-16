@@ -43,7 +43,8 @@ public:
 	void GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE& nBlue);
 	void SetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
 	void GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
-
+	void SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel);
+	void GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel);
 	// 实现父类接口，实现这几个接口让父类调用
 	BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte);
 	void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);

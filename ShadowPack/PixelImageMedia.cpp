@@ -154,6 +154,39 @@ void CPixelImageMedia::GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_F
 	}
 }
 
+void CPixelImageMedia::SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel)
+{
+
+}
+
+void CPixelImageMedia::GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel)
+{
+	ASSERT(nY < m_nHeight);
+	if (nY < m_nHeight) {
+		switch (Format) {
+		case CPixelBlock::PIXEL_FORMAT_BGR:
+			for (INT x = 0; x < m_nWidth; x++) {
+				GetPixelPerChannel(x, nY, pBuffer[x], nChannel);
+			}
+			break;
+		case CPixelBlock::PIXEL_FORMAT_RGB:
+			for (INT x = 0; x < m_nWidth; x++) {
+				GetPixelPerChannel(x, nY, pBuffer[x], nChannel);
+			}
+			break;
+		case CPixelBlock::PIXEL_FORMAT_RGBA:
+			for (INT x = 0; x < m_nWidth; x++) {
+				GetPixel(x, nY, pBuffer[x * 4], pBuffer[x * 4 + 1], pBuffer[x * 4 + 2], pBuffer[x * 4 + 3]);
+			}
+			break;
+		default:
+			ASSERT(FALSE);
+			break;
+		}
+
+	}
+}
+
 UINT CPixelImageMedia::GetTotalBlocks()
 {
 	return m_nWidth * m_nHeight;

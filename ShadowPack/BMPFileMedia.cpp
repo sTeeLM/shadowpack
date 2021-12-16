@@ -87,7 +87,7 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 			Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 			goto err;
 		}
-		CPixelImageMedia::SetScanline(i, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
+		CPixelImageMedia::SetScanline(pinfoHeader->biHeight - i - 1, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
 		Progress.Increase(1);
 	}
 
@@ -167,7 +167,7 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 
 	// write scanline
 	for (INT i = 0; i < pinfoHeader->biHeight; i++) {
-		CPixelImageMedia::GetScanline(i, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
+		CPixelImageMedia::GetScanline(pinfoHeader->biHeight - i - 1, pScanLine, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_BGR);
 		if (fwrite(pScanLine, nScanLineSize, 1, pFile) != 1) {
 			Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastStdError(errno));
 			goto err;
