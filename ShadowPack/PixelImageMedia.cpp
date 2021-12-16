@@ -6,6 +6,7 @@ CPixelImageMedia::CPixelImageMedia() :
 	m_nWidth(0),
 	m_nHeight(0),
 	m_pBlockBuffer(NULL),
+	m_nEmpty(0),
 	m_OptPagePixelImageMedia(NULL, IDS_OPT_PIXEL_MEDIA)
 {
 
@@ -104,17 +105,17 @@ void CPixelImageMedia::SetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_F
 	if (nY < m_nHeight) {
 		switch (Format) {
 		case CPixelBlock::PIXEL_FORMAT_BGR:
-			for (INT x = 0; x < m_nWidth; x++) {
+			for (UINT x = 0; x < m_nWidth; x++) {
 				SetPixel(x, nY, pBuffer[x * 3 + 2], pBuffer[x * 3 + 1], pBuffer[x * 3]);
 			}
 		break;
 		case CPixelBlock::PIXEL_FORMAT_RGB:
-			for (INT x = 0; x < m_nWidth; x++) {
+			for (UINT x = 0; x < m_nWidth; x++) {
 				SetPixel(x, nY, pBuffer[x * 3], pBuffer[x * 3 + 1], pBuffer[x * 3 + 2]);
 			}
 		break;
 		case CPixelBlock::PIXEL_FORMAT_RGBA:
-			for (INT x = 0; x < m_nWidth; x++) {
+			for (UINT x = 0; x < m_nWidth; x++) {
 				SetPixel(x, nY, pBuffer[x * 4], pBuffer[x * 4 + 1], pBuffer[x * 4 + 2], pBuffer[x * 4 + 3]);
 			}
 		break;
@@ -132,17 +133,17 @@ void CPixelImageMedia::GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_F
 	if (nY < m_nHeight) {
 		switch (Format) {
 		case CPixelBlock::PIXEL_FORMAT_BGR:
-			for (INT x = 0; x < m_nWidth; x++) {
+			for (UINT x = 0; x < m_nWidth; x++) {
 				GetPixel(x, nY, pBuffer[x * 3 + 2], pBuffer[x * 3 + 1], pBuffer[x * 3]);
 			}
 		break;
 		case CPixelBlock::PIXEL_FORMAT_RGB:
-			for (INT x = 0; x < m_nWidth; x++) {
+			for (UINT x = 0; x < m_nWidth; x++) {
 				GetPixel(x, nY, pBuffer[x * 3], pBuffer[x * 3 + 1], pBuffer[x * 3 + 2]);
 			}
 		break;
 		case CPixelBlock::PIXEL_FORMAT_RGBA:
-			for (INT x = 0; x < m_nWidth; x++) {
+			for (UINT x = 0; x < m_nWidth; x++) {
 				GetPixel(x, nY, pBuffer[x * 4], pBuffer[x * 4 + 1], pBuffer[x * 4 + 2], pBuffer[x * 4 + 3]);
 			}
 		break;
@@ -154,9 +155,80 @@ void CPixelImageMedia::GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_F
 	}
 }
 
+BYTE& CPixelImageMedia::GetPixelR(UINT nX, UINT nY)
+{
+	UINT nIndex = nY * m_nWidth + nX;
+	CPixelBlock* pBlock = NULL;
+	ASSERT(nIndex < GetTotalBlocks());
+	if (nIndex < GetTotalBlocks()) {
+		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
+		return pBlock[nIndex].m_nRed;
+	}
+	return m_nEmpty;
+}
+
+BYTE& CPixelImageMedia::GetPixelG(UINT nX, UINT nY)
+{
+	UINT nIndex = nY * m_nWidth + nX;
+	CPixelBlock* pBlock = NULL;
+	ASSERT(nIndex < GetTotalBlocks());
+	if (nIndex < GetTotalBlocks()) {
+		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
+		return pBlock[nIndex].m_nGreen;
+	}
+	return m_nEmpty;
+}
+
+BYTE& CPixelImageMedia::GetPixelB(UINT nX, UINT nY)
+{
+	UINT nIndex = nY * m_nWidth + nX;
+	CPixelBlock* pBlock = NULL;
+	ASSERT(nIndex < GetTotalBlocks());
+	if (nIndex < GetTotalBlocks()) {
+		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
+		return pBlock[nIndex].m_nBlue;
+	}
+	return m_nEmpty;
+}
+
+BYTE& CPixelImageMedia::GetPixelA(UINT nX, UINT nY)
+{
+	UINT nIndex = nY * m_nWidth + nX;
+	CPixelBlock* pBlock = NULL;
+	ASSERT(nIndex < GetTotalBlocks());
+	if (nIndex < GetTotalBlocks()) {
+		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
+		return pBlock[nIndex].m_nAlpha;
+	}
+	return m_nEmpty;
+}
+
 void CPixelImageMedia::SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel)
 {
+	ASSERT(nY < m_nHeight);
+	if (nY < m_nHeight) {
+		switch (Format) {
+		case CPixelBlock::PIXEL_FORMAT_BGR:
+			for (UINT x = 0; x < m_nWidth; x++) {
+				(nChannel == 0 ? GetPixelB(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : GetPixelR(x, nY))) = pBuffer[x];
+			}
+			break;
+		case CPixelBlock::PIXEL_FORMAT_RGB:
+			for (UINT x = 0; x < m_nWidth; x++) {
+				(nChannel == 0 ? GetPixelR(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : GetPixelB(x, nY))) = pBuffer[x];
+			}
+			break;
+		case CPixelBlock::PIXEL_FORMAT_RGBA:
+			for (UINT x = 0; x < m_nWidth; x++) {
+				(nChannel == 0 ? GetPixelR(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : (nChannel == 2 ? GetPixelB(x, nY) : GetPixelA(x, nY)))) = pBuffer[x];
+			}
+			break;
+		default:
+			ASSERT(FALSE);
+			break;
+		}
 
+	}
 }
 
 void CPixelImageMedia::GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel)
@@ -165,18 +237,18 @@ void CPixelImageMedia::GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBloc
 	if (nY < m_nHeight) {
 		switch (Format) {
 		case CPixelBlock::PIXEL_FORMAT_BGR:
-			for (INT x = 0; x < m_nWidth; x++) {
-				GetPixelPerChannel(x, nY, pBuffer[x], nChannel);
+			for (UINT x = 0; x < m_nWidth; x++) {
+				pBuffer[x] = (nChannel == 0 ? GetPixelB(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : GetPixelR(x, nY)));
 			}
 			break;
 		case CPixelBlock::PIXEL_FORMAT_RGB:
-			for (INT x = 0; x < m_nWidth; x++) {
-				GetPixelPerChannel(x, nY, pBuffer[x], nChannel);
+			for (UINT x = 0; x < m_nWidth; x++) {
+				pBuffer[x] = (nChannel == 0 ? GetPixelR(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : GetPixelB(x, nY)));
 			}
 			break;
 		case CPixelBlock::PIXEL_FORMAT_RGBA:
-			for (INT x = 0; x < m_nWidth; x++) {
-				GetPixel(x, nY, pBuffer[x * 4], pBuffer[x * 4 + 1], pBuffer[x * 4 + 2], pBuffer[x * 4 + 3]);
+			for (UINT x = 0; x < m_nWidth; x++) {
+				pBuffer[x] = (nChannel == 0 ? GetPixelR(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : (nChannel == 2 ? GetPixelB(x, nY) : GetPixelA(x, nY))));
 			}
 			break;
 		default:

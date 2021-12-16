@@ -45,6 +45,11 @@ public:
 	void GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
 	void SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel);
 	void GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel);
+	BYTE & GetPixelR(UINT nX, UINT nY);
+	BYTE & GetPixelG(UINT nX, UINT nY);
+	BYTE& GetPixelB(UINT nX, UINT nY);
+	BYTE& GetPixelA(UINT nX, UINT nY);
+
 	// 实现父类接口，实现这几个接口让父类调用
 	BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte);
 	void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);
@@ -62,5 +67,6 @@ protected:
 	static BYTE F5LookupTable[4][8];
 	static BYTE F5RevLookupTable[8];
 	COptPageBPBMedia m_OptPagePixelImageMedia;
+	BYTE m_nEmpty;
 };
 

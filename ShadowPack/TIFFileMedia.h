@@ -50,6 +50,7 @@ protected:
 		FLOAT  fYResolution;
 		USHORT nResolutionUnit;
 		USHORT nExtraSamples;
+		USHORT *pExtraSamplesInfo;
 	}TIFFInfo;
 	TIFFInfo m_TIFFInfo;
 };

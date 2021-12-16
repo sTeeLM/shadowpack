@@ -21,6 +21,8 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	tdata_t buf = NULL;
 	TIFFSetErrorHandler(ErrorHandler);
 
+	ZeroMemory(&m_TIFFInfo, sizeof(m_TIFFInfo));
+
 #ifdef _UNICODE
 	m_pTiff = TIFFOpenW(szFilePath, "r");
 #else
@@ -74,20 +76,34 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	}
 
 	if (m_TIFFInfo.nSamplesPerPixel == 4) {
-		if (!TIFFGetField(m_pTiff, TIFFTAG_EXTRASAMPLES, &m_TIFFInfo.nExtraSamples)) {
+		USHORT * pExtraSamplesInfo = NULL;
+		if (!TIFFGetField(m_pTiff, TIFFTAG_EXTRASAMPLES, &m_TIFFInfo.nExtraSamples, &pExtraSamplesInfo)) {
 			Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 			goto err;
+		} else {
+			m_TIFFInfo.pExtraSamplesInfo = new(std::nothrow)USHORT[m_TIFFInfo.nExtraSamples];
+			if (m_TIFFInfo.pExtraSamplesInfo) {
+				CopyMemory(m_TIFFInfo.pExtraSamplesInfo, pExtraSamplesInfo, m_TIFFInfo.nExtraSamples * sizeof(USHORT));
+			}
+			else {
+				Errors.SetError(CPackErrors::PE_NOMEM);
+				goto err;
+			}
 		}
 	}
+	
 	if ((buf = _TIFFmalloc(TIFFScanlineSize(m_pTiff))) == NULL) {
 		Errors.SetError(CPackErrors::PE_NOMEM);
 		goto err;
 	}
 
+
+
 	// alloc buffer
 	if (!CPixelImageMedia::Alloc(m_TIFFInfo.nWidth, m_TIFFInfo.nHeight, Errors)) {
 		goto err;
 	}
+
 
 	if (m_TIFFInfo.nPlanarConfig == PLANARCONFIG_CONTIG) {
 		for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
@@ -107,24 +123,35 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 					goto err;
 				}
 				CPixelImageMedia::SetScanlinePerChannel(m_TIFFInfo.nHeight - 1 - irow,
-					(LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA, 0);
+					(LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA, s);
 			}
 		}
 	}
+
+	// test format
+	if (!CBytePerBlockMedia::LoadMeta(PasswordGetter, Errors)) {
+		goto err;
+	}
 	
 	bRet = TRUE;
-	
+
 err:
-	if (!buf) {
+	if (buf) {
 		_TIFFfree(buf);
 		buf = NULL;
 	}
-	if (!m_pTiff) {
+	if (m_pTiff) {
 		TIFFClose(m_pTiff);
 		m_pTiff = NULL;
 	}
 	if (!bRet) {
 		CPixelImageMedia::Free();
+	}
+	if (!bRet) {
+		if (m_TIFFInfo.pExtraSamplesInfo) {
+			delete[] m_TIFFInfo.pExtraSamplesInfo;
+		}
+		ZeroMemory(&m_TIFFInfo, sizeof(m_TIFFInfo));
 	}
 	return bRet;
 }
@@ -137,6 +164,10 @@ BOOL CTIFFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 void CTIFFileMedia::CloseMedia()
 {
 	CPixelImageMedia::Free();
+	if (m_TIFFInfo.pExtraSamplesInfo) {
+		delete[] m_TIFFInfo.pExtraSamplesInfo;
+	}
+	ZeroMemory(&m_TIFFInfo, sizeof(m_TIFFInfo));
 }
 
 void CTIFFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
