@@ -117,37 +117,18 @@ test_encrypt:
 				continue;
 			}
 
-			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_AES, (LPCTSTR)strPassword)) {
-				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
-				if (TestHeaderValid((const MEDIA_HEADER_T*)&HeaderPlain)) {
-					bRet = TRUE;
-					goto success;
+			for (INT i = 1; i < CPackCipher::GetCipherCount(); i++) {
+				if (m_Cipher.SetKeyType((CPackCipher::PACK_CIPHER_TYPE_T)i, (LPCTSTR)strPassword)) {
+					m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
+					if (TestHeaderValid((const MEDIA_HEADER_T*)&HeaderPlain)) {
+						bRet = TRUE;
+						goto success;
+					}
 				}
-			} else {
-				Errors.SetError(CPackErrors::PE_CIPHER);
-				goto err;
-			}
-
-			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_SEED, (LPCTSTR)strPassword)) {
-				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
-				if (TestHeaderValid((const MEDIA_HEADER_T*)&HeaderPlain)) {
-					bRet = TRUE;
-					goto success;
+				else {
+					Errors.SetError(CPackErrors::PE_CIPHER);
+					goto err;
 				}
-			} else {
-				Errors.SetError(CPackErrors::PE_CIPHER);
-				goto err;
-			}
-
-			if (m_Cipher.SetKeyType(CPackCipher::CIPHER_CAMELLIA, (LPCTSTR)strPassword)) {
-				m_Cipher.DecryptBlock(&Header, &HeaderPlain, sizeof(Header), 0);
-				if (TestHeaderValid((const MEDIA_HEADER_T*)&HeaderPlain)) {
-					bRet = TRUE;
-					goto success;
-				}
-			} else {
-				Errors.SetError(CPackErrors::PE_CIPHER);
-				goto err;
 			}
 		}
 	}

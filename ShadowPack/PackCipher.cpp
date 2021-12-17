@@ -18,7 +18,11 @@ LPCTSTR CPackCipher::m_CiherNames[] =
 	_T("≤ªº”√‹"),
 	_T("AES"),
 	_T("SEED"),
-	_T("CAMELLIA")
+	_T("CAMELLIA"),
+	_T("BLOWFISH"),
+	_T("CAST"),
+	_T("IDEA"),
+	_T("RC4"),
 };
 
 void CPackCipher::GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex)
@@ -69,6 +73,18 @@ BOOL CPackCipher::SetKeyType(PACK_CIPHER_TYPE_T type,LPCTSTR szPassword)
 	case CIPHER_CAMELLIA:
 		Camellia_set_key(m_Key, 128, &m_CipherKey.camellia_key);
 		break;
+	case CIPHER_BLOWFISH:
+		BF_set_key(&m_CipherKey.blowfish_key, 16, m_Key);
+		break;
+	case CIPHER_CAST:
+		CAST_set_key(&m_CipherKey.cast_key, 16, m_Key);
+		break;
+	case CIPHER_IDEA:
+		IDEA_set_encrypt_key(m_Key, &m_CipherKey.idea_key);
+		break;
+	case CIPHER_RC4:
+		RC4_set_key(&m_CipherKey.rc4_key, 16, m_Key);
+		break;
 	case CIPHER_NONE:
 		break;
 	default:
@@ -96,6 +112,18 @@ void CPackCipher::Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL
 		break;
 	case CIPHER_CAMELLIA:
 		block = (block128_f)Camellia_encrypt;
+		break;
+	case CIPHER_BLOWFISH:
+		block = (block128_f)Blowfish_Encrypt;
+		break;
+	case CIPHER_CAST:
+		block = (block128_f)Cast_Encrypt;
+		break;
+	case CIPHER_IDEA:
+		block = (block128_f)Idea_Encrypt;
+		break;
+	case CIPHER_RC4:
+		block = (block128_f)RC4_Encrypt;
 		break;
 	}
 

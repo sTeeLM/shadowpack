@@ -7,6 +7,8 @@
 #include "openssl\cast.h"
 #include "openssl\modes.h"
 
+#include "crypto_warpper.h"
+
 #define CIPHER_BLOCK_SIZE (16)
 
 class CPackCipher
@@ -17,6 +19,10 @@ public:
 		CIPHER_AES,
 		CIPHER_SEED,
 		CIPHER_CAMELLIA,
+		CIPHER_BLOWFISH,
+		CIPHER_CAST,
+		CIPHER_IDEA,
+		CIPHER_RC4,
 		CIPHER_CNT
 
 	}PACK_CIPHER_TYPE_T;
@@ -25,6 +31,10 @@ public:
 		AES_KEY aes_key;
 		SEED_KEY_SCHEDULE seed_key;
 		CAMELLIA_KEY camellia_key;
+		BF_KEY blowfish_key;
+		CAST_KEY cast_key;
+		IDEA_KEY_SCHEDULE idea_key;
+		RC4_KEY rc4_key;
 	} PACK_CIPHER_KEY_T;
 public:
 	CPackCipher(void);

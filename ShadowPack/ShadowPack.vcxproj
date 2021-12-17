@@ -102,7 +102,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;uafxcwd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -194,6 +195,7 @@
     <ClInclude Include="BytePerBlockMedia.h" />
     <ClInclude Include="ChartControl.h" />
     <ClInclude Include="CorImageMedia.h" />
+    <ClInclude Include="crypto_warpper.h" />
     <ClInclude Include="JPEGFileMedia.h" />
     <ClInclude Include="MediaOptionDlg.h" />
     <ClInclude Include="OptPageBMPFile.h" />
@@ -228,6 +230,9 @@
     <ClCompile Include="BytePerBlockMedia.cpp" />
     <ClCompile Include="ChartControl.cpp" />
     <ClCompile Include="CorImageMedia.cpp" />
+    <ClCompile Include="crypto_warpper.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="JPEGFileMedia.cpp" />
     <ClCompile Include="MediaBase.cpp" />
     <ClCompile Include="MediaOptionDlg.cpp" />
