@@ -200,6 +200,7 @@
     <ClInclude Include="OptPageBPBMedia.h" />
     <ClInclude Include="OptPageJPEGFile.h" />
     <ClInclude Include="OptPagePNGFile.h" />
+    <ClInclude Include="OptPageTIFFFile.h" />
     <ClInclude Include="PackCipher.h" />
     <ClInclude Include="PackManager.h" />
     <ClInclude Include="PackManagerBase.h" />
@@ -234,6 +235,7 @@
     <ClCompile Include="OptPageBPBMedia.cpp" />
     <ClCompile Include="OptPageJPEGFile.cpp" />
     <ClCompile Include="OptPagePNGFile.cpp" />
+    <ClCompile Include="OptPageTIFFFile.cpp" />
     <ClCompile Include="PackCipher.cpp" />
     <ClCompile Include="PackManager.cpp" />
     <ClCompile Include="MediaFactory.cpp" />

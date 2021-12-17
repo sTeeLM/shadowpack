@@ -1,55 +1,61 @@
 #include "pch.h"
 #include "TIFFileMedia.h"
 
-CTIFFileMedia::CTIFFileMedia() :
-	m_pTiff(NULL)
+CTIFFileMedia::CTIFFileMedia()
 {
+
 }
 
 CTIFFileMedia::~CTIFFileMedia()
 {
 }
 
+CString CTIFFileMedia::m_strLastError;
+CHAR CTIFFileMedia::szBuffer[4096];
 void CTIFFileMedia::ErrorHandler(const char* module, const char* fmt, va_list ap)
 {
-
+	vsnprintf(szBuffer, sizeof(szBuffer) - 1, fmt, ap);
+	CA2CT str(szBuffer);
+	m_strLastError = str;
 }
 
 BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordGetter, CProgressBase& Progress, CPackErrors& Errors)
 {
 	BOOL bRet = FALSE;
 	tdata_t buf = NULL;
+	TIFF* pTiff = NULL;
+
 	TIFFSetErrorHandler(ErrorHandler);
 
 	ZeroMemory(&m_TIFFInfo, sizeof(m_TIFFInfo));
 
 #ifdef _UNICODE
-	m_pTiff = TIFFOpenW(szFilePath, "r");
+	pTiff = TIFFOpenW(szFilePath, "r");
 #else
-	m_pTiff = TIFFOpen(szFilePath, "r");
+	pTiff = TIFFOpen(szFilePath, "r");
 #endif
 
-	if (!m_pTiff) {
+	if (!pTiff) {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
 		goto err;
 	}
 
 
-	if (TIFFNumberOfDirectories(m_pTiff) != 1) {
+	if (TIFFNumberOfDirectories(pTiff) != 1) {
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
 	
-	if(!TIFFGetField(m_pTiff, TIFFTAG_IMAGELENGTH, &m_TIFFInfo.nHeight)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_IMAGEWIDTH, &m_TIFFInfo.nWidth)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_COMPRESSION, &m_TIFFInfo.nCompression)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_SAMPLESPERPIXEL, &m_TIFFInfo.nSamplesPerPixel)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_BITSPERSAMPLE, &m_TIFFInfo.nBitPerSample)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_PHOTOMETRIC, &m_TIFFInfo.nPhotoMatric)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_PLANARCONFIG, &m_TIFFInfo.nPlanarConfig)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_XRESOLUTION, &m_TIFFInfo.fXResolution)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_YRESOLUTION, &m_TIFFInfo.fYResolution)
-		|| !TIFFGetField(m_pTiff, TIFFTAG_RESOLUTIONUNIT, &m_TIFFInfo.nResolutionUnit)) {
+	if(!TIFFGetField(pTiff, TIFFTAG_IMAGELENGTH, &m_TIFFInfo.nHeight)
+		|| !TIFFGetField(pTiff, TIFFTAG_IMAGEWIDTH, &m_TIFFInfo.nWidth)
+		|| !TIFFGetField(pTiff, TIFFTAG_COMPRESSION, &m_TIFFInfo.nCompression)
+		|| !TIFFGetField(pTiff, TIFFTAG_SAMPLESPERPIXEL, &m_TIFFInfo.nSamplesPerPixel)
+		|| !TIFFGetField(pTiff, TIFFTAG_BITSPERSAMPLE, &m_TIFFInfo.nBitPerSample)
+		|| !TIFFGetField(pTiff, TIFFTAG_PHOTOMETRIC, &m_TIFFInfo.nPhotoMatric)
+		|| !TIFFGetField(pTiff, TIFFTAG_PLANARCONFIG, &m_TIFFInfo.nPlanarConfig)
+		|| !TIFFGetField(pTiff, TIFFTAG_XRESOLUTION, &m_TIFFInfo.fXResolution)
+		|| !TIFFGetField(pTiff, TIFFTAG_YRESOLUTION, &m_TIFFInfo.fYResolution)
+		|| !TIFFGetField(pTiff, TIFFTAG_RESOLUTIONUNIT, &m_TIFFInfo.nResolutionUnit)) {
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
@@ -77,7 +83,7 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 
 	if (m_TIFFInfo.nSamplesPerPixel == 4) {
 		USHORT * pExtraSamplesInfo = NULL;
-		if (!TIFFGetField(m_pTiff, TIFFTAG_EXTRASAMPLES, &m_TIFFInfo.nExtraSamples, &pExtraSamplesInfo)) {
+		if (!TIFFGetField(pTiff, TIFFTAG_EXTRASAMPLES, &m_TIFFInfo.nExtraSamples, &pExtraSamplesInfo)) {
 			Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 			goto err;
 		} else {
@@ -92,7 +98,7 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		}
 	}
 	
-	if ((buf = _TIFFmalloc(TIFFScanlineSize(m_pTiff))) == NULL) {
+	if ((buf = _TIFFmalloc(TIFFScanlineSize(pTiff))) == NULL) {
 		Errors.SetError(CPackErrors::PE_NOMEM);
 		goto err;
 	}
@@ -107,23 +113,21 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 
 	if (m_TIFFInfo.nPlanarConfig == PLANARCONFIG_CONTIG) {
 		for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
-			if (!TIFFReadScanline(m_pTiff, buf, irow)) {
-				Errors.SetError(CPackErrors::PE_IO, szFilePath);
+			if (!TIFFReadScanline(pTiff, buf, irow)) {
+				Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
 				goto err;
 			}
-			CPixelImageMedia::SetScanline(m_TIFFInfo.nHeight - 1 - irow,
-				(LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA);
+			CPixelImageMedia::SetScanline(irow, (LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA);
 		}
 	}
 	else {
 		for (UINT s = 0; s < m_TIFFInfo.nSamplesPerPixel; s++) {
 			for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
-				if (!TIFFReadScanline(m_pTiff, buf, irow, s)) {
-					Errors.SetError(CPackErrors::PE_IO, szFilePath);
+				if (!TIFFReadScanline(pTiff, buf, irow, s)) {
+					Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
 					goto err;
 				}
-				CPixelImageMedia::SetScanlinePerChannel(m_TIFFInfo.nHeight - 1 - irow,
-					(LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA, s);
+				CPixelImageMedia::SetScanlinePerChannel(irow, (LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA, s);
 			}
 		}
 	}
@@ -140,9 +144,9 @@ err:
 		_TIFFfree(buf);
 		buf = NULL;
 	}
-	if (m_pTiff) {
-		TIFFClose(m_pTiff);
-		m_pTiff = NULL;
+	if (pTiff) {
+		TIFFClose(pTiff);
+		pTiff = NULL;
 	}
 	if (!bRet) {
 		CPixelImageMedia::Free();
@@ -158,7 +162,91 @@ err:
 
 BOOL CTIFFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors)
 {
-	return 0;
+	BOOL bRet = FALSE;
+	tdata_t buf = NULL;
+	TIFF* pTiff = NULL;
+
+	TIFFSetErrorHandler(ErrorHandler);
+
+	if (!CBytePerBlockMedia::SaveMeta(Errors)) {
+		goto err;
+	}
+
+#ifdef _UNICODE
+	pTiff = TIFFOpenW(szFilePath, "w");
+#else
+	pTiff = TIFFOpen(szFilePath, "w");
+#endif
+
+	if (!pTiff) {
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
+		goto err;
+	}
+
+	if (!TIFFSetField(pTiff, TIFFTAG_IMAGELENGTH, m_TIFFInfo.nHeight)
+		|| !TIFFSetField(pTiff, TIFFTAG_IMAGEWIDTH, m_TIFFInfo.nWidth)
+		|| !TIFFSetField(pTiff, TIFFTAG_COMPRESSION, m_TIFFInfo.nCompression)
+		|| !TIFFSetField(pTiff, TIFFTAG_SAMPLESPERPIXEL, m_TIFFInfo.nSamplesPerPixel)
+		|| !TIFFSetField(pTiff, TIFFTAG_BITSPERSAMPLE, m_TIFFInfo.nBitPerSample)
+		|| !TIFFSetField(pTiff, TIFFTAG_PHOTOMETRIC, m_TIFFInfo.nPhotoMatric)
+		|| !TIFFSetField(pTiff, TIFFTAG_PLANARCONFIG, m_TIFFInfo.nPlanarConfig)
+		|| !TIFFSetField(pTiff, TIFFTAG_XRESOLUTION, m_TIFFInfo.fXResolution)
+		|| !TIFFSetField(pTiff, TIFFTAG_YRESOLUTION, m_TIFFInfo.fYResolution)
+		|| !TIFFSetField(pTiff, TIFFTAG_RESOLUTIONUNIT, m_TIFFInfo.nResolutionUnit)) {
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
+		goto err;
+	}
+
+	if (m_TIFFInfo.nExtraSamples) {
+		if (!TIFFSetField(pTiff, TIFFTAG_EXTRASAMPLES, m_TIFFInfo.nExtraSamples, m_TIFFInfo.pExtraSamplesInfo)) {
+			Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
+		}
+	}
+
+	if ((buf = _TIFFmalloc(TIFFScanlineSize(pTiff))) == NULL) {
+		Errors.SetError(CPackErrors::PE_NOMEM);
+		goto err;
+	}
+
+	if (m_TIFFInfo.nPlanarConfig == PLANARCONFIG_CONTIG) {
+		for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
+			CPixelImageMedia::GetScanline(irow, (LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA);
+			if (!TIFFWriteScanline(pTiff, buf, irow)) {
+				Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
+				goto err;
+			}
+		}
+	}
+	else {
+		for (UINT s = 0; s < m_TIFFInfo.nSamplesPerPixel; s++) {
+			for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
+				CPixelImageMedia::GetScanlinePerChannel(irow, (LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA, s);
+				if (!TIFFWriteScanline(pTiff, buf, irow, s)) {
+					Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
+					goto err;
+				}
+			}
+		}
+	}
+
+	if (!TIFFFlush(pTiff)) {
+		Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
+		goto err;
+	}
+
+	ClearMediaDirty();
+
+	bRet = TRUE;
+err:
+	if (buf) {
+		_TIFFfree(buf);
+		buf = NULL;
+	}
+	if (pTiff) {
+		TIFFClose(pTiff);
+		pTiff = NULL;
+	}
+	return bRet;
 }
 
 void CTIFFileMedia::CloseMedia()
@@ -172,11 +260,25 @@ void CTIFFileMedia::CloseMedia()
 
 void CTIFFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
+	m_OptPageTIFFFile.m_strBitsPerSample.Format(_T("%d"), m_TIFFInfo.nBitPerSample);
+	m_OptPageTIFFFile.m_strCompression.Format(_T("%d"), m_TIFFInfo.nCompression);
+	m_OptPageTIFFFile.m_strImageLength.Format(_T("%d"), m_TIFFInfo.nHeight);
+	m_OptPageTIFFFile.m_strImageWidth.Format(_T("%d"), m_TIFFInfo.nWidth);
+	m_OptPageTIFFFile.m_strPhotoMetric.Format(_T("%d"), m_TIFFInfo.nPhotoMatric);
+	m_OptPageTIFFFile.m_strPlanarConfig.Format(_T("%d"), m_TIFFInfo.nPlanarConfig);
+	m_OptPageTIFFFile.m_strResolutionUnit.Format(_T("%d"), m_TIFFInfo.nResolutionUnit);
+	m_OptPageTIFFFile.m_strSamplesPerPixel.Format(_T("%d"), m_TIFFInfo.nSamplesPerPixel);
+	m_OptPageTIFFFile.m_strXResolution.Format(_T("%f"), m_TIFFInfo.fXResolution);
+	m_OptPageTIFFFile.m_strYResolution.Format(_T("%f"), m_TIFFInfo.fYResolution);
+	m_OptPageTIFFFile.m_strExtraSamples.Format(_T("%d"), m_TIFFInfo.nExtraSamples, m_TIFFInfo.pExtraSamplesInfo[0]);
+
+	pPropertySheet->AddPage(&m_OptPageTIFFFile);
+	CPixelImageMedia::AddOptPage(pPropertySheet);
 }
 
 BOOL CTIFFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 {
-	return 0;
+	return CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
 BOOL CTIFFileMedia::TestExt(LPCTSTR szExt)

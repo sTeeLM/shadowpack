@@ -1,5 +1,6 @@
 #pragma once
 #include "PixelImageMedia.h"
+#include "OptPageTIFFFile.h"
 #include "libtiff\tiff.h"
 #include "libtiff\tiffio.h"
 
@@ -36,8 +37,8 @@ public:
 protected:
 	static LPCTSTR m_szFilter;
 	static LPCTSTR m_szExt;
-	TIFF* m_pTiff;
-	CString m_strLastError;
+	static CString m_strLastError;
+	static CHAR szBuffer[];
 	typedef struct _TIFFInfo {
 		UINT nWidth;
 		UINT nHeight;
@@ -53,5 +54,6 @@ protected:
 		USHORT *pExtraSamplesInfo;
 	}TIFFInfo;
 	TIFFInfo m_TIFFInfo;
+	COptPageTIFFFile m_OptPageTIFFFile;
 };
 
