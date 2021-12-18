@@ -59,6 +59,8 @@ void Idea_Encrypt(const unsigned char in[16],
         out[8 + i] ^= out[i];
     }
 }
+
+//把流密码用成这样子，也是足够的诡异
 void RC4_Encrypt(const unsigned char in[16],
     unsigned char out[16], const void* key)
 {
@@ -69,3 +71,17 @@ void RC4_Encrypt(const unsigned char in[16],
     RC4((RC4_KEY *)&rc4_saved_key, 16, in, out);
 }
 
+void TDES_Encrypt(const unsigned char in[16],
+    unsigned char out[16], const void* key)
+{
+    TDES_KEY_T des_key;
+    memcpy(&des_key, (const TDES_KEY_T*)(key), sizeof(des_key));
+    md5_sum(in, out);
+
+    DES_encrypt3((unsigned long*)out, &des_key.des1_key, &des_key.des2_key, &des_key.des3_key);
+    DES_encrypt3((unsigned long*)(out + 8), &des_key.des1_key, &des_key.des2_key, &des_key.des3_key);
+    for (int i = 0; i < 8; i++) {
+        out[8 + i] ^= out[i];
+    }
+    
+}

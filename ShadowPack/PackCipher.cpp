@@ -23,6 +23,7 @@ LPCTSTR CPackCipher::m_CiherNames[] =
 	_T("CAST"),
 	_T("IDEA"),
 	_T("RC4"),
+	_T("3DES"),
 };
 
 void CPackCipher::GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex)
@@ -85,6 +86,12 @@ BOOL CPackCipher::SetKeyType(PACK_CIPHER_TYPE_T type,LPCTSTR szPassword)
 	case CIPHER_RC4:
 		RC4_set_key(&m_CipherKey.rc4_key, 16, m_Key);
 		break;
+		break;
+	case CIPHER_3DES:
+		DES_set_key((const_DES_cblock *)(m_Key), &m_CipherKey.des_key.des1_key);
+		DES_set_key((const_DES_cblock*)(m_Key + 8), &m_CipherKey.des_key.des2_key);
+		DES_set_key((const_DES_cblock*)(m_Key), &m_CipherKey.des_key.des3_key);
+		break;
 	case CIPHER_NONE:
 		break;
 	default:
@@ -124,6 +131,9 @@ void CPackCipher::Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL
 		break;
 	case CIPHER_RC4:
 		block = (block128_f)RC4_Encrypt;
+		break;
+	case CIPHER_3DES:
+		block = (block128_f)TDES_Encrypt;
 		break;
 	}
 

@@ -23,6 +23,7 @@ public:
 		CIPHER_CAST,
 		CIPHER_IDEA,
 		CIPHER_RC4,
+		CIPHER_3DES,
 		CIPHER_CNT
 
 	}PACK_CIPHER_TYPE_T;
@@ -35,6 +36,7 @@ public:
 		CAST_KEY cast_key;
 		IDEA_KEY_SCHEDULE idea_key;
 		RC4_KEY rc4_key;
+		TDES_KEY_T des_key;
 	} PACK_CIPHER_KEY_T;
 public:
 	CPackCipher(void);
