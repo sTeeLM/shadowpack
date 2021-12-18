@@ -163,7 +163,7 @@ success:
 	memcpy(&m_Header, &HeaderPlain, sizeof(HeaderPlain));
 	return bRet;
 }
-
+#ifdef DEBUG
 void CBytePerBlockMedia::DumpHeader(CString strWhen, BPB_MEDIA_HEADER_T& Header)
 {
 	LPBYTE p = (LPBYTE)&Header;
@@ -173,7 +173,7 @@ void CBytePerBlockMedia::DumpHeader(CString strWhen, BPB_MEDIA_HEADER_T& Header)
 	}
 	TRACE(_T("\n"));
 }
-
+#endif
 BOOL CBytePerBlockMedia::SaveMeta(CPackErrors& Errors)
 {
 	BPB_MEDIA_HEADER_T Header;

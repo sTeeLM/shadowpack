@@ -270,7 +270,7 @@ void CTIFFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 	m_OptPageTIFFFile.m_strSamplesPerPixel.Format(_T("%d"), m_TIFFInfo.nSamplesPerPixel);
 	m_OptPageTIFFFile.m_strXResolution.Format(_T("%f"), m_TIFFInfo.fXResolution);
 	m_OptPageTIFFFile.m_strYResolution.Format(_T("%f"), m_TIFFInfo.fYResolution);
-	m_OptPageTIFFFile.m_strExtraSamples.Format(_T("%d"), m_TIFFInfo.nExtraSamples, m_TIFFInfo.pExtraSamplesInfo[0]);
+	m_OptPageTIFFFile.m_strExtraSamples.Format(_T("%d"), m_TIFFInfo.nExtraSamples > 0 ?  m_TIFFInfo.pExtraSamplesInfo[0] : 0);
 
 	pPropertySheet->AddPage(&m_OptPageTIFFFile);
 	CPixelImageMedia::AddOptPage(pPropertySheet);
