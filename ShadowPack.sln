@@ -16,6 +16,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtiff", "libtiff\libtiff.
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "libjpeg\libjpeg.vcxproj", "{F58359E1-B0E9-4D8B-BC36-06A7265DF59A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{51CF70D8-7239-4CFA-A264-D68E04A08016} = {51CF70D8-7239-4CFA-A264-D68E04A08016}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShadowPack", "ShadowPack\ShadowPack.vcxproj", "{CE7AE7CD-B0BD-4F48-B3B6-105B6D3F6C7A}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -24,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShadowPack", "ShadowPack\Sh
 		{F58359E1-B0E9-4D8B-BC36-06A7265DF59A} = {F58359E1-B0E9-4D8B-BC36-06A7265DF59A}
 		{B3F1BDF6-C8B3-4A9B-A15B-223725F0F575} = {B3F1BDF6-C8B3-4A9B-A15B-223725F0F575}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjbig", "libjbig\libjbig.vcxproj", "{51CF70D8-7239-4CFA-A264-D68E04A08016}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +78,14 @@ Global
 		{CE7AE7CD-B0BD-4F48-B3B6-105B6D3F6C7A}.Release|Win32.Build.0 = Release|Win32
 		{CE7AE7CD-B0BD-4F48-B3B6-105B6D3F6C7A}.Release|x64.ActiveCfg = Release|x64
 		{CE7AE7CD-B0BD-4F48-B3B6-105B6D3F6C7A}.Release|x64.Build.0 = Release|x64
+		{51CF70D8-7239-4CFA-A264-D68E04A08016}.Debug|Win32.ActiveCfg = Debug|Win32
+		{51CF70D8-7239-4CFA-A264-D68E04A08016}.Debug|Win32.Build.0 = Debug|Win32
+		{51CF70D8-7239-4CFA-A264-D68E04A08016}.Debug|x64.ActiveCfg = Debug|x64
+		{51CF70D8-7239-4CFA-A264-D68E04A08016}.Debug|x64.Build.0 = Debug|x64
+		{51CF70D8-7239-4CFA-A264-D68E04A08016}.Release|Win32.ActiveCfg = Release|Win32
+		{51CF70D8-7239-4CFA-A264-D68E04A08016}.Release|Win32.Build.0 = Release|Win32
+		{51CF70D8-7239-4CFA-A264-D68E04A08016}.Release|x64.ActiveCfg = Release|x64
+		{51CF70D8-7239-4CFA-A264-D68E04A08016}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

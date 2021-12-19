@@ -101,12 +101,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjpeg;..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win32\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static_debug\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;uafxcwd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -127,12 +127,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjpeg;..\openssl\win64\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win64\static_debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\openssl\win64\static_debug\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;uafxcwd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -154,14 +154,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjpeg;..\openssl\win32\static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win32\static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;uafxcw.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -184,14 +184,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjpeg;..\openssl\win64\static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win64\static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\openssl\win64\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;uafxcw.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>

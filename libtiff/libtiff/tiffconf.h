@@ -92,7 +92,7 @@
 #define JPEG_SUPPORT 1
 
 /* Support JBIG compression (requires JBIG-KIT library) */
-/* #undef JBIG_SUPPORT */
+#define JBIG_SUPPORT 1
 
 /* Support LogLuv high dynamic range encoding */
 #define LOGLUV_SUPPORT 1
