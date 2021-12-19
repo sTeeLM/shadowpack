@@ -4,7 +4,7 @@ on: [push]
 
 env:
   # Path to the solution file relative to the root of the project.
-  SOLUTION_FILE_PATH: shadowpack\ShadowPack.sln
+  SOLUTION_FILE_PATH: .
 
   # Configuration type to build.
   # You can convert this to a build matrix if you need coverage of multiple configuration types.
@@ -47,5 +47,5 @@ jobs:
         prerelease: false
         title: "Development Build"
         files: |
-            shadowpack\Release\Win32\bin\ShadowPack.exe
-            shadowpack\Release\x64\bin\ShadowPack.exe
+            ${{env.GITHUB_WORKSPACE}}\shadowpack\Release\Win32\bin\ShadowPack.exe
+            ${{env.GITHUB_WORKSPACE}}\shadowpack\Release\x64\bin\ShadowPack.exe
