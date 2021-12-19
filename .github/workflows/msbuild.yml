@@ -39,5 +39,4 @@ jobs:
         prerelease: false
         title: "Development Build"
         files: |
-          Release\x64\bin\ShadowPack.exe
-          Release\Win32\bin\ShadowPack.exe
+          ..\Release\Win32\bin\ShadowPack.exe
