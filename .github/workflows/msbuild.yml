@@ -47,5 +47,6 @@ jobs:
         prerelease: false
         title: "Development Build"
         files: |
-            ${{env.GITHUB_WORKSPACE}}\shadowpack\Release\Win32\bin\ShadowPack.exe
-            ${{env.GITHUB_WORKSPACE}}\shadowpack\Release\x64\bin\ShadowPack.exe
+            Todo.txt    
+            ${{env.GITHUB_WORKSPACE}}\Release\Win32\bin\ShadowPack.exe
+            ${{env.GITHUB_WORKSPACE}}\Release\x64\bin\ShadowPack.exe
