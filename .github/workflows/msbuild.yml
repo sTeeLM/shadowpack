@@ -46,4 +46,6 @@ jobs:
         automatic_release_tag: "latest"
         prerelease: false
         title: "Development Build"
-        files: Release\Win32\bin\ShadowPack.exe
+        files: |
+            Release\Win32\bin\ShadowPack.exe
+            Release\x64\bin\ShadowPack.exe
