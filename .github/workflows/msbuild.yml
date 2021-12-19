@@ -39,6 +39,9 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM_X64}} ${{env.SOLUTION_FILE_PATH}}
     
+    - name: test
+      run: dir ${{env.GITHUB_WORKSPACE}}
+
     - name: upload
       uses: marvinpinto/action-automatic-releases@latest
       with:
