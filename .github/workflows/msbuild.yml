@@ -46,7 +46,7 @@ jobs:
       uses: papeloto/action-zip@v1
       with:
         files: Release/zip
-        recursive: True
+        recursive: true
         dest: latest.zip
 
     - name: upload
