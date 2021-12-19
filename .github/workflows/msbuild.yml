@@ -49,7 +49,4 @@ jobs:
         automatic_release_tag: "latest"
         prerelease: false
         title: "Development Build"
-        files: |
-            Todo.txt    
-            ${{env.GITHUB_WORKSPACE}}\Release\Win32\bin\ShadowPack.exe
-            ${{env.GITHUB_WORKSPACE}}\Release\x64\bin\ShadowPack.exe
+        files: Todo.txt
