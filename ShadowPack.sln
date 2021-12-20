@@ -12,13 +12,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libzlib", "zlib\libzlib.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtiff", "libtiff\libtiff.vcxproj", "{B3F1BDF6-C8B3-4A9B-A15B-223725F0F575}"
 	ProjectSection(ProjectDependencies) = postProject
+		{A9ADC342-1609-44C9-8BF6-7726E9496534} = {A9ADC342-1609-44C9-8BF6-7726E9496534}
 		{60D3E4AB-669C-41CF-AC8E-AB5E6DF3CA6C} = {60D3E4AB-669C-41CF-AC8E-AB5E6DF3CA6C}
+		{F58359E1-B0E9-4D8B-BC36-06A7265DF59A} = {F58359E1-B0E9-4D8B-BC36-06A7265DF59A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "libjpeg\libjpeg.vcxproj", "{F58359E1-B0E9-4D8B-BC36-06A7265DF59A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{51CF70D8-7239-4CFA-A264-D68E04A08016} = {51CF70D8-7239-4CFA-A264-D68E04A08016}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShadowPack", "ShadowPack\ShadowPack.vcxproj", "{CE7AE7CD-B0BD-4F48-B3B6-105B6D3F6C7A}"
 	ProjectSection(ProjectDependencies) = postProject
