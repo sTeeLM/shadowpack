@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "framework.h"
+#include "resource.h"
 #include "PackCipher.h"
 
 CPackCipher::CPackCipher(void):
@@ -13,8 +14,19 @@ CPackCipher::~CPackCipher(void)
 
 }
 
-LPCTSTR CPackCipher::m_CiherNames[] =
+UINT CPackCipher::m_CiherNameIDs[] =
 {
+	IDS_CIPHER_NONE,
+	IDS_CIPHER_AES,
+	IDS_CIPHER_SEED,
+	IDS_CIPHER_CAMELLIA,
+	IDS_CIPHER_BLOWFISH,
+	IDS_CIPHER_CAST,
+	IDS_CIPHER_IDEA,
+	IDS_CIPHER_RC4,
+	IDS_CIPHER_3DES,
+};
+/*
 	_T("≤ªº”√‹"),
 	_T("AES"),
 	_T("SEED"),
@@ -24,7 +36,7 @@ LPCTSTR CPackCipher::m_CiherNames[] =
 	_T("IDEA"),
 	_T("RC4"),
 	_T("3DES"),
-};
+*/
 
 void CPackCipher::GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex)
 {
@@ -181,10 +193,11 @@ UINT CPackCipher::GetCipherCount()
 	return CIPHER_CNT;
 }
 
-LPCTSTR CPackCipher::GetCipherName(UINT nIndex)
+CString CPackCipher::GetCipherName(UINT nIndex)
 {
+	CString strText = _T("");
 	if (nIndex < CIPHER_CNT) {
-		return m_CiherNames[nIndex];
+		strText.LoadString(m_CiherNameIDs[nIndex]);
 	}
-	return _T("");
+	return strText;
 }

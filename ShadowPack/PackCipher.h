@@ -49,7 +49,7 @@ public:
 	PACK_CIPHER_TYPE_T GetCipherType(){return m_Type;}
 	CString GetPassword();
 	static UINT GetCipherCount();
-	static LPCTSTR GetCipherName(UINT nIndex);
+	static CString GetCipherName(UINT nIndex);
 private:
 	void GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex);
 	void GenerateKey(LPCTSTR szPassword);
@@ -59,5 +59,5 @@ private:
 	PACK_CIPHER_TYPE_T m_Type;
 	PACK_CIPHER_KEY_T m_CipherKey;
 	CString m_strPassword;
-	static LPCTSTR m_CiherNames[];
+	static UINT m_CiherNameIDs[];
 };

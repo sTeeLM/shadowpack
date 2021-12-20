@@ -27,8 +27,17 @@
 #define IDS_OPT_PIXEL_MEDIA_BLOCK_UNIT  118
 #define IDS_OPT_COFF_MEDIA              119
 #define IDS_OPT_COFF_MEDIA_BLOCK_UNIT   120
+#define IDS_CIPHER_NONE                 121
+#define IDS_CIPHER_AES                  122
+#define IDS_CIPHER_SEED                 123
+#define IDS_CIPHER_CAMELLIA             124
+#define IDS_CIPHER_BLOWFISH             125
+#define IDS_CIPHER_CAST                 126
+#define IDS_CIPHER_IDEA                 127
 #define IDR_MAINFRAME                   128
+#define IDS_CIPHER_RC4                  128
 #define IDD_DIALOG_PASSWORD             129
+#define IDS_CIPHER_3DES                 129
 #define IDD_PROPPAGE_BMP_FILE           131
 #define IDD_PROPPAGE_PNG_FILE           133
 #define IDD_PROPPAGE_BYTE_PER_BLOCK_MEDIA 134
