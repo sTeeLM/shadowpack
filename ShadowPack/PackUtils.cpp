@@ -235,7 +235,6 @@ CString CPackUtils::GetLastStdError(int err)
 
 void CPackUtils::FillBufferRand(LPBYTE pBuffer, UINT nSize)
 {
-	int out;
 	int* p = NULL;
 	LPBYTE p1 = NULL;
 	srand((unsigned)time(NULL));

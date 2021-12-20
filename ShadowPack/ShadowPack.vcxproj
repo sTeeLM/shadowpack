@@ -106,7 +106,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static_debug\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;uafxcwd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -132,7 +132,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\openssl\win64\static_debug\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;uafxcwd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -161,7 +161,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;uafxcw.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -191,7 +191,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\openssl\win64\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;uafxcw.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>

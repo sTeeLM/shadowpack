@@ -100,6 +100,9 @@
 /* Support LZW algorithm */
 #define LZW_SUPPORT 1
 
+/* Support LZMA algorithm */
+#define LZMA_SUPPORT 1
+
 /* Support NeXT 2-bit RLE algorithm */
 #define NEXT_SUPPORT 1
 
