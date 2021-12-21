@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "TIFFileMedia.h"
+#include "resource.h"
 
 CTIFFileMedia::CTIFFileMedia()
 {
@@ -53,11 +54,21 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		|| !TIFFGetField(pTiff, TIFFTAG_BITSPERSAMPLE, &m_TIFFInfo.nBitPerSample)
 		|| !TIFFGetField(pTiff, TIFFTAG_PHOTOMETRIC, &m_TIFFInfo.nPhotoMatric)
 		|| !TIFFGetField(pTiff, TIFFTAG_PLANARCONFIG, &m_TIFFInfo.nPlanarConfig)
-		|| !TIFFGetField(pTiff, TIFFTAG_XRESOLUTION, &m_TIFFInfo.fXResolution)
-		|| !TIFFGetField(pTiff, TIFFTAG_YRESOLUTION, &m_TIFFInfo.fYResolution)
-		|| !TIFFGetField(pTiff, TIFFTAG_RESOLUTIONUNIT, &m_TIFFInfo.nResolutionUnit)) {
+//		|| !TIFFGetField(pTiff, TIFFTAG_XRESOLUTION, &m_TIFFInfo.fXResolution)
+//		|| !TIFFGetField(pTiff, TIFFTAG_YRESOLUTION, &m_TIFFInfo.fYResolution)
+//		|| !TIFFGetField(pTiff, TIFFTAG_RESOLUTIONUNIT, &m_TIFFInfo.nResolutionUnit)
+		)
+	{
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
+	}
+
+	if (TIFFGetField(pTiff, TIFFTAG_RESOLUTIONUNIT, &m_TIFFInfo.nResolutionUnit) && m_TIFFInfo.nResolutionUnit != 0) {
+		if (!TIFFGetField(pTiff, TIFFTAG_XRESOLUTION, &m_TIFFInfo.fXResolution)
+			|| !TIFFGetField(pTiff, TIFFTAG_YRESOLUTION, &m_TIFFInfo.fYResolution)) {
+			Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
+			goto err;
+		}
 	}
 
 	if (!(m_TIFFInfo.nCompression == COMPRESSION_NONE || m_TIFFInfo.nCompression == COMPRESSION_LZW
@@ -110,24 +121,32 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		goto err;
 	}
 
-
+	Progress.Reset(IDS_LOAD_DATA);
 	if (m_TIFFInfo.nPlanarConfig == PLANARCONFIG_CONTIG) {
+		Progress.SetFullScale(m_TIFFInfo.nHeight);
 		for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
 			if (!TIFFReadScanline(pTiff, buf, irow)) {
 				Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
 				goto err;
 			}
-			CPixelImageMedia::SetScanline(irow, (LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA);
+			Progress.Increase(1);
+			CPixelImageMedia::SetScanline(irow, (LPBYTE)buf,
+				m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA 
+				: CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB);
 		}
 	}
 	else {
+		Progress.SetFullScale(m_TIFFInfo.nHeight * m_TIFFInfo.nSamplesPerPixel);
 		for (UINT s = 0; s < m_TIFFInfo.nSamplesPerPixel; s++) {
 			for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
 				if (!TIFFReadScanline(pTiff, buf, irow, s)) {
 					Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
 					goto err;
 				}
-				CPixelImageMedia::SetScanlinePerChannel(irow, (LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA, s);
+				Progress.Increase(1);
+				CPixelImageMedia::SetScanlinePerChannel(irow, (LPBYTE)buf, m_TIFFInfo.nSamplesPerPixel == 4 ? 
+					CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA
+					: CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB, s);
 			}
 		}
 	}
@@ -190,11 +209,21 @@ BOOL CTIFFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		|| !TIFFSetField(pTiff, TIFFTAG_BITSPERSAMPLE, m_TIFFInfo.nBitPerSample)
 		|| !TIFFSetField(pTiff, TIFFTAG_PHOTOMETRIC, m_TIFFInfo.nPhotoMatric)
 		|| !TIFFSetField(pTiff, TIFFTAG_PLANARCONFIG, m_TIFFInfo.nPlanarConfig)
-		|| !TIFFSetField(pTiff, TIFFTAG_XRESOLUTION, m_TIFFInfo.fXResolution)
-		|| !TIFFSetField(pTiff, TIFFTAG_YRESOLUTION, m_TIFFInfo.fYResolution)
-		|| !TIFFSetField(pTiff, TIFFTAG_RESOLUTIONUNIT, m_TIFFInfo.nResolutionUnit)) {
+//		|| !TIFFSetField(pTiff, TIFFTAG_XRESOLUTION, m_TIFFInfo.fXResolution)
+//		|| !TIFFSetField(pTiff, TIFFTAG_YRESOLUTION, m_TIFFInfo.fYResolution)
+//		|| !TIFFSetField(pTiff, TIFFTAG_RESOLUTIONUNIT, m_TIFFInfo.nResolutionUnit)
+		) {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
 		goto err;
+	}
+
+	if (m_TIFFInfo.nResolutionUnit != 0) {
+		if (!TIFFSetField(pTiff, TIFFTAG_RESOLUTIONUNIT, m_TIFFInfo.nResolutionUnit)
+			|| !TIFFSetField(pTiff, TIFFTAG_XRESOLUTION, &m_TIFFInfo.fXResolution)
+			|| !TIFFSetField(pTiff, TIFFTAG_YRESOLUTION, &m_TIFFInfo.fYResolution)) {
+			Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
+			goto err;
+		}
 	}
 
 	if (m_TIFFInfo.nExtraSamples) {
@@ -208,9 +237,13 @@ BOOL CTIFFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto err;
 	}
 
+	Progress.Reset(IDS_SAVE_DATA);
 	if (m_TIFFInfo.nPlanarConfig == PLANARCONFIG_CONTIG) {
+		Progress.SetFullScale(m_TIFFInfo.nHeight);
 		for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
-			CPixelImageMedia::GetScanline(irow, (LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA);
+			CPixelImageMedia::GetScanline(irow, (LPBYTE)buf, m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA
+				: CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB);
+			Progress.Increase(1);
 			if (!TIFFWriteScanline(pTiff, buf, irow)) {
 				Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
 				goto err;
@@ -218,9 +251,12 @@ BOOL CTIFFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		}
 	}
 	else {
+		Progress.SetFullScale(m_TIFFInfo.nHeight * m_TIFFInfo.nSamplesPerPixel);
 		for (UINT s = 0; s < m_TIFFInfo.nSamplesPerPixel; s++) {
 			for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
-				CPixelImageMedia::GetScanlinePerChannel(irow, (LPBYTE)buf, CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA, s);
+				CPixelImageMedia::GetScanlinePerChannel(irow, (LPBYTE)buf, m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA
+					: CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB, s);
+				Progress.Increase(1);
 				if (!TIFFWriteScanline(pTiff, buf, irow, s)) {
 					Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
 					goto err;

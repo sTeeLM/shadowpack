@@ -61,7 +61,7 @@
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <OpenMPSupport>true</OpenMPSupport>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ProgramDatabaseFileName>..\bin\CORE_DB_liblzma_.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>$(OutDir)$(TargetName).pdb</ProgramDatabaseFileName>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <OmitFramePointers>false</OmitFramePointers>
       <Optimization>Disabled</Optimization>
@@ -93,7 +93,7 @@
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <OpenMPSupport>true</OpenMPSupport>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ProgramDatabaseFileName>..\bin\CORE_DB_liblzma_.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>$(OutDir)$(TargetName).pdb</ProgramDatabaseFileName>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <OmitFramePointers>false</OmitFramePointers>
       <Optimization>Disabled</Optimization>
@@ -125,7 +125,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <OpenMPSupport>true</OpenMPSupport>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ProgramDatabaseFileName>..\bin\CORE_RL_liblzma_.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>$(OutDir)$(TargetName).pdb</ProgramDatabaseFileName>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <OmitFramePointers>true</OmitFramePointers>
       <Optimization>Full</Optimization>
@@ -157,7 +157,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <OpenMPSupport>true</OpenMPSupport>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ProgramDatabaseFileName>..\bin\CORE_RL_liblzma_.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>$(OutDir)$(TargetName).pdb</ProgramDatabaseFileName>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <OmitFramePointers>true</OmitFramePointers>
       <Optimization>Full</Optimization>
