@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lib\colorname.c" />
+    <ClCompile Include="lib\fileio.c" />
+    <ClCompile Include="lib\libpam.c" />
+    <ClCompile Include="lib\libpamcolor.c" />
+    <ClCompile Include="lib\libpamd.c" />
+    <ClCompile Include="lib\libpammap.c" />
+    <ClCompile Include="lib\libpamn.c" />
+    <ClCompile Include="lib\libpamread.c" />
+    <ClCompile Include="lib\libpamwrite.c" />
+    <ClCompile Include="lib\libpbm1.c" />
+    <ClCompile Include="lib\libpbm2.c" />
+    <ClCompile Include="lib\libpbm3.c" />
+    <ClCompile Include="lib\libpbmfont.c" />
+    <ClCompile Include="lib\libpgm1.c" />
+    <ClCompile Include="lib\libpgm2.c" />
+    <ClCompile Include="lib\libpm.c" />
+    <ClCompile Include="lib\libpnm1.c" />
+    <ClCompile Include="lib\libpnm2.c" />
+    <ClCompile Include="lib\libpnm3.c" />
+    <ClCompile Include="lib\libppm1.c" />
+    <ClCompile Include="lib\libppm2.c" />
+    <ClCompile Include="lib\libppmcmap.c" />
+    <ClCompile Include="lib\libppmcolor.c" />
+    <ClCompile Include="lib\libppmd.c" />
+    <ClCompile Include="lib\libppmfloyd.c" />
+    <ClCompile Include="lib\libppmfuzzy.c" />
+    <ClCompile Include="lib\libsystem_dummy.c" />
+    <ClCompile Include="lib\path.c" />
+    <ClCompile Include="lib\pmfileio.c" />
+    <ClCompile Include="lib\ppmdfont.c" />
+    <ClCompile Include="lib\standardppmdfont.c" />
+    <ClCompile Include="lib\util\bitio.c" />
+    <ClCompile Include="lib\util\filename.c" />
+    <ClCompile Include="lib\util\mallocvar.c" />
+    <ClCompile Include="lib\util\matrix.c" />
+    <ClCompile Include="lib\util\nsleep.c" />
+    <ClCompile Include="lib\util\nstring.c" />
+    <ClCompile Include="lib\util\pm_io.c" />
+    <ClCompile Include="lib\util\runlength.c" />
+    <ClCompile Include="lib\util\shhopt.c" />
+    <ClCompile Include="lib\util\token.c" />
+    <ClCompile Include="lib\util\vasprintf.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\netpbm\colorname.h" />
+    <ClInclude Include="include\netpbm\mallocvar.h" />
+    <ClInclude Include="include\netpbm\pam.h" />
+    <ClInclude Include="include\netpbm\pamdraw.h" />
+    <ClInclude Include="include\netpbm\pammap.h" />
+    <ClInclude Include="include\netpbm\pbm.h" />
+    <ClInclude Include="include\netpbm\pbmfont.h" />
+    <ClInclude Include="include\netpbm\pgm.h" />
+    <ClInclude Include="include\netpbm\pm.h" />
+    <ClInclude Include="include\netpbm\pm_config.h" />
+    <ClInclude Include="include\netpbm\pm_gamma.h" />
+    <ClInclude Include="include\netpbm\pm_system.h" />
+    <ClInclude Include="include\netpbm\pnm.h" />
+    <ClInclude Include="include\netpbm\ppm.h" />
+    <ClInclude Include="include\netpbm\ppmcmap.h" />
+    <ClInclude Include="include\netpbm\ppmdfont.h" />
+    <ClInclude Include="include\netpbm\ppmdraw.h" />
+    <ClInclude Include="include\netpbm\ppmfloyd.h" />
+    <ClInclude Include="include\netpbm\runlength.h" />
+    <ClInclude Include="include\netpbm\shhopt.h" />
+    <ClInclude Include="include\netpbm\unistd.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{d39dc0b0-d09e-4d28-935b-f31b93a787ea}</ProjectGuid>
+    <RootNamespace>libnetpbm</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\$(Configuration)\$(PlatformName)\lib\</OutDir>
+    <IntDir>..\$(Configuration)\$(PlatformName)\libnetpbm\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>..\$(Configuration)\$(PlatformName)\libnetpbm\</IntDir>
+    <OutDir>..\$(Configuration)\$(PlatformName)\lib\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>..\$(Configuration)\$(PlatformName)\libnetpbm\</IntDir>
+    <OutDir>..\$(Configuration)\$(PlatformName)\lib\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>..\$(Configuration)\$(PlatformName)\libnetpbm\</IntDir>
+    <OutDir>..\$(Configuration)\$(PlatformName)\lib\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\;.\include;.\lib;.\lib\util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\;.\include;.\lib;.\lib\util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\;.\include;.\lib;.\lib\util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\;.\include;.\lib;.\lib\util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

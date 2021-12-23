@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lib\libpm.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\pmfileio.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\fileio.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\colorname.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpamd.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpbm1.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpbm2.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpbm3.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpbmfont.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpgm1.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpgm2.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libppmd.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libppm1.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libppm2.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libppmcmap.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libppmcolor.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libppmfuzzy.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\ppmdfont.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\standardppmdfont.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\path.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libppmfloyd.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpnm1.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpnm2.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpnm3.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpam.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpamread.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpamwrite.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpamn.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpammap.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libpamcolor.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\libsystem_dummy.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\bitio.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\filename.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\pm_io.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\mallocvar.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\matrix.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\nsleep.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\nstring.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\runlength.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\shhopt.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\token.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\util\vasprintf.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\netpbm\colorname.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\mallocvar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pam.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pamdraw.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pammap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pbm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pbmfont.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pgm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pm_config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pm_gamma.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pm_system.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\pnm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\ppm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\ppmcmap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\ppmdfont.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\ppmdraw.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\ppmfloyd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\runlength.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\shhopt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\netpbm\unistd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

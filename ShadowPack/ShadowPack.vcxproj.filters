@@ -114,6 +114,12 @@
     <ClInclude Include="crypto_warpper.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="PPMFileMedia.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OptPagePPMFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShadowPack.cpp">
@@ -192,6 +198,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="crypto_warpper.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PPMFileMedia.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OptPagePPMFile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

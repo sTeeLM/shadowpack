@@ -42,8 +42,8 @@
 #define IDD_PROPPAGE_PNG_FILE           133
 #define IDD_PROPPAGE_BYTE_PER_BLOCK_MEDIA 134
 #define IDD_PROPPAGE_JPEG_FILE          135
-#define IDD_PROPPAGE_PNG_FILE2          135
 #define IDD_PROPPAGE_TIFF_FILE          136
+#define IDD_PROPPAGE_PPM_FILE           137
 #define IDS_PE_CANCELED                 400
 #define IDS_PE_IO                       401
 #define IDS_PE_CORRUPT_DATA             402
@@ -118,14 +118,17 @@
 #define IDC_TIFF_TIFFTAG_PHOTOMETRIC    1054
 #define IDC_TIFF_TIFFTAG_PLANARCONFIG   1055
 #define IDC_TIFF_TIFFTAG_XRESOLUTION    1056
+#define IDC_PPM_IMAGE_WIDTH             1057
+#define IDC_PPM_IMAGE_HEIGHT            1058
+#define IDC_PPM_IMAGE_FORMAT            1059
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1057
+#define _APS_NEXT_CONTROL_VALUE         1060
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
