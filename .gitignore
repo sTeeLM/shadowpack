@@ -25,4 +25,4 @@
 Debug
 Release
 !openssl/**
-!libpbm/**
+!libnetpbm/**
