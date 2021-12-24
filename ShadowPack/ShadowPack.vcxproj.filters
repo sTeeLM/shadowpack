@@ -120,6 +120,15 @@
     <ClInclude Include="OptPagePPMFile.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowPackConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LocaleManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShadowPack.cpp">
@@ -204,6 +213,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="OptPagePPMFile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowPackConfig.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LocaleManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

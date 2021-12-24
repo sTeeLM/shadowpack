@@ -9,6 +9,7 @@
 #include "ShadowPackDlg.h"
 #include "afxdialogex.h"
 #include "MediaFactory.h"
+#include "ConfigDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -96,18 +97,27 @@ BOOL CShadowPackDlg::OnInitDialog()
 	// IDM_ABOUTBOX 必须在系统命令范围内。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
-
+	ASSERT((IDM_CONFIGBOX & 0xFFF0) == IDM_CONFIGBOX);
+	ASSERT(IDM_CONFIGBOX < 0xF000);
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != nullptr)
 	{
 		BOOL bNameValid;
 		CString strAboutMenu;
+		CString strConfigMenu;
 		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
 		ASSERT(bNameValid);
 		if (!strAboutMenu.IsEmpty())
 		{
 			pSysMenu->AppendMenu(MF_SEPARATOR);
 			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+		}
+		bNameValid = strConfigMenu.LoadString(IDS_CONFIGBOX);
+		ASSERT(bNameValid);
+		if (!strConfigMenu.IsEmpty())
+		{
+			pSysMenu->AppendMenu(MF_SEPARATOR);
+			pSysMenu->AppendMenu(MF_STRING, IDM_CONFIGBOX, strConfigMenu);
 		}
 	}
 
@@ -132,9 +142,10 @@ void CShadowPackDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	{
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
-	}
-	else
-	{
+	} else if((nID & 0xFFF0) == IDM_CONFIGBOX) {
+		CConfigDlg dlgConfig;
+		dlgConfig.DoModal();
+	} else {
 		CDialog::OnSysCommand(nID, lParam);
 	}
 }

@@ -13,7 +13,6 @@
 *.suo
 *.exp
 *.bak
-*.def
 *.ilk
 *.pdb
 *.exe

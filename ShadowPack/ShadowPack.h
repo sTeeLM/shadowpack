@@ -10,6 +10,8 @@
 
 #include "resource.h"		// 主符号
 
+#include "ShadowPackConfig.h"
+#include "LocaleManager.h"
 
 // CShadowPackApp:
 // 有关此类的实现，请参阅 ShadowPack.cpp
@@ -27,6 +29,9 @@ public:
 // 实现
 
 	DECLARE_MESSAGE_MAP()
+public:
+	CShadowPackConfig m_Config;
+	CLocaleManager m_Locale;
 };
 
 extern CShadowPackApp theApp;

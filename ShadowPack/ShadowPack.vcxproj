@@ -208,9 +208,11 @@
     <ClInclude Include="BMPFileMedia.h" />
     <ClInclude Include="BytePerBlockMedia.h" />
     <ClInclude Include="ChartControl.h" />
+    <ClInclude Include="ConfigDlg.h" />
     <ClInclude Include="CorImageMedia.h" />
     <ClInclude Include="crypto_warpper.h" />
     <ClInclude Include="JPEGFileMedia.h" />
+    <ClInclude Include="LocaleManager.h" />
     <ClInclude Include="MediaOptionDlg.h" />
     <ClInclude Include="OptPageBMPFile.h" />
     <ClInclude Include="OptPageBPBMedia.h" />
@@ -236,6 +238,7 @@
     <ClInclude Include="ProgressControl.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ShadowPack.h" />
+    <ClInclude Include="ShadowPackConfig.h" />
     <ClInclude Include="ShadowPackDlg.h" />
     <ClInclude Include="StreamBase.h" />
     <ClInclude Include="targetver.h" />
@@ -245,6 +248,7 @@
     <ClCompile Include="BMPFileMedia.cpp" />
     <ClCompile Include="BytePerBlockMedia.cpp" />
     <ClCompile Include="ChartControl.cpp" />
+    <ClCompile Include="ConfigDlg.cpp" />
     <ClCompile Include="CorImageMedia.cpp" />
     <ClCompile Include="crypto_warpper.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -253,6 +257,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="JPEGFileMedia.cpp" />
+    <ClCompile Include="LocaleManager.cpp" />
     <ClCompile Include="MediaBase.cpp" />
     <ClCompile Include="MediaOptionDlg.cpp" />
     <ClCompile Include="OptPageBMPFile.cpp" />
@@ -278,6 +283,7 @@
     <ClCompile Include="PPMFileMedia.cpp" />
     <ClCompile Include="ProgressControl.cpp" />
     <ClCompile Include="ShadowPack.cpp" />
+    <ClCompile Include="ShadowPackConfig.cpp" />
     <ClCompile Include="ShadowPackDlg.cpp" />
     <ClCompile Include="TIFFileMedia.cpp" />
   </ItemGroup>
