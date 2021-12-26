@@ -214,31 +214,6 @@ void CShadowPackDlg::StartThread(FN_PACK_THREAD fn)
 	AfxBeginThread(fnThread, pParam);
 }
 
-BOOL CShadowPackDlg::ShowLocationDirDlg(CString& strDir)
-{
-	// get dir location
-	BROWSEINFO bi;
-	ZeroMemory(&bi, sizeof(BROWSEINFO));
-	bi.hwndOwner = GetSafeHwnd();
-	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
-	BOOL bRet = FALSE;
-	TCHAR szFolder[MAX_PATH * 2];
-	szFolder[0] = 0;
-	if (pidl)
-	{
-		if (SHGetPathFromIDList(pidl, szFolder))
-			bRet = TRUE;
-		IMalloc* pMalloc = NULL;
-		if (SUCCEEDED(SHGetMalloc(&pMalloc)) && pMalloc)
-		{
-			pMalloc->Free(pidl);
-			pMalloc->Release();
-		}
-	}
-	strDir = szFolder;
-	return bRet;
-}
 
 void CShadowPackDlg::ThreadOpenMedia()
 {
@@ -362,7 +337,7 @@ void CShadowPackDlg::OnBnClickedBtnItemExport()
 				StartThread(&CShadowPackDlg::ThreadExportItem);
 			}
 		} else {
-			if (ShowLocationDirDlg(m_szItemPathName)) {
+			if (CPackUtils::ShowLocationDirDlg(this, m_szItemPathName)) {
 				StartThread(&CShadowPackDlg::ThreadExportItem);
 			}
 		}

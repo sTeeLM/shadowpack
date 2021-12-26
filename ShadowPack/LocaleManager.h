@@ -17,6 +17,19 @@ public:
 	}LOCAL_ID_T;
 	BOOL Initialize();
 	BOOL SetLocale(LOCAL_ID_T Locale);
+	static UINT GetLocaleCount() { return (UINT)LOCALE_CNT; }
+	static CString GetLocalName(UINT nIndex)
+	{
+		CString strRet;
+		
+		if (nIndex < LOCALE_CNT) {
+			strRet.LoadString(m_LocalTable[nIndex].nLocaleDesc);
+		}
+		else {
+			strRet.LoadString(IDS_LOCALE_UNKNOWN);
+		}
+		return strRet;
+	}
 protected:
 	typedef struct _LOCAL_TABLE_T
 	{

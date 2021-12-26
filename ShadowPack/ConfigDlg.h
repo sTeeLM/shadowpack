@@ -11,6 +11,8 @@ public:
 	CConfigDlg(CWnd* pParent = nullptr);   // 标准构造函数
 	virtual ~CConfigDlg();
 
+	BOOL OnInitDialog();
+
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_CONFIGBOX };
@@ -20,4 +22,26 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedBtnSelMediaHdCache();
+	afx_msg void OnBnClickedBtnSelPackHdCache();
+	afx_msg void OnBnClickedCheckMediaHdCache();
+	afx_msg void OnBnClickedCheckPackHdCache();
+	afx_msg void OnBnClickedCheckMediaHdCacheUseTmp();
+	afx_msg void OnBnClickedCheckPackHdCacheUseTmp();
+
+public:
+	CComboBox m_ctlComboLang;
+	BOOL m_bMediaHDCacheEnable;
+	BOOL m_bPackHDCacheEnable;
+	BOOL m_bMediaHDCacheUseTmp;
+	BOOL m_bPackHDCacheUseTmp;
+	CString m_strMediaHDCachePath;
+	CString m_strPackHDCachePath;
+	UINT m_nCurrentLocale;
+
+protected:
+	void UpdateUI();
 };

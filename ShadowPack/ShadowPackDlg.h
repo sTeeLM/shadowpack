@@ -47,8 +47,6 @@ public:
 	afx_msg void OnBnClickedBtnCancel();
 	afx_msg void OnBnClickedBtnItemDelete();
 
-	BOOL ShowLocationDirDlg(CString& strDir);
-
 public:
 	CChartControl m_ctlCapicityChart;
 	CStatic m_ctlCapicityInfo;
@@ -77,7 +75,7 @@ protected:
 		CShadowPackDlg* m_pThis;
 		FN_PACK_THREAD  m_pFn;
 	};
-	void CShadowPackDlg::StartThread(FN_PACK_THREAD fn);
+	void StartThread(FN_PACK_THREAD fn);
 	static UINT __cdecl fnThread(LPVOID p);
 protected:
 	void UpdateUI();

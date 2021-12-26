@@ -41,6 +41,8 @@
 #define IDS_CIPHER_3DES                 129
 #define IDS_CONFIGBOX                   130
 #define IDD_PROPPAGE_BMP_FILE           131
+#define IDS_PATH_CAN_NOT_NULL           131
+#define IDS_HD_PATH_CAN_NOT_NULL        131
 #define IDD_PROPPAGE_PNG_FILE           133
 #define IDD_PROPPAGE_BYTE_PER_BLOCK_MEDIA 134
 #define IDD_PROPPAGE_JPEG_FILE          135
@@ -57,8 +59,9 @@
 #define IDS_PE_EXISTED                  407
 #define IDS_PE_NOMEM                    408
 #define IDS_PE_INTERNAL                 409
-#define IDS_LOCAL_CHINESE_SC            600
-#define IDS_LOCAL_ENGLISH_US            601
+#define IDS_LOCALE_UNKNOWN              599
+#define IDS_LOCALE_CHINESE_SC           600
+#define IDS_LOCALE_ENGLISH_US           601
 #define IDC_LIST_DATA                   1000
 #define IDC_BFSIZE                      1000
 #define IDC_BTN_ITEM_DELETE             1001
@@ -126,6 +129,15 @@
 #define IDC_PPM_IMAGE_WIDTH             1057
 #define IDC_PPM_IMAGE_HEIGHT            1058
 #define IDC_PPM_IMAGE_FORMAT            1059
+#define IDC_COMBO_LANG                  1060
+#define IDC_CHECK_MEDIA_HD_CACHE        1061
+#define IDC_CHECK_PACK_HD_CACHE         1062
+#define IDC_EDIT_MEDIA_HD_CACHE_DIR     1063
+#define IDC_EDIT_PACK_HD_CACHE_DIR      1064
+#define IDC_BTN_SEL_MEDIA_HD_CACHE      1065
+#define IDC_BTN_SEL_PACK_HD_CACHE       1066
+#define IDC_CHECK_MEDIA_HD_CACHE_USE_TMP 1067
+#define IDC_CHECK_PACK_HD_CACHE_USE_TMP 1068
 
 // Next default values for new objects
 // 
@@ -133,7 +145,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1060
+#define _APS_NEXT_CONTROL_VALUE         1068
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

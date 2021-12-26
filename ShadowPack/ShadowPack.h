@@ -10,7 +10,7 @@
 
 #include "resource.h"		// 主符号
 
-#include "ShadowPackConfig.h"
+#include "ConfigManager.h"
 #include "LocaleManager.h"
 
 // CShadowPackApp:
@@ -30,7 +30,7 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CShadowPackConfig m_Config;
+	CConfigManager m_Config;
 	CLocaleManager m_Locale;
 };
 

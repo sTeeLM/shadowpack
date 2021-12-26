@@ -29,6 +29,9 @@
   <ItemGroup>
     <Image Include="res\ShadowPack.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{5EF3B476-E06F-4CA0-BF34-211ED8AB2652}</ProjectGuid>

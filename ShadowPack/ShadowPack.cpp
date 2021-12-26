@@ -6,6 +6,7 @@
 #include "framework.h"
 #include "ShadowPack.h"
 #include "ShadowPackDlg.h"
+#include "PackUtils.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -46,6 +47,9 @@ BOOL CShadowPackApp::InitInstance()
 	//则需要 InitCommonControlsEx()。  否则，将无法创建窗口。
 	INITCOMMONCONTROLSEX InitCtrls;
 	CShadowPackDlg dlg;
+	INT_PTR nResponse;
+	CConfigManager::CONFIG_VALUE_T val;
+	CString strIniFilePath;
 
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	// 将它设置为包括所有要在应用程序中使用的
@@ -64,16 +68,25 @@ BOOL CShadowPackApp::InitInstance()
 		goto err;
 	}
 
-	if (!m_Config.LoadConfig()) {
+	//m_Config.SetConfigReg(HKEY_CURRENT_USER, _T("Software\\ShadowPack"));
+
+	strIniFilePath = CPackUtils::GetWorkingPath();
+	strIniFilePath += _T("ShadowPack.ini");
+	m_Config.SetConfigFile(strIniFilePath);
+	m_Config.CreateDefault();
+	m_Config.DumpConfig();
+
+	if (m_Config.GetConfig(_T("main"), _T("locale"), val)) {
+		m_Locale.SetLocale((CLocaleManager::LOCAL_ID_T)val.n8);
+	}
+	else {
 		goto err;
 	}
-
-
 
 	AfxEnableControlContainer();
 
 	m_pMainWnd = &dlg;
-	INT_PTR nResponse = dlg.DoModal();
+	nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
 		// TODO: 在此放置处理何时用

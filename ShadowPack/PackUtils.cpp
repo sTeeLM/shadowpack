@@ -37,6 +37,46 @@ void CPackUtils::TranslateSize(LONGLONG nSize, CString & strOut)
 	}
 }
 
+BOOL CPackUtils::ShowLocationDirDlg(CWnd *pOwner, CString& strDir)
+{
+	// get dir location
+	BROWSEINFO bi;
+	ZeroMemory(&bi, sizeof(BROWSEINFO));
+	bi.hwndOwner = pOwner->GetSafeHwnd();
+	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
+	BOOL bRet = FALSE;
+	TCHAR szFolder[MAX_PATH * 2];
+	szFolder[0] = 0;
+	if (pidl)
+	{
+		if (SHGetPathFromIDList(pidl, szFolder))
+			bRet = TRUE;
+		IMalloc* pMalloc = NULL;
+		if (SUCCEEDED(SHGetMalloc(&pMalloc)) && pMalloc)
+		{
+			pMalloc->Free(pidl);
+			pMalloc->Release();
+		}
+	}
+	strDir = szFolder;
+	return bRet;
+}
+
+CString CPackUtils::GetWorkingPath()
+{
+	TCHAR Buffer[1024];
+	CString strRet = _T("");
+	if (_tgetcwd(Buffer, _countof(Buffer))) {
+		strRet = Buffer;
+	}
+	if (strRet.Right(1).Compare(_T("\\"))) {
+		strRet += _T("\\");
+	}
+
+	return strRet;
+}
+
 BOOL CPackUtils::GetFileSize(LPCTSTR szPath, ULONGLONG & size)
 {
 	CFile file;
@@ -162,6 +202,24 @@ BOOL CPackUtils::IsPathExist(LPCTSTR szPath, LPWIN32_FIND_DATA pffd /*= NULL*/)
 	}
 }
 
+CString CPackUtils::GetTempPath()
+{
+	CString strPath, strRet;
+	INT nSize = (MAX_PATH + 1) * 10;
+	LPTSTR pBuffer = strPath.GetBuffer(nSize);
+	if (::GetTempPath(nSize, pBuffer) != 0) {
+		strPath.ReleaseBuffer();
+		srand((UINT)time(NULL));
+		strRet.Format(_T("%s"), strPath);
+		if (strRet.Right(1).Compare(_T("\\"))) {
+			strRet += _T("\\");
+		}
+		return strRet;
+	}
+	strPath.ReleaseBuffer();
+	strPath = _T("");
+	return strPath;
+}
 
 CString CPackUtils::CreateTempPath()
 {

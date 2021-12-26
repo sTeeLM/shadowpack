@@ -18,10 +18,13 @@ public:
 	static CString GetPathPath(LPCTSTR szPath);
 	static BOOL IsPathExist(LPCTSTR szPath, LPWIN32_FIND_DATA pffd = NULL);
 	static CString CreateTempPath();
+	static CString GetTempPath();
 	static BOOL RemoveDir(LPCTSTR szPath);
 	static CString GetLastError(DWORD dwError);
 	static CString GetLastError();
 	static CString GetLastStdError(int err);
+	static CString GetWorkingPath();
+	static BOOL ShowLocationDirDlg(CWnd* pOwner, CString& strDir);
 	static void FillBufferRand(LPBYTE pBuffer, UINT nSize);
 };
 
