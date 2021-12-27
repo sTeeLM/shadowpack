@@ -72,6 +72,7 @@ BOOL CShadowPackApp::InitInstance()
 
 	strIniFilePath = CPackUtils::GetWorkingPath();
 	strIniFilePath += _T("ShadowPack.ini");
+	TRACE(_T("Use INI file %s\n"), strIniFilePath);
 	m_Config.SetConfigFile(strIniFilePath);
 	m_Config.CreateDefault();
 	m_Config.DumpConfig();

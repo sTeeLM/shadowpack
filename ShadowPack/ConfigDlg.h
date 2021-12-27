@@ -38,10 +38,11 @@ public:
 	BOOL m_bPackHDCacheEnable;
 	BOOL m_bMediaHDCacheUseTmp;
 	BOOL m_bPackHDCacheUseTmp;
-	CString m_strMediaHDCachePath;
-	CString m_strPackHDCachePath;
 	UINT m_nCurrentLocale;
-
+	CString m_strMediaCacheTmpDir;
+	CString m_strMediaCacheCustomDir;
+	CString m_strPackCacheTmpDir;
+	CString m_strPackCacheCustomDir;
 protected:
 	void UpdateUI();
 };

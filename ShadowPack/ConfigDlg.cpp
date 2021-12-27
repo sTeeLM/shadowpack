@@ -20,8 +20,10 @@ CConfigDlg::CConfigDlg(CWnd* pParent /*=nullptr*/)
 	, m_bMediaHDCacheUseTmp(FALSE)
 	, m_bPackHDCacheUseTmp(FALSE)
 	, m_nCurrentLocale(0)
-	, m_strMediaHDCachePath(_T(""))
-	, m_strPackHDCachePath(_T(""))
+	, m_strMediaCacheTmpDir(_T(""))
+	, m_strMediaCacheCustomDir(_T(""))
+	, m_strPackCacheTmpDir(_T(""))
+	, m_strPackCacheCustomDir(_T(""))
 {
 
 }
@@ -38,18 +40,31 @@ void CConfigDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_PACK_HD_CACHE, m_bPackHDCacheEnable);
 	DDX_Check(pDX, IDC_CHECK_MEDIA_HD_CACHE_USE_TMP, m_bMediaHDCacheUseTmp);
 	DDX_Check(pDX, IDC_CHECK_PACK_HD_CACHE_USE_TMP, m_bPackHDCacheUseTmp);
-	DDX_Text(pDX, IDC_EDIT_MEDIA_HD_CACHE_DIR, m_strMediaHDCachePath);
-	DDX_Text(pDX, IDC_EDIT_PACK_HD_CACHE_DIR, m_strPackHDCachePath);
+	DDX_Text(pDX, IDC_STATIC_MEDIA_TEMP_DIR, m_strMediaCacheTmpDir);
+	DDX_Text(pDX, IDC_STATIC_MEDIA_CUSTOM_TEMP_DIR, m_strMediaCacheCustomDir);
+	DDX_Text(pDX, IDC_STATIC_PACK_TEMP_DIR, m_strPackCacheTmpDir);
+	DDX_Text(pDX, IDC_STATIC_PACK_CUSTOM_TEMP_DIR, m_strPackCacheCustomDir);
 
 	if (pDX->m_bSaveAndValidate) {
 		m_nCurrentLocale = m_ctlComboLang.GetCurSel();
 	}
 
 	if (pDX->m_bSaveAndValidate) {
-		if (m_bMediaHDCacheEnable && !m_strMediaHDCachePath.GetLength()
-			|| m_bPackHDCacheEnable && !m_strPackHDCachePath.GetLength()) {
-			AfxMessageBox(IDS_HD_PATH_CAN_NOT_NULL);
-			pDX->Fail();
+		if (m_bMediaHDCacheEnable) {
+			if (m_bMediaHDCacheUseTmp && m_strMediaCacheTmpDir.GetLength() == 0
+				|| !m_bMediaHDCacheUseTmp && m_strMediaCacheCustomDir.GetLength() == 0) {
+				AfxMessageBox(IDS_CACHE_PATH_CAN_NOT_NULL);
+				pDX->Fail();
+			}
+
+		}
+		if (m_bPackHDCacheEnable) {
+			if (m_bPackHDCacheUseTmp && m_strPackCacheTmpDir.GetLength() == 0
+				|| !m_bPackHDCacheUseTmp && m_strPackCacheCustomDir.GetLength() == 0) {
+				AfxMessageBox(IDS_CACHE_PATH_CAN_NOT_NULL);
+				pDX->Fail();
+			}
+
 		}
 	}
 }
@@ -98,34 +113,29 @@ void CConfigDlg::OnBnClickedOk()
 void CConfigDlg::OnBnClickedBtnSelMediaHdCache()
 {
 	CString strRet;
-	if (!CPackUtils::ShowLocationDirDlg(this, strRet)) {
-		strRet = CPackUtils::GetTempPath();
+	if (CPackUtils::ShowLocationDirDlg(this, strRet)) {
+		if (strRet.Right(1).Compare(_T("\\"))) {
+			strRet += _T("\\");
+		}
+		GetDlgItem(IDC_STATIC_MEDIA_CUSTOM_TEMP_DIR)->SetWindowText(strRet);
 	}
-
-	if (strRet.Right(1).Compare(_T("\\"))) {
-		strRet += _T("\\");
-	}
-
-	GetDlgItem(IDC_EDIT_MEDIA_HD_CACHE_DIR)->SetWindowText(strRet);
 }
 
 
 void CConfigDlg::OnBnClickedBtnSelPackHdCache()
 {
 	CString strRet;
-	if (!CPackUtils::ShowLocationDirDlg(this, strRet)) {
-		strRet = CPackUtils::GetTempPath();
+	if (CPackUtils::ShowLocationDirDlg(this, strRet)) {
+		if (strRet.Right(1).Compare(_T("\\"))) {
+			strRet += _T("\\");
+		}
+		GetDlgItem(IDC_STATIC_PACK_CUSTOM_TEMP_DIR)->SetWindowText(strRet);
 	}
-
-	if (strRet.Right(1).Compare(_T("\\"))) {
-		strRet += _T("\\");
-	}
-
-	GetDlgItem(IDC_EDIT_PACK_HD_CACHE_DIR)->SetWindowText(strRet);
 }
 
 void CConfigDlg::UpdateUI()
 {
+	
 	CString strTemp = CPackUtils::GetTempPath();
 	BOOL bMediaCacheHDEnable = IsDlgButtonChecked(IDC_CHECK_MEDIA_HD_CACHE);
 	BOOL bCustomMediaHDCacheDirEnable = bMediaCacheHDEnable
@@ -138,18 +148,12 @@ void CConfigDlg::UpdateUI()
 	GetDlgItem(IDC_BTN_SEL_MEDIA_HD_CACHE)->EnableWindow(bCustomMediaHDCacheDirEnable);
 	GetDlgItem(IDC_CHECK_PACK_HD_CACHE_USE_TMP)->EnableWindow(bPackCacheHDEnable);
 	GetDlgItem(IDC_BTN_SEL_PACK_HD_CACHE)->EnableWindow(bCustomPackHDCacheDirEnable);
-	if (bMediaCacheHDEnable && !bCustomMediaHDCacheDirEnable) {
-		GetDlgItem(IDC_EDIT_MEDIA_HD_CACHE_DIR)->SetWindowText(strTemp);
-	}
-	else {
-		GetDlgItem(IDC_EDIT_MEDIA_HD_CACHE_DIR)->SetWindowText(_T(""));
-	}
-	if (bPackCacheHDEnable && !bCustomPackHDCacheDirEnable) {
-		GetDlgItem(IDC_EDIT_PACK_HD_CACHE_DIR)->SetWindowText(strTemp);
-	}
-	else {
-		GetDlgItem(IDC_EDIT_PACK_HD_CACHE_DIR)->SetWindowText(_T(""));
-	}
+
+	GetDlgItem(IDC_STATIC_MEDIA_TEMP_DIR)->SetWindowText(strTemp);
+	
+	GetDlgItem(IDC_STATIC_PACK_TEMP_DIR)->SetWindowText(strTemp);
+
+	
 }
 
 void CConfigDlg::OnBnClickedCheckMediaHdCache()
