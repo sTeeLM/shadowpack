@@ -46,7 +46,7 @@ public:
 	afx_msg void OnBnClickedBtnItemClearAll();
 	afx_msg void OnBnClickedBtnCancel();
 	afx_msg void OnBnClickedBtnItemDelete();
-
+	afx_msg void OnLvnItemChangedListData(NMHDR* pNMHDR, LRESULT* pResult);
 public:
 	CChartControl m_ctlCapicityChart;
 	CStatic m_ctlCapicityInfo;
@@ -83,7 +83,6 @@ protected:
 	void ThreadSaveMedia();
 	void ThreadExportItem();
 	void ThreadAddItem();
-	
-public:
-	afx_msg void OnLvnItemChangedListData(NMHDR* pNMHDR, LRESULT* pResult);
+	BOOL ShowConfigDlg();
+
 };

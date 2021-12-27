@@ -22,7 +22,8 @@ END_MESSAGE_MAP()
 
 // CShadowPackApp 构造
 
-CShadowPackApp::CShadowPackApp()
+CShadowPackApp::CShadowPackApp():
+	m_bRestart(FALSE)
 {
 	// 支持重新启动管理器
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -77,10 +78,10 @@ BOOL CShadowPackApp::InitInstance()
 	m_Config.CreateDefault();
 	m_Config.DumpConfig();
 
+
 	if (m_Config.GetConfig(_T("main"), _T("locale"), val)) {
 		m_Locale.SetLocale((CLocaleManager::LOCAL_ID_T)val.n8);
-	}
-	else {
+	} else {
 		goto err;
 	}
 
@@ -90,13 +91,11 @@ BOOL CShadowPackApp::InitInstance()
 	nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
-		// TODO: 在此放置处理何时用
-		//  “确定”来关闭对话框的代码
+
 	}
 	else if (nResponse == IDCANCEL)
 	{
-		// TODO: 在此放置处理何时用
-		//  “取消”来关闭对话框的代码
+
 	}
 	else if (nResponse == -1)
 	{
@@ -110,7 +109,34 @@ BOOL CShadowPackApp::InitInstance()
 
 	// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
 	//  而不是启动应用程序的消息泵。
+	if (m_bRestart) {
+		RestartApp();
+	}
 err:
 	return FALSE;
+}
+
+void CShadowPackApp::RestartApp()
+{
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	TCHAR FilePath[255];
+
+
+	::ZeroMemory(&si, sizeof(si));
+	::ZeroMemory(&pi, sizeof(pi));
+
+	si.cb = sizeof(STARTUPINFO);
+	si.wShowWindow = SW_SHOW;
+	si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+
+	if (::GetModuleFileName(NULL, FilePath, _countof(FilePath))) {
+		FilePath[_countof(FilePath) - 1] = 0;
+
+		if (::CreateProcess(NULL, FilePath, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {
+			::CloseHandle(pi.hProcess);
+			::CloseHandle(pi.hThread);
+		}
+	}
 }
 

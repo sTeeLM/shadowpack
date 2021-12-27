@@ -148,12 +148,6 @@ void CConfigDlg::UpdateUI()
 	GetDlgItem(IDC_BTN_SEL_MEDIA_HD_CACHE)->EnableWindow(bCustomMediaHDCacheDirEnable);
 	GetDlgItem(IDC_CHECK_PACK_HD_CACHE_USE_TMP)->EnableWindow(bPackCacheHDEnable);
 	GetDlgItem(IDC_BTN_SEL_PACK_HD_CACHE)->EnableWindow(bCustomPackHDCacheDirEnable);
-
-	GetDlgItem(IDC_STATIC_MEDIA_TEMP_DIR)->SetWindowText(strTemp);
-	
-	GetDlgItem(IDC_STATIC_PACK_TEMP_DIR)->SetWindowText(strTemp);
-
-	
 }
 
 void CConfigDlg::OnBnClickedCheckMediaHdCache()

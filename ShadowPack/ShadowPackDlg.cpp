@@ -136,6 +136,102 @@ BOOL CShadowPackDlg::OnInitDialog()
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
+BOOL CShadowPackDlg::ShowConfigDlg()
+{
+	CConfigDlg dlgConfig;
+	CConfigManager::CONFIG_VALUE_T val;
+
+	if (!theApp.m_Config.GetConfig(_T("main"), _T("locale"), val)) {
+		goto err;
+	}
+	dlgConfig.m_nCurrentLocale = val.n8;
+
+	if (!theApp.m_Config.GetConfig(_T("media"), _T("media_use_hd_cache"), val)) {
+		goto err;
+	}
+	dlgConfig.m_bMediaHDCacheEnable = val.n8;
+
+	if (!theApp.m_Config.GetConfig(_T("media"), _T("media_use_system_cache"), val)) {
+		goto err;
+	}
+	dlgConfig.m_bMediaHDCacheUseTmp = val.n8;
+
+	if (!theApp.m_Config.GetConfig(_T("media"), _T("media_custom_cache_path"), val)) {
+		goto err;
+	}
+	dlgConfig.m_strMediaCacheCustomDir = val.str;
+	free(val.str);
+
+	dlgConfig.m_strMediaCacheTmpDir = CPackUtils::GetTempPath() + _T("ShadowPack\\Media\\");
+
+
+	if (!theApp.m_Config.GetConfig(_T("pack"), _T("pack_use_hd_cache"), val)) {
+		goto err;
+	}
+	dlgConfig.m_bPackHDCacheEnable = val.n8;
+
+	if (!theApp.m_Config.GetConfig(_T("pack"), _T("pack_use_system_cache"), val)) {
+		goto err;
+	}
+	dlgConfig.m_bPackHDCacheUseTmp = val.n8;
+
+	if (!theApp.m_Config.GetConfig(_T("pack"), _T("pack_custom_cache_path"), val)) {
+		goto err;
+	}
+	dlgConfig.m_strPackCacheCustomDir = val.str;
+	free(val.str);
+
+	dlgConfig.m_strPackCacheTmpDir = CPackUtils::GetTempPath() + _T("ShadowPack\\Content\\");
+
+	if (dlgConfig.DoModal() == IDOK) {
+		val.n8 = dlgConfig.m_nCurrentLocale;
+		if (!theApp.m_Config.SetConfig(_T("main"), _T("locale"), val)) {
+			goto err;
+		}
+
+		val.n8 = dlgConfig.m_bMediaHDCacheEnable;
+		if (!theApp.m_Config.SetConfig(_T("media"), _T("media_use_hd_cache"), val)) {
+			goto err;
+		}
+
+		val.n8 = dlgConfig.m_bMediaHDCacheUseTmp;
+		if (!theApp.m_Config.SetConfig(_T("media"), _T("media_use_system_cache"), val)) {
+			goto err;
+		}
+
+		val.str = dlgConfig.m_strMediaCacheCustomDir.LockBuffer();
+		if (!theApp.m_Config.SetConfig(_T("media"), _T("media_custom_cache_path"), val)) {
+			dlgConfig.m_strMediaCacheCustomDir.UnlockBuffer();
+			goto err;
+		}
+		dlgConfig.m_strMediaCacheCustomDir.UnlockBuffer();
+
+
+		val.n8 = dlgConfig.m_bPackHDCacheEnable;
+		if (!theApp.m_Config.SetConfig(_T("pack"), _T("pack_use_hd_cache"), val)) {
+			goto err;
+		}
+
+		val.n8 = dlgConfig.m_bPackHDCacheUseTmp;
+		if (!theApp.m_Config.SetConfig(_T("pack"), _T("pack_use_system_cache"), val)) {
+			goto err;
+		}
+
+		val.str = dlgConfig.m_strPackCacheCustomDir.LockBuffer();
+		if (!theApp.m_Config.SetConfig(_T("pack"), _T("pack_custom_cache_path"), val)) {
+			dlgConfig.m_strPackCacheCustomDir.UnlockBuffer();
+			goto err;
+		}
+		dlgConfig.m_strPackCacheCustomDir.UnlockBuffer();
+
+		AfxMessageBox(IDS_RELOAD_CONFIG, MB_ICONINFORMATION);
+
+		return TRUE;
+	}
+err:
+	return FALSE;
+}
+
 void CShadowPackDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
@@ -143,8 +239,10 @@ void CShadowPackDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
 	} else if((nID & 0xFFF0) == IDM_CONFIGBOX) {
-		CConfigDlg dlgConfig;
-		dlgConfig.DoModal();
+		if (ShowConfigDlg()) {
+			theApp.m_bRestart = TRUE;
+			PostMessage(WM_CLOSE, 0, 0);
+		}
 	} else {
 		CDialog::OnSysCommand(nID, lParam);
 	}
