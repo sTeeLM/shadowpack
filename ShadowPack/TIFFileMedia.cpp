@@ -131,8 +131,8 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 			}
 			Progress.Increase(1);
 			CPixelImageMedia::SetScanline(irow, (LPBYTE)buf,
-				m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA 
-				: CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB);
+				m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::PIXEL_FORMAT_RGBA 
+				: CPixelImageMedia::PIXEL_FORMAT_RGB);
 		}
 	}
 	else {
@@ -145,8 +145,8 @@ BOOL CTIFFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 				}
 				Progress.Increase(1);
 				CPixelImageMedia::SetScanlinePerChannel(irow, (LPBYTE)buf, m_TIFFInfo.nSamplesPerPixel == 4 ? 
-					CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA
-					: CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB, s);
+					CPixelImageMedia::PIXEL_FORMAT_RGBA
+					: CPixelImageMedia::PIXEL_FORMAT_RGB, s);
 			}
 		}
 	}
@@ -241,8 +241,8 @@ BOOL CTIFFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 	if (m_TIFFInfo.nPlanarConfig == PLANARCONFIG_CONTIG) {
 		Progress.SetFullScale(m_TIFFInfo.nHeight);
 		for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
-			CPixelImageMedia::GetScanline(irow, (LPBYTE)buf, m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA
-				: CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB);
+			CPixelImageMedia::GetScanline(irow, (LPBYTE)buf, m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::PIXEL_FORMAT_RGBA
+				: CPixelImageMedia::PIXEL_FORMAT_RGB);
 			Progress.Increase(1);
 			if (!TIFFWriteScanline(pTiff, buf, irow)) {
 				Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);
@@ -254,8 +254,8 @@ BOOL CTIFFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		Progress.SetFullScale(m_TIFFInfo.nHeight * m_TIFFInfo.nSamplesPerPixel);
 		for (UINT s = 0; s < m_TIFFInfo.nSamplesPerPixel; s++) {
 			for (UINT irow = 0; irow < m_TIFFInfo.nHeight; irow++) {
-				CPixelImageMedia::GetScanlinePerChannel(irow, (LPBYTE)buf, m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA
-					: CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB, s);
+				CPixelImageMedia::GetScanlinePerChannel(irow, (LPBYTE)buf, m_TIFFInfo.nSamplesPerPixel == 4 ? CPixelImageMedia::PIXEL_FORMAT_RGBA
+					: CPixelImageMedia::PIXEL_FORMAT_RGB, s);
 				Progress.Increase(1);
 				if (!TIFFWriteScanline(pTiff, buf, irow, s)) {
 					Errors.SetError(CPackErrors::PE_IO, szFilePath, m_strLastError);

@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "PixelImageMedia.h"
+#include "ShadowPack.h"
+#include "ConfigManager.h"
 #include "resource.h"
 
 CPixelImageMedia::CPixelImageMedia() :
@@ -7,7 +9,8 @@ CPixelImageMedia::CPixelImageMedia() :
 	m_nHeight(0),
 	m_pBlockBuffer(NULL),
 	m_nEmpty(0),
-	m_OptPagePixelImageMedia(NULL, IDS_OPT_PIXEL_MEDIA)
+	m_OptPagePixelImageMedia(NULL, IDS_OPT_PIXEL_MEDIA),
+	m_bUseFileCache(FALSE)
 {
 
 }
@@ -20,8 +23,12 @@ CPixelImageMedia::~CPixelImageMedia()
 void CPixelImageMedia::Free()
 {
 	if (m_pBlockBuffer) {
-		CPixelImageMedia::CPixelBlock* p = dynamic_cast<CPixelImageMedia::CPixelBlock*>(m_pBlockBuffer);
-		delete[] p;
+		if (m_bUseFileCache) {
+			m_FileCache.Free();
+		}else {
+			delete[] m_pBlockBuffer;
+		}
+		m_bUseFileCache = FALSE;
 		m_pBlockBuffer = NULL;
 		m_nWidth = 0;
 		m_nHeight = 0;
@@ -31,15 +38,30 @@ void CPixelImageMedia::Free()
 BOOL CPixelImageMedia::Alloc(UINT nWidth, UINT nHeight, CPackErrors& Error)
 {
 	UINT nBlocks = nWidth * nHeight;
+	CConfigManager::CONFIG_VALUE_T val;
+
+	if (theApp.m_Config.GetConfig(_T("media"), _T("media_use_hd_cache"), val)) {
+		m_bUseFileCache = val.n8;
+	}
+
 	if (m_pBlockBuffer) {
 		Error.SetError(CPackErrors::PE_INTERNAL);
 		return FALSE;
 	}
-	m_pBlockBuffer = new (std::nothrow) CPixelBlock[nBlocks];
+	if (m_bUseFileCache) {
+		m_pBlockBuffer = (IMAGE_PIXEL_T *) m_FileCache.Alloc(nBlocks * sizeof(IMAGE_PIXEL_T), Error);
+	}
+	else {
+		m_pBlockBuffer = new (std::nothrow) IMAGE_PIXEL_T[nBlocks];
+		if (!m_pBlockBuffer) {
+			Error.SetError(CPackErrors::PE_NOMEM);
+		}
+	}
+
 	if (!m_pBlockBuffer) {
-		Error.SetError(CPackErrors::PE_NOMEM);
 		return FALSE;
 	}
+
 	m_nWidth = nWidth;
 	m_nHeight = nHeight;
 	return TRUE;
@@ -48,73 +70,65 @@ BOOL CPixelImageMedia::Alloc(UINT nWidth, UINT nHeight, CPackErrors& Error)
 void CPixelImageMedia::SetPixel(UINT nX, UINT nY, BYTE nRed, BYTE nGreen, BYTE nBlue, BYTE nAlpha)
 {
 	UINT nIndex = nY * m_nWidth + nX;
-	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < GetTotalBlocks());
 	if (nIndex < GetTotalBlocks()) {
-		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
-		pBlock[nIndex].m_nRed   = nRed;
-		pBlock[nIndex].m_nGreen = nGreen;
-		pBlock[nIndex].m_nBlue  = nBlue;
-		pBlock[nIndex].m_nAlpha = nAlpha;
+		m_pBlockBuffer[nIndex].m_nRed   = nRed;
+		m_pBlockBuffer[nIndex].m_nGreen = nGreen;
+		m_pBlockBuffer[nIndex].m_nBlue  = nBlue;
+		m_pBlockBuffer[nIndex].m_nAlpha = nAlpha;
 	}
 }
 
 void CPixelImageMedia::SetPixel(UINT nX, UINT nY, BYTE nRed, BYTE nGreen, BYTE nBlue)
 {
 	UINT nIndex = nY * m_nWidth + nX;
-	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < GetTotalBlocks());
 	if (nIndex < GetTotalBlocks()) {
-		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
-		pBlock[nIndex].m_nRed = nRed;
-		pBlock[nIndex].m_nGreen = nGreen;
-		pBlock[nIndex].m_nBlue = nBlue;;
+		m_pBlockBuffer[nIndex].m_nRed = nRed;
+		m_pBlockBuffer[nIndex].m_nGreen = nGreen;
+		m_pBlockBuffer[nIndex].m_nBlue = nBlue;;
 	}
 }
 
 void CPixelImageMedia::GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE& nBlue, BYTE& nAlpha)
 {
 	UINT nIndex = nY * m_nWidth + nX;
-	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < GetTotalBlocks());
 	if (nIndex < GetTotalBlocks()) {
-		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
-		nRed   = pBlock[nIndex].m_nRed;
-		nGreen = pBlock[nIndex].m_nGreen;
-		nBlue  = pBlock[nIndex].m_nBlue;
-		nAlpha = pBlock[nIndex].m_nAlpha;
+		nRed   = m_pBlockBuffer[nIndex].m_nRed;
+		nGreen = m_pBlockBuffer[nIndex].m_nGreen;
+		nBlue  = m_pBlockBuffer[nIndex].m_nBlue;
+		nAlpha = m_pBlockBuffer[nIndex].m_nAlpha;
 	}
 }
 
 void CPixelImageMedia::GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE& nBlue)
 {
 	UINT nIndex = nY * m_nWidth + nX;
-	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < GetTotalBlocks());
 	if (nIndex < GetTotalBlocks()) {
-		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
-		nRed = pBlock[nIndex].m_nRed;
-		nGreen = pBlock[nIndex].m_nGreen;
-		nBlue = pBlock[nIndex].m_nBlue;
+		nRed = m_pBlockBuffer[nIndex].m_nRed;
+		nGreen = m_pBlockBuffer[nIndex].m_nGreen;
+		nBlue = m_pBlockBuffer[nIndex].m_nBlue;
 	}
 }
 
-void CPixelImageMedia::SetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format)
+void CPixelImageMedia::SetScanline(UINT nY, LPBYTE pBuffer, CPixelImageMedia::PIXEL_FORMAT_T Format)
 {
 	ASSERT(nY < m_nHeight);
 	if (nY < m_nHeight) {
 		switch (Format) {
-		case CPixelBlock::PIXEL_FORMAT_BGR:
+		case PIXEL_FORMAT_BGR:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				SetPixel(x, nY, pBuffer[x * 3 + 2], pBuffer[x * 3 + 1], pBuffer[x * 3]);
 			}
 		break;
-		case CPixelBlock::PIXEL_FORMAT_RGB:
+		case PIXEL_FORMAT_RGB:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				SetPixel(x, nY, pBuffer[x * 3], pBuffer[x * 3 + 1], pBuffer[x * 3 + 2]);
 			}
 		break;
-		case CPixelBlock::PIXEL_FORMAT_RGBA:
+		case  PIXEL_FORMAT_RGBA:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				SetPixel(x, nY, pBuffer[x * 4], pBuffer[x * 4 + 1], pBuffer[x * 4 + 2], pBuffer[x * 4 + 3]);
 			}
@@ -127,22 +141,22 @@ void CPixelImageMedia::SetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_F
 	}
 }
 
-void CPixelImageMedia::GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format)
+void CPixelImageMedia::GetScanline(UINT nY, LPBYTE pBuffer, CPixelImageMedia::PIXEL_FORMAT_T Format)
 {
 	ASSERT(nY < m_nHeight);
 	if (nY < m_nHeight) {
 		switch (Format) {
-		case CPixelBlock::PIXEL_FORMAT_BGR:
+		case PIXEL_FORMAT_BGR:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				GetPixel(x, nY, pBuffer[x * 3 + 2], pBuffer[x * 3 + 1], pBuffer[x * 3]);
 			}
 		break;
-		case CPixelBlock::PIXEL_FORMAT_RGB:
+		case PIXEL_FORMAT_RGB:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				GetPixel(x, nY, pBuffer[x * 3], pBuffer[x * 3 + 1], pBuffer[x * 3 + 2]);
 			}
 		break;
-		case CPixelBlock::PIXEL_FORMAT_RGBA:
+		case PIXEL_FORMAT_RGBA:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				GetPixel(x, nY, pBuffer[x * 4], pBuffer[x * 4 + 1], pBuffer[x * 4 + 2], pBuffer[x * 4 + 3]);
 			}
@@ -158,11 +172,9 @@ void CPixelImageMedia::GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_F
 BYTE& CPixelImageMedia::GetPixelR(UINT nX, UINT nY)
 {
 	UINT nIndex = nY * m_nWidth + nX;
-	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < GetTotalBlocks());
 	if (nIndex < GetTotalBlocks()) {
-		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
-		return pBlock[nIndex].m_nRed;
+		return m_pBlockBuffer[nIndex].m_nRed;
 	}
 	return m_nEmpty;
 }
@@ -170,11 +182,9 @@ BYTE& CPixelImageMedia::GetPixelR(UINT nX, UINT nY)
 BYTE& CPixelImageMedia::GetPixelG(UINT nX, UINT nY)
 {
 	UINT nIndex = nY * m_nWidth + nX;
-	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < GetTotalBlocks());
 	if (nIndex < GetTotalBlocks()) {
-		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
-		return pBlock[nIndex].m_nGreen;
+		return m_pBlockBuffer[nIndex].m_nGreen;
 	}
 	return m_nEmpty;
 }
@@ -182,11 +192,9 @@ BYTE& CPixelImageMedia::GetPixelG(UINT nX, UINT nY)
 BYTE& CPixelImageMedia::GetPixelB(UINT nX, UINT nY)
 {
 	UINT nIndex = nY * m_nWidth + nX;
-	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < GetTotalBlocks());
 	if (nIndex < GetTotalBlocks()) {
-		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
-		return pBlock[nIndex].m_nBlue;
+		return m_pBlockBuffer[nIndex].m_nBlue;
 	}
 	return m_nEmpty;
 }
@@ -194,31 +202,29 @@ BYTE& CPixelImageMedia::GetPixelB(UINT nX, UINT nY)
 BYTE& CPixelImageMedia::GetPixelA(UINT nX, UINT nY)
 {
 	UINT nIndex = nY * m_nWidth + nX;
-	CPixelBlock* pBlock = NULL;
 	ASSERT(nIndex < GetTotalBlocks());
 	if (nIndex < GetTotalBlocks()) {
-		pBlock = dynamic_cast<CPixelBlock*>(m_pBlockBuffer);
-		return pBlock[nIndex].m_nAlpha;
+		return m_pBlockBuffer[nIndex].m_nAlpha;
 	}
 	return m_nEmpty;
 }
 
-void CPixelImageMedia::SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel)
+void CPixelImageMedia::SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelImageMedia::PIXEL_FORMAT_T Format, UINT nChannel)
 {
 	ASSERT(nY < m_nHeight);
 	if (nY < m_nHeight) {
 		switch (Format) {
-		case CPixelBlock::PIXEL_FORMAT_BGR:
+		case PIXEL_FORMAT_BGR:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				(nChannel == 0 ? GetPixelB(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : GetPixelR(x, nY))) = pBuffer[x];
 			}
 			break;
-		case CPixelBlock::PIXEL_FORMAT_RGB:
+		case PIXEL_FORMAT_RGB:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				(nChannel == 0 ? GetPixelR(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : GetPixelB(x, nY))) = pBuffer[x];
 			}
 			break;
-		case CPixelBlock::PIXEL_FORMAT_RGBA:
+		case PIXEL_FORMAT_RGBA:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				(nChannel == 0 ? GetPixelR(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : (nChannel == 2 ? GetPixelB(x, nY) : GetPixelA(x, nY)))) = pBuffer[x];
 			}
@@ -231,22 +237,22 @@ void CPixelImageMedia::SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBloc
 	}
 }
 
-void CPixelImageMedia::GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel)
+void CPixelImageMedia::GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelImageMedia::PIXEL_FORMAT_T Format, UINT nChannel)
 {
 	ASSERT(nY < m_nHeight);
 	if (nY < m_nHeight) {
 		switch (Format) {
-		case CPixelBlock::PIXEL_FORMAT_BGR:
+		case PIXEL_FORMAT_BGR:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				pBuffer[x] = (nChannel == 0 ? GetPixelB(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : GetPixelR(x, nY)));
 			}
 			break;
-		case CPixelBlock::PIXEL_FORMAT_RGB:
+		case PIXEL_FORMAT_RGB:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				pBuffer[x] = (nChannel == 0 ? GetPixelR(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : GetPixelB(x, nY)));
 			}
 			break;
-		case CPixelBlock::PIXEL_FORMAT_RGBA:
+		case PIXEL_FORMAT_RGBA:
 			for (UINT x = 0; x < m_nWidth; x++) {
 				pBuffer[x] = (nChannel == 0 ? GetPixelR(x, nY) : (nChannel == 1 ? GetPixelG(x, nY) : (nChannel == 2 ? GetPixelB(x, nY) : GetPixelA(x, nY))));
 			}
@@ -390,7 +396,7 @@ BYTE CPixelImageMedia::F5RevLookupTable[8] = {
 BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 {
 	ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
-	CPixelBlock* pPixelBlock = m_pBlockBuffer; // this always is first object!
+	IMAGE_PIXEL_T* pPixelBlock = m_pBlockBuffer; // this always is first object!
 	pPixelBlock += nOffset * nBlockPerByte;
 	BYTE nRet = 0;
 	BYTE nTarget = 0;
@@ -452,7 +458,7 @@ BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 void CPixelImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte)
 {
 	ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
-	CPixelBlock* pPixelBlock = m_pBlockBuffer; // this always is first object!
+	IMAGE_PIXEL_T * pPixelBlock = m_pBlockBuffer; // this always is first object!
 	pPixelBlock += nOffset * nBlockPerByte;
 	BYTE nTarget = 0;
 	BYTE nRet = 0;

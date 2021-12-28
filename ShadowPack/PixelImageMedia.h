@@ -2,6 +2,7 @@
 #include "MediaBase.h"
 #include "BytePerBlockMedia.h"
 #include "OptPageBPBMedia.h"
+#include "FileCache.h"
 
 class CPixelImageMedia :
     public CBytePerBlockMedia
@@ -11,29 +12,18 @@ public:
 	virtual ~CPixelImageMedia();
 
 	// ¶¨Òå¾¿¾¹É¶½Ðblock
-	class CPixelBlock
+	typedef struct _IMAGE_PIXEL_T
 	{
-	public:
-		typedef enum {
-			PIXEL_FORMAT_RGB = 0,
-			PIXEL_FORMAT_RGBA,
-			PIXEL_FORMAT_BGR
-		}PIXEL_FORMAT_T;
-	public:
-		CPixelBlock() :
-			m_nRed(0),
-			m_nGreen(0),
-			m_nBlue(0),
-			m_nAlpha(0)
-		{};
-		virtual ~CPixelBlock() {}
-	protected:
 		BYTE m_nRed;
 		BYTE m_nGreen;
 		BYTE m_nBlue;
 		BYTE m_nAlpha;
-		friend CPixelImageMedia;
-	};
+	}IMAGE_PIXEL_T;
+	typedef enum {
+		PIXEL_FORMAT_RGB = 0,
+		PIXEL_FORMAT_RGBA,
+		PIXEL_FORMAT_BGR
+	}PIXEL_FORMAT_T;
 public:
 	BOOL Alloc(UINT nWidth, UINT nHeight, CPackErrors& Error);
 	void Free();
@@ -41,10 +31,10 @@ public:
 	void GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE& nBlue, BYTE& nAlpha);
 	void SetPixel(UINT nX, UINT nY, BYTE nRed, BYTE nGreen, BYTE nBlue);
 	void GetPixel(UINT nX, UINT nY, BYTE& nRed, BYTE& nGreen, BYTE& nBlue);
-	void SetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
-	void GetScanline(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format);
-	void SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel);
-	void GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelBlock::PIXEL_FORMAT_T Format, UINT nChannel);
+	void SetScanline(UINT nY, LPBYTE pBuffer, PIXEL_FORMAT_T Format);
+	void GetScanline(UINT nY, LPBYTE pBuffer, PIXEL_FORMAT_T Format);
+	void SetScanlinePerChannel(UINT nY, LPBYTE pBuffer, PIXEL_FORMAT_T Format, UINT nChannel);
+	void GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, PIXEL_FORMAT_T Format, UINT nChannel);
 	BYTE & GetPixelR(UINT nX, UINT nY);
 	BYTE & GetPixelG(UINT nX, UINT nY);
 	BYTE& GetPixelB(UINT nX, UINT nY);
@@ -63,7 +53,9 @@ public:
 protected:
 	UINT m_nWidth;
 	UINT m_nHeight;
-	CPixelBlock * m_pBlockBuffer;
+	IMAGE_PIXEL_T * m_pBlockBuffer;
+	CFileCache m_FileCache;
+	BOOL m_bUseFileCache;
 	static BYTE F5LookupTable[4][8];
 	static BYTE F5RevLookupTable[8];
 	COptPageBPBMedia m_OptPagePixelImageMedia;

@@ -174,7 +174,7 @@ BOOL CPNGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	// fill buffer
 	for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
 		CPixelImageMedia::SetScanline(i, row_pointers[i], m_PNGInfo.nChannels == 4 ? 
-			CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA : CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB);
+			CPixelImageMedia::PIXEL_FORMAT_RGBA : CPixelImageMedia::PIXEL_FORMAT_RGB);
 		Progress.Increase(1);
 	}
 
@@ -272,7 +272,7 @@ BOOL CPNGFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 	// fill buffer
 	for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
 		CPixelImageMedia::GetScanline(i, row_pointers[i], m_PNGInfo.nChannels == 4 ?
-			CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGBA : CPixelImageMedia::CPixelBlock::PIXEL_FORMAT_RGB);
+			CPixelImageMedia::PIXEL_FORMAT_RGBA : CPixelImageMedia::PIXEL_FORMAT_RGB);
 		Progress.Increase(1);
 	}
 

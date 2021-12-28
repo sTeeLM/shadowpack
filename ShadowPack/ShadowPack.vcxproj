@@ -215,6 +215,7 @@
     <ClInclude Include="ConfigDlg.h" />
     <ClInclude Include="CorImageMedia.h" />
     <ClInclude Include="crypto_warpper.h" />
+    <ClInclude Include="FileCache.h" />
     <ClInclude Include="JPEGFileMedia.h" />
     <ClInclude Include="LocaleManager.h" />
     <ClInclude Include="MediaOptionDlg.h" />
@@ -260,6 +261,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="FileCache.cpp" />
     <ClCompile Include="JPEGFileMedia.cpp" />
     <ClCompile Include="LocaleManager.cpp" />
     <ClCompile Include="MediaBase.cpp" />
