@@ -26,5 +26,7 @@ public:
 	static CString GetWorkingPath();
 	static BOOL ShowLocationDirDlg(CWnd* pOwner, CString& strDir);
 	static void FillBufferRand(LPBYTE pBuffer, ULONGLONG nSize);
+	static BOOL SetWindowTop(CWnd* pWnd);
+	static BOOL CancelWindowTop(CWnd* pWnd);
 };
 

@@ -315,3 +315,27 @@ void CPackUtils::FillBufferRand(LPBYTE pBuffer, ULONGLONG nSize)
 		p1[i] = rand();
 	}
 }
+//设置窗口置顶
+BOOL CPackUtils::SetWindowTop(CWnd* pWnd)
+{
+	if (pWnd) {
+		if (pWnd->GetExStyle() & WS_EX_TOPMOST)
+		{
+			return TRUE;
+		}
+		else {
+			return pWnd->SetWindowPos(&CWnd::wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		}
+	}
+	return FALSE;
+}
+
+//取消窗口置顶
+BOOL CPackUtils::CancelWindowTop(CWnd* pWnd)
+{
+	if (pWnd) {
+		return pWnd->SetWindowPos(&CWnd::wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	} else {
+		return FALSE;
+	}
+}

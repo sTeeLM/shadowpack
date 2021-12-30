@@ -126,13 +126,13 @@ BOOL CShadowPackDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	ShowWindow(SW_MINIMIZE);
-
 	// TODO: 在此添加额外的初始化代码
 	m_ctlCapicityChart.Initialize(this, IDC_IMAGE_CAPICITY);
 	m_ctlProgress.Initialize(this, IDC_PROGRESS, IDC_INFO_FOOTER);
 	m_ctlFileManager.Initialize(this, IDC_LIST_DATA);
 	UpdateUI();
+
+	ShowWindow(SW_SHOWNORMAL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
