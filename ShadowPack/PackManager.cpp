@@ -216,7 +216,7 @@ BOOL CPackManager::ExportSelectedItemsToDir(LPCTSTR szItemPath, CProgressBase& P
 	CPackItem* pItem = NULL;
 	CString strItemPath;
 	INT nItem;
-	UINT nSize = 0;
+	ULONGLONG nSize = 0;
 
 	// cal total data size!
 	while (pos != NULL) {
@@ -338,7 +338,7 @@ BOOL CPackManager::IsDirty()
 	return m_bDirty || (m_pMedia && m_pMedia->IsMediaDirty());
 }
 
-UINT CPackManager::GetTotalSize()
+ULONGLONG CPackManager::GetTotalSize()
 {
 	return m_nTotalSize;
 }
@@ -513,7 +513,7 @@ BOOL CPackManager::CPackItem::WriteItemToStream(CStreamBase* pStream, CProgressB
 	CT2CA sza((LPCTSTR)m_strFileName);
 	Header.dwSign = PACK_ITEM_SIGN;
 	Header.nDataSize = m_nSize;
-	Header.nNameSize = strlen((LPSTR)sza);
+	Header.nNameSize = (UINT)strlen((LPSTR)sza);
 	Header.nTime = mktime(m_Time.GetLocalTm(&Tm));
 	if (pStream->Write(&Header, sizeof(Header), Progress, Errors)) {
 		if (pStream->Write((LPSTR)sza, Header.nNameSize, Progress, Errors)) {
@@ -564,12 +564,12 @@ CString CPackManager::CPackItem::GetName()
 	return m_strFileName;
 }
 
-UINT CPackManager::CPackItem::GetDataSize()
+ULONGLONG CPackManager::CPackItem::GetDataSize()
 {
 	return m_nSize;
 }
 
-UINT CPackManager::CPackItem::GetTotalSize()
+ULONGLONG CPackManager::CPackItem::GetTotalSize()
 {
 	CT2CA sza((LPCTSTR)m_strFileName);
 

@@ -87,9 +87,9 @@ BOOL CPPMFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	Progress.SetFullScale(m_nRows);
 	m_bError = FALSE;
 	try {
-		for (INT i = 0; i < m_nRows; i++) {
+		for (UINT i = 0; i < m_nRows; i++) {
 			ppm_readppmrow(pFile, row_buffer, m_nCols, maxval, m_nFormat);
-			for (INT j = 0; j < m_nCols; j++) {
+			for (UINT j = 0; j < m_nCols; j++) {
 				CPixelImageMedia::SetPixel(j, i, row_buffer[j].r, row_buffer[j].g, row_buffer[j].b);
 			}
 			Progress.Increase(1);
@@ -179,8 +179,8 @@ BOOL CPPMFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 	m_bError = FALSE;
 	pm_plain_output = 0;
 	try {
-		for (INT i = 0; i < m_nRows; i++) {
-			for (INT j = 0; j < m_nCols; j++) {
+		for (UINT i = 0; i < m_nRows; i++) {
+			for (UINT j = 0; j < m_nCols; j++) {
 				BYTE R, G, B;
 				CPixelImageMedia::GetPixel(j, i, R, G, B);
 				row_buffer[j].r = R;

@@ -167,8 +167,8 @@ SHORT CCorImageMedia::GetCoeff(UINT nComponents, UINT nX, UINT nY, UINT nCoeff)
     }
     return 0;
 }
-
-SHORT& CCorImageMedia::GetCorFromIndex(UINT nIndex)
+//INT_PTR
+SHORT& CCorImageMedia::GetCorFromIndex(ULONGLONG nIndex)
 {
     UINT nComponents, nX, nY, nCoeff;
     ASSERT(nIndex < (UINT)m_CoeffIndex.GetCount());
@@ -194,7 +194,7 @@ SHORT& CCorImageMedia::GetCorFromIndex(UINT nIndex)
     return m_nDummy;
 }
 
-BYTE CCorImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
+BYTE CCorImageMedia::GetByteFromBlocks(ULONGLONG nOffset, UINT nBlockPerByte)
 {
     BYTE nRet = 0;
     ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
@@ -236,7 +236,7 @@ BYTE CCorImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
     return nRet;
 }
 
-void CCorImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte)
+void CCorImageMedia::SetByteToBlocks(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte)
 {
     BYTE nRet = 0;
     ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
@@ -281,20 +281,23 @@ void CCorImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByt
     }
 }
 
-UINT CCorImageMedia::GetTotalBlocks()
+ULONGLONG CCorImageMedia::GetTotalBlocks()
 {
     return m_CoeffIndex.GetCount() / (2);
 }
 
 void CCorImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
+    LARGE_INTEGER li;
     m_OptPageCorImageMedia.m_nCrypto = m_Header.dwBPBCipher;
     m_OptPageCorImageMedia.m_nBytePerBlock = m_Header.dwBPBBlockPerByte - 1;
     m_OptPageCorImageMedia.m_strPasswd1 = m_OptPageCorImageMedia.m_strPasswd2
         = m_Cipher.GetPassword();
     m_OptPageCorImageMedia.m_nTotalBlocks = GetTotalBlocks();
     m_OptPageCorImageMedia.m_nHeaderSize = sizeof(m_Header);
-    m_OptPageCorImageMedia.m_nUsedBytes = m_Header.BPBHeader.dwDataSize;
+    li.HighPart = m_Header.BPBHeader.dwDataSizeHi;
+    li.LowPart = m_Header.BPBHeader.dwDataSizeLow;
+    m_OptPageCorImageMedia.m_nUsedBytes = li.QuadPart;
     m_OptPageCorImageMedia.m_strBlockUnit.LoadString(IDS_OPT_COFF_MEDIA_BLOCK_UNIT);
     pPropertySheet->AddPage(&m_OptPageCorImageMedia);
 }

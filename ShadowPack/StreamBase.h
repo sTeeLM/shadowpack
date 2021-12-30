@@ -17,8 +17,8 @@ public:
 public:
 	virtual BOOL Read(LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors & Error) = 0;
 	virtual BOOL Write(const LPVOID pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors & Error) = 0;
-	virtual BOOL Seek(INT nOffset, SEEK_TYPE_T Org,  CPackErrors & Error) = 0;
-	virtual UINT GetOffset() { return m_nOffset; }
+	virtual BOOL Seek(LONGLONG nOffset, SEEK_TYPE_T Org,  CPackErrors & Error) = 0;
+	virtual ULONGLONG GetOffset() { return m_nOffset; }
 protected:
-	UINT m_nOffset;
+	ULONGLONG m_nOffset;
 };

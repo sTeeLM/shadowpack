@@ -42,8 +42,8 @@ protected:
 		BOOL WriteItemToStream(CStreamBase* pStream, CProgressBase& Progress, CPackErrors& Errors);
 		BOOL WriteItemToFile(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors);
 		CString GetName();
-		UINT GetDataSize();
-		UINT GetTotalSize();
+		ULONGLONG GetDataSize();
+		ULONGLONG GetTotalSize();
 		CString FormatDateItme();
 	};
 
@@ -72,7 +72,7 @@ public:
 
 	virtual BOOL IsDirty();
 
-	virtual UINT GetTotalSize();
+	virtual ULONGLONG GetTotalSize();
 
 private:
 	BOOL InsertPackItem(CPackItem * pItem, CPackErrors& Errors);
@@ -80,7 +80,7 @@ private:
 private:
 	CMediaBase* m_pMedia;
 	CString m_strMediaPath;
-	UINT m_nTotalSize;
+	ULONGLONG m_nTotalSize;
 	BOOL m_bDirty;
 };
 

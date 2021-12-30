@@ -468,7 +468,8 @@ void CShadowPackDlg::UpdateUI()
 	GetDlgItem(IDC_BTN_CANCEL)->EnableWindow(m_bInProgress);
 
 	if (m_ctlFileManager.GetMedia() && m_ctlFileManager.GetMedia()->GetMediaTotalBytes() > 0) {
-		nPercent = (m_ctlFileManager.GetMedia()->GetMediaTotalBytes() - m_ctlFileManager.GetMedia()->GetMediaUsedBytes()) * 100 / m_ctlFileManager.GetMedia()->GetMediaTotalBytes();
+		nPercent = (INT)((m_ctlFileManager.GetMedia()->GetMediaTotalBytes() - m_ctlFileManager.GetMedia()->GetMediaUsedBytes()) * 100 
+			/ m_ctlFileManager.GetMedia()->GetMediaTotalBytes());
 		CPackUtils::TranslateSize(m_ctlFileManager.GetMedia()->GetMediaTotalBytes(), strTotal);
 		CPackUtils::TranslateSize(m_ctlFileManager.GetMedia()->GetMediaUsedBytes(), strUsed);
 	} else {

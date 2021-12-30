@@ -41,9 +41,9 @@ public:
 	BYTE& GetPixelA(UINT nX, UINT nY);
 
 	// 实现父类接口，实现这几个接口让父类调用
-	BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte);
-	void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);
-	UINT GetTotalBlocks();
+	BYTE GetByteFromBlocks(ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteToBlocks(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+	ULONGLONG GetTotalBlocks();
 
 	// 实现CMediaBase接口
 	// 添加opt page

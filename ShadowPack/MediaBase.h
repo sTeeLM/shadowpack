@@ -18,7 +18,8 @@ protected:
 	{
 		DWORD dwSign;
 		DWORD dwHeaderSize;
-		DWORD dwDataSize;
+		DWORD dwDataSizeHi;
+		DWORD dwDataSizeLow;
 	}MEDIA_HEADER_T;
 public:
 // open and close
@@ -41,9 +42,9 @@ public:
 	virtual CStreamBase * GetStream() = 0;
 
 // size
-	virtual UINT GetMediaUsedBytes() = 0;
-	virtual UINT GetMediaTotalBytes() = 0;
-	virtual BOOL SetMediaUsedBytes(UINT nSize, CPackErrors& Error) = 0;
+	virtual ULONGLONG GetMediaUsedBytes() = 0;
+	virtual ULONGLONG GetMediaTotalBytes() = 0;
+	virtual BOOL SetMediaUsedBytes(ULONGLONG nSize, CPackErrors& Error) = 0;
 
 // misc
 	virtual BOOL IsMediaDirty() = 0;

@@ -42,10 +42,10 @@ public:
 	CPackCipher(void);
 	virtual ~CPackCipher(void);
 	BOOL SetKeyType(PACK_CIPHER_TYPE_T type,LPCTSTR szPassword);
-	void EncryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset);
-	void EncryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset);
-	void DecryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset);
-	void DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset);
+	void EncryptBlock(LPVOID pBuffer, UINT nSize, ULONGLONG nOffset);
+	void EncryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, UINT nSize, ULONGLONG nOffset);
+	void DecryptBlock(LPVOID pBuffer, UINT nSize, ULONGLONG nOffset);
+	void DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, UINT nSize, ULONGLONG nOffset);
 	PACK_CIPHER_TYPE_T GetCipherType(){return m_Type;}
 	CString GetPassword();
 	static UINT GetCipherCount();
@@ -53,7 +53,7 @@ public:
 private:
 	void GenerateIV(BYTE iv[CIPHER_BLOCK_SIZE], ULONGLONG nIndex);
 	void GenerateKey(LPCTSTR szPassword);
-	void Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL bIsEncrypt, ULONGLONG nOffset);
+	void Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, UINT nSize, BOOL bIsEncrypt, ULONGLONG nOffset);
 private:
 	BYTE m_Key[CIPHER_BLOCK_SIZE];
 	PACK_CIPHER_TYPE_T m_Type;

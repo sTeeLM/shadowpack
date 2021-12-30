@@ -36,6 +36,6 @@ public:
 
 	virtual BOOL IsDirty() = 0;
 
-	virtual UINT GetTotalSize() = 0;
+	virtual ULONGLONG GetTotalSize() = 0;
 
 };

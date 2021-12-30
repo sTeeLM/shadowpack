@@ -11,29 +11,38 @@ CPackUtils::~CPackUtils(void)
 {
 }
 
+#define P_BYTES 1099511627776L
+#define G_BYTES 1073741824
+#define M_BYTES 1048576
+#define K_BYTES 1024
 
-void CPackUtils::TranslateSize(LONGLONG nSize, CString & strOut)
+void CPackUtils::TranslateSize(ULONGLONG nSize, CString & strOut)
 {
 	double dSize;
-	LONGLONG r;
-	if(nSize > 1024 * 1024 * 1024) {
-		r = nSize / (1024 * 1024 * 1024);
-		nSize %= (1024 * 1024 * 1024);
-		dSize = (double)r + (double)nSize / (1024 * 1024 * 1024);
-		strOut.Format(_T("%.1f G"), dSize);
-	} else if(nSize > 1024 * 1024) {
-		r = nSize / (1024 * 1024);
-		nSize %= (1024 * 1024);
-		dSize = (double)r + (double)nSize / (1024 * 1024);
-		strOut.Format(_T("%.1f M"), dSize);
-	} else if(nSize > 1024) {
-		r = nSize / (1024);
-		nSize %= (1024);
-		dSize = (double)r + (double)nSize / (1024);
-		strOut.Format(_T("%.1f K"), dSize);
+	ULONGLONG r;
+	if (nSize > P_BYTES) {
+		r = nSize / (P_BYTES);
+		nSize %= (P_BYTES);
+		dSize = (double)r + (double)nSize / (P_BYTES);
+		strOut.Format(_T("%.1f PB"), dSize);
+	} else if (nSize > G_BYTES) {
+		r = nSize / (G_BYTES);
+		nSize %= (G_BYTES);
+		dSize = (double)r + (double)nSize / (G_BYTES);
+		strOut.Format(_T("%.1f GB"), dSize);
+	} else if(nSize > M_BYTES) {
+		r = nSize / (M_BYTES);
+		nSize %= (M_BYTES);
+		dSize = (double)r + (double)nSize / (M_BYTES);
+		strOut.Format(_T("%.1f MB"), dSize);
+	} else if(nSize > K_BYTES) {
+		r = nSize / (K_BYTES);
+		nSize %= (K_BYTES);
+		dSize = (double)r + (double)nSize / (K_BYTES);
+		strOut.Format(_T("%.1f KB"), dSize);
 	} else {
 		dSize = (double) nSize;
-		strOut.Format(_T("%.1f"), dSize);
+		strOut.Format(_T("%.1f B"), dSize);
 	}
 }
 
@@ -291,13 +300,13 @@ CString CPackUtils::GetLastStdError(int err)
 	return strMessage;
 }
 
-void CPackUtils::FillBufferRand(LPBYTE pBuffer, UINT nSize)
+void CPackUtils::FillBufferRand(LPBYTE pBuffer, ULONGLONG nSize)
 {
 	int* p = NULL;
 	LPBYTE p1 = NULL;
 	srand((unsigned)time(NULL));
 	p = (int*)pBuffer;
-	for (INT i = 0; i < nSize / sizeof(int); i++) {
+	for (ULONGLONG i = 0; i < nSize / sizeof(int); i++) {
 		*p = rand();
 		p++;
 	}

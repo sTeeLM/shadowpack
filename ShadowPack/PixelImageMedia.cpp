@@ -265,20 +265,23 @@ void CPixelImageMedia::GetScanlinePerChannel(UINT nY, LPBYTE pBuffer, CPixelImag
 	}
 }
 
-UINT CPixelImageMedia::GetTotalBlocks()
+ULONGLONG CPixelImageMedia::GetTotalBlocks()
 {
 	return m_nWidth * m_nHeight;
 }
 
 void CPixelImageMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
+	LARGE_INTEGER li;
 	m_OptPagePixelImageMedia.m_nCrypto = m_Header.dwBPBCipher;
 	m_OptPagePixelImageMedia.m_nBytePerBlock = m_Header.dwBPBBlockPerByte - 1;
 	m_OptPagePixelImageMedia.m_strPasswd1 = m_OptPagePixelImageMedia.m_strPasswd2
 		= m_Cipher.GetPassword();
 	m_OptPagePixelImageMedia.m_nTotalBlocks = GetTotalBlocks();
 	m_OptPagePixelImageMedia.m_nHeaderSize = sizeof(m_Header);
-	m_OptPagePixelImageMedia.m_nUsedBytes = m_Header.BPBHeader.dwDataSize;
+	li.HighPart = m_Header.BPBHeader.dwDataSizeHi;
+	li.LowPart = m_Header.BPBHeader.dwDataSizeLow;
+	m_OptPagePixelImageMedia.m_nUsedBytes = li.QuadPart;
 	m_OptPagePixelImageMedia.m_strBlockUnit.LoadString(IDS_OPT_PIXEL_MEDIA_BLOCK_UNIT);
 	pPropertySheet->AddPage(&m_OptPagePixelImageMedia);
 }
@@ -393,7 +396,7 @@ BYTE CPixelImageMedia::F5RevLookupTable[8] = {
 	0,1,2,3,3,2,1,0
 };
 
-BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
+BYTE CPixelImageMedia::GetByteFromBlocks(ULONGLONG nOffset, UINT nBlockPerByte)
 {
 	ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
 	IMAGE_PIXEL_T* pPixelBlock = m_pBlockBuffer; // this always is first object!
@@ -455,7 +458,7 @@ BYTE CPixelImageMedia::GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte)
 	return nRet;
 }
 
-void CPixelImageMedia::SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte)
+void CPixelImageMedia::SetByteToBlocks(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte)
 {
 	ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
 	IMAGE_PIXEL_T * pPixelBlock = m_pBlockBuffer; // this always is first object!

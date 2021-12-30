@@ -41,7 +41,7 @@ protected:
 		INT  nBitDepth;
 		UINT nWidth;
 		UINT nHeight;
-		UINT nRowBytes;
+		ULONGLONG nRowBytes;
 		INT nInterlaceType;
 		INT nCompressionType;
 		INT nFilterType;

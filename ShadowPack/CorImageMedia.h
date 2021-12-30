@@ -26,9 +26,9 @@ public:
 
 public:
 	// 实现父类接口，实现这几个接口让父类调用
-	BYTE GetByteFromBlocks(UINT nOffset, UINT nBlockPerByte);
-	void SetByteToBlocks(BYTE nData, UINT nOffset, UINT nBlockPerByte);
-	UINT GetTotalBlocks();
+	BYTE GetByteFromBlocks(ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteToBlocks(BYTE nData, ULONGLONG ULONGLONG, UINT nBlockPerByte);
+	ULONGLONG GetTotalBlocks();
 
 	// 实现CMediaBase接口
 	// 添加opt page
@@ -37,7 +37,7 @@ public:
 
 private:
 	UINT DivRoundup(UINT a, UINT b);
-	SHORT& GetCorFromIndex(UINT nIndex);
+	SHORT& GetCorFromIndex(ULONGLONG nIndex);
 private:
 	UINT m_nComponents;
 	UINT m_nTotalCoeffs;

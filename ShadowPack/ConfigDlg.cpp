@@ -84,7 +84,7 @@ END_MESSAGE_MAP()
 BOOL CConfigDlg::OnInitDialog()
 {
 	if (CDialogEx::OnInitDialog()) {
-		for (INT i = 0; i < CLocaleManager::GetLocaleCount(); i++) {
+		for (UINT i = 0; i < CLocaleManager::GetLocaleCount(); i++) {
 			m_ctlComboLang.AddString(CLocaleManager::GetLocalName(i));
 		}
 		m_ctlComboLang.SetCurSel(m_nCurrentLocale);

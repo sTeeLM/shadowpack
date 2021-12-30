@@ -9,7 +9,7 @@ private:
 	virtual ~CPackUtils(void);
 public:
 
-	static void TranslateSize(LONGLONG nSize, CString & strOut);
+	static void TranslateSize(ULONGLONG nSize, CString & strOut);
 	static BOOL GetFileSize(LPCTSTR szPath,ULONGLONG & size);
 	static BOOL WalkDir(LPCTSTR szPath, CB_WALK_DIR cb, LPVOID pParam, BOOL bSkipError = TRUE, INT nLevel = -1);
 	static size_t ST2SA(LPCTSTR szSrc, CStringA & szDst);
@@ -25,6 +25,6 @@ public:
 	static CString GetLastStdError(int err);
 	static CString GetWorkingPath();
 	static BOOL ShowLocationDirDlg(CWnd* pOwner, CString& strDir);
-	static void FillBufferRand(LPBYTE pBuffer, UINT nSize);
+	static void FillBufferRand(LPBYTE pBuffer, ULONGLONG nSize);
 };
 

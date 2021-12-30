@@ -64,7 +64,7 @@ void COptPageBPBMedia::SetBPBInfo()
 BOOL COptPageBPBMedia::OnInitDialog()
 {
 	if (CMFCPropertyPage::OnInitDialog()) {
-		for (INT i = 0; i < CPackCipher::GetCipherCount(); i++) {
+		for (UINT i = 0; i < CPackCipher::GetCipherCount(); i++) {
 			m_ctlCrypto.AddString(CPackCipher::GetCipherName(i));
 		}
 		m_ctlCrypto.SetCurSel(m_nCrypto);

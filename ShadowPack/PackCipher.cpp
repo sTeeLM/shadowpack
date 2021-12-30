@@ -113,7 +113,7 @@ BOOL CPackCipher::SetKeyType(PACK_CIPHER_TYPE_T type,LPCTSTR szPassword)
 	return TRUE;
 }
 
-void CPackCipher::Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, BOOL bIsEncrypt, ULONGLONG nOffset)
+void CPackCipher::Crypt(LPVOID pBufferFrom, LPVOID pBufferTo, UINT nSize, BOOL bIsEncrypt, ULONGLONG nOffset)
 {
 	// 根据计算nIndex计算block index
 	ULONGLONG nBlockIndex = nOffset / CIPHER_BLOCK_SIZE;
@@ -168,22 +168,22 @@ CString CPackCipher::GetPassword()
 	return m_strPassword;
 }
 
-void CPackCipher::EncryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset)
+void CPackCipher::EncryptBlock(LPVOID pBuffer, UINT nSize, ULONGLONG nOffset)
 {
 	Crypt(pBuffer, pBuffer, nSize, TRUE, nOffset);
 }
 
-void CPackCipher::EncryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset)
+void CPackCipher::EncryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, UINT nSize, ULONGLONG nOffset)
 {
 	Crypt(pBufferFrom, pBufferTo, nSize, TRUE, nOffset);
 }
 
-void CPackCipher::DecryptBlock(LPVOID pBuffer, size_t nSize, ULONGLONG nOffset)
+void CPackCipher::DecryptBlock(LPVOID pBuffer, UINT nSize, ULONGLONG nOffset)
 {
 	Crypt(pBuffer, pBuffer, nSize, FALSE, nOffset);
 }
 
-void CPackCipher::DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, size_t nSize, ULONGLONG nOffset)
+void CPackCipher::DecryptBlock(LPVOID pBufferFrom, LPVOID pBufferTo, UINT nSize, ULONGLONG nOffset)
 {
 	Crypt(pBufferFrom, pBufferTo, nSize, FALSE, nOffset);
 }
