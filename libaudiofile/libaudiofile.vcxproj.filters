@@ -1,0 +1,390 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libaudiofile\aes.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\af_vfs.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\AIFF.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\AudioFormat.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\aupv.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\AVR.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\Buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\CAF.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\compression.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\data.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\debug.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\error.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\extended.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\File.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\FileHandle.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\FLACFile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\format.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\g711.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\IFF.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\Instrument.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\IRCAM.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\Loop.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\Marker.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\Miscellaneous.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\NeXT.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\NIST.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\openclose.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\PacketTable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\pcm_internal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\query.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\Raw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\SampleVision.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\Setup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\Track.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\units.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\UUID.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\VOC.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\WAVE.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\ag_dec.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\ag_enc.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\ALACBitUtilities.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\ALACDecoder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\ALACEncoder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\dp_dec.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\dp_enc.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\EndianPortable.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\matrix_dec.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\alac\matrix_enc.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\ALAC.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\BlockCodec.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\FileModule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\FLAC.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\G711.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\IMA.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\Module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\ModuleState.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\MSADPCM.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\PCM.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\RebufferModule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libaudiofile\modules\SimpleModule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libaudiofile\af_vfs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\afinternal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\AIFF.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\audiofile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\AudioFormat.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\aupvinternal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\aupvlist.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\AVR.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Buffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\byteorder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\CAF.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Compiler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\compression.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\debug.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\error.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\extended.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Features.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\File.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\FileHandle.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\FLACFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\g711.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\IFF.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Instrument.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\IRCAM.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Marker.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\NeXT.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\NIST.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\PacketTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\pcm_internal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Raw.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\SampleVision.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Setup.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Shared.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Tag.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\Track.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\units.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\UUID.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\VOC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\WAVE.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\alac\aglib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\alac\ALACAudioTypes.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\alac\ALACBitUtilities.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\alac\ALACDecoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\alac\ALACEncoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\alac\dplib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\alac\EndianPortable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\alac\matrixlib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\ALAC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\BlockCodec.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\FileModule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\FLAC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\G711.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\IMA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\Module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\ModuleState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\MSADPCM.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\PCM.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\RebufferModule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libaudiofile\modules\SimpleModule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="unistd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

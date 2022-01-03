@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libaudiofile\aes.cpp" />
+    <ClCompile Include="libaudiofile\af_vfs.cpp" />
+    <ClCompile Include="libaudiofile\AIFF.cpp" />
+    <ClCompile Include="libaudiofile\alac\ag_dec.c" />
+    <ClCompile Include="libaudiofile\alac\ag_enc.c" />
+    <ClCompile Include="libaudiofile\alac\ALACBitUtilities.c" />
+    <ClCompile Include="libaudiofile\alac\ALACDecoder.cpp" />
+    <ClCompile Include="libaudiofile\alac\ALACEncoder.cpp" />
+    <ClCompile Include="libaudiofile\alac\dp_dec.c" />
+    <ClCompile Include="libaudiofile\alac\dp_enc.c" />
+    <ClCompile Include="libaudiofile\alac\EndianPortable.c" />
+    <ClCompile Include="libaudiofile\alac\matrix_dec.c" />
+    <ClCompile Include="libaudiofile\alac\matrix_enc.c" />
+    <ClCompile Include="libaudiofile\AudioFormat.cpp" />
+    <ClCompile Include="libaudiofile\aupv.c" />
+    <ClCompile Include="libaudiofile\AVR.cpp" />
+    <ClCompile Include="libaudiofile\Buffer.cpp" />
+    <ClCompile Include="libaudiofile\CAF.cpp" />
+    <ClCompile Include="libaudiofile\compression.cpp" />
+    <ClCompile Include="libaudiofile\data.cpp" />
+    <ClCompile Include="libaudiofile\debug.cpp" />
+    <ClCompile Include="libaudiofile\error.c" />
+    <ClCompile Include="libaudiofile\extended.c" />
+    <ClCompile Include="libaudiofile\File.cpp" />
+    <ClCompile Include="libaudiofile\FileHandle.cpp" />
+    <ClCompile Include="libaudiofile\FLACFile.cpp" />
+    <ClCompile Include="libaudiofile\format.cpp" />
+    <ClCompile Include="libaudiofile\g711.c" />
+    <ClCompile Include="libaudiofile\IFF.cpp" />
+    <ClCompile Include="libaudiofile\Instrument.cpp" />
+    <ClCompile Include="libaudiofile\IRCAM.cpp" />
+    <ClCompile Include="libaudiofile\Loop.cpp" />
+    <ClCompile Include="libaudiofile\Marker.cpp" />
+    <ClCompile Include="libaudiofile\Miscellaneous.cpp" />
+    <ClCompile Include="libaudiofile\modules\ALAC.cpp" />
+    <ClCompile Include="libaudiofile\modules\BlockCodec.cpp" />
+    <ClCompile Include="libaudiofile\modules\FileModule.cpp" />
+    <ClCompile Include="libaudiofile\modules\FLAC.cpp" />
+    <ClCompile Include="libaudiofile\modules\G711.cpp" />
+    <ClCompile Include="libaudiofile\modules\IMA.cpp" />
+    <ClCompile Include="libaudiofile\modules\Module.cpp" />
+    <ClCompile Include="libaudiofile\modules\ModuleState.cpp" />
+    <ClCompile Include="libaudiofile\modules\MSADPCM.cpp" />
+    <ClCompile Include="libaudiofile\modules\PCM.cpp" />
+    <ClCompile Include="libaudiofile\modules\RebufferModule.cpp" />
+    <ClCompile Include="libaudiofile\modules\SimpleModule.cpp" />
+    <ClCompile Include="libaudiofile\NeXT.cpp" />
+    <ClCompile Include="libaudiofile\NIST.cpp" />
+    <ClCompile Include="libaudiofile\openclose.cpp" />
+    <ClCompile Include="libaudiofile\PacketTable.cpp" />
+    <ClCompile Include="libaudiofile\pcm_internal.cpp" />
+    <ClCompile Include="libaudiofile\query.cpp" />
+    <ClCompile Include="libaudiofile\Raw.cpp" />
+    <ClCompile Include="libaudiofile\SampleVision.cpp" />
+    <ClCompile Include="libaudiofile\Setup.cpp" />
+    <ClCompile Include="libaudiofile\Track.cpp" />
+    <ClCompile Include="libaudiofile\units.cpp" />
+    <ClCompile Include="libaudiofile\util.cpp" />
+    <ClCompile Include="libaudiofile\UUID.cpp" />
+    <ClCompile Include="libaudiofile\VOC.cpp" />
+    <ClCompile Include="libaudiofile\WAVE.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config.h" />
+    <ClInclude Include="libaudiofile\afinternal.h" />
+    <ClInclude Include="libaudiofile\af_vfs.h" />
+    <ClInclude Include="libaudiofile\AIFF.h" />
+    <ClInclude Include="libaudiofile\alac\aglib.h" />
+    <ClInclude Include="libaudiofile\alac\ALACAudioTypes.h" />
+    <ClInclude Include="libaudiofile\alac\ALACBitUtilities.h" />
+    <ClInclude Include="libaudiofile\alac\ALACDecoder.h" />
+    <ClInclude Include="libaudiofile\alac\ALACEncoder.h" />
+    <ClInclude Include="libaudiofile\alac\dplib.h" />
+    <ClInclude Include="libaudiofile\alac\EndianPortable.h" />
+    <ClInclude Include="libaudiofile\alac\matrixlib.h" />
+    <ClInclude Include="libaudiofile\audiofile.h" />
+    <ClInclude Include="libaudiofile\AudioFormat.h" />
+    <ClInclude Include="libaudiofile\aupvinternal.h" />
+    <ClInclude Include="libaudiofile\aupvlist.h" />
+    <ClInclude Include="libaudiofile\AVR.h" />
+    <ClInclude Include="libaudiofile\Buffer.h" />
+    <ClInclude Include="libaudiofile\byteorder.h" />
+    <ClInclude Include="libaudiofile\CAF.h" />
+    <ClInclude Include="libaudiofile\Compiler.h" />
+    <ClInclude Include="libaudiofile\compression.h" />
+    <ClInclude Include="libaudiofile\debug.h" />
+    <ClInclude Include="libaudiofile\error.h" />
+    <ClInclude Include="libaudiofile\extended.h" />
+    <ClInclude Include="libaudiofile\Features.h" />
+    <ClInclude Include="libaudiofile\File.h" />
+    <ClInclude Include="libaudiofile\FileHandle.h" />
+    <ClInclude Include="libaudiofile\FLACFile.h" />
+    <ClInclude Include="libaudiofile\g711.h" />
+    <ClInclude Include="libaudiofile\IFF.h" />
+    <ClInclude Include="libaudiofile\Instrument.h" />
+    <ClInclude Include="libaudiofile\IRCAM.h" />
+    <ClInclude Include="libaudiofile\Marker.h" />
+    <ClInclude Include="libaudiofile\modules\ALAC.h" />
+    <ClInclude Include="libaudiofile\modules\BlockCodec.h" />
+    <ClInclude Include="libaudiofile\modules\FileModule.h" />
+    <ClInclude Include="libaudiofile\modules\FLAC.h" />
+    <ClInclude Include="libaudiofile\modules\G711.h" />
+    <ClInclude Include="libaudiofile\modules\IMA.h" />
+    <ClInclude Include="libaudiofile\modules\Module.h" />
+    <ClInclude Include="libaudiofile\modules\ModuleState.h" />
+    <ClInclude Include="libaudiofile\modules\MSADPCM.h" />
+    <ClInclude Include="libaudiofile\modules\PCM.h" />
+    <ClInclude Include="libaudiofile\modules\RebufferModule.h" />
+    <ClInclude Include="libaudiofile\modules\SimpleModule.h" />
+    <ClInclude Include="libaudiofile\NeXT.h" />
+    <ClInclude Include="libaudiofile\NIST.h" />
+    <ClInclude Include="libaudiofile\PacketTable.h" />
+    <ClInclude Include="libaudiofile\pcm_internal.h" />
+    <ClInclude Include="libaudiofile\Raw.h" />
+    <ClInclude Include="libaudiofile\SampleVision.h" />
+    <ClInclude Include="libaudiofile\Setup.h" />
+    <ClInclude Include="libaudiofile\Shared.h" />
+    <ClInclude Include="libaudiofile\Tag.h" />
+    <ClInclude Include="libaudiofile\Track.h" />
+    <ClInclude Include="libaudiofile\units.h" />
+    <ClInclude Include="libaudiofile\util.h" />
+    <ClInclude Include="libaudiofile\UUID.h" />
+    <ClInclude Include="libaudiofile\VOC.h" />
+    <ClInclude Include="libaudiofile\WAVE.h" />
+    <ClInclude Include="unistd.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{65816179-4deb-4f1b-a777-1f0bc027d24d}</ProjectGuid>
+    <RootNamespace>libaudiofile</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\$(Configuration)\$(PlatformName)\lib\</OutDir>
+    <IntDir>..\$(Configuration)\$(PlatformName)\libaudiofile\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\$(Configuration)\$(PlatformName)\lib\</OutDir>
+    <IntDir>..\$(Configuration)\$(PlatformName)\libaudiofile\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\$(Configuration)\$(PlatformName)\lib\</OutDir>
+    <IntDir>..\$(Configuration)\$(PlatformName)\libaudiofile\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\$(Configuration)\$(PlatformName)\lib\</OutDir>
+    <IntDir>..\$(Configuration)\$(PlatformName)\libaudiofile\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\libaudiofile;..\libaudiofile\libaudiofile;..\libaudiofile\libaudiofile\modules;..\libaudiofile\libaudiofile\alac;..\libflac\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\libaudiofile;..\libaudiofile\libaudiofile;..\libaudiofile\libaudiofile\modules;..\libaudiofile\libaudiofile\alac;..\libflac\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\libaudiofile;..\libaudiofile\libaudiofile;..\libaudiofile\libaudiofile\modules;..\libaudiofile\libaudiofile\alac;..\libflac\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\libaudiofile;..\libaudiofile\libaudiofile;..\libaudiofile\libaudiofile\modules;..\libaudiofile\libaudiofile\alac;..\libflac\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
