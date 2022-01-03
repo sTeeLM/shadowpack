@@ -43,11 +43,9 @@ jobs:
       run: .\pack.bat
 
     - name: Pack
-      uses: papeloto/action-zip@v1
+      uses: montudor/action-zip@v1
       with:
-        files: Release/zip
-        recursive: true
-        dest: latest.zip
+        args: zip -qq -r latest.zip Release/zip
 
     - name: upload
       uses: marvinpinto/action-automatic-releases@latest
