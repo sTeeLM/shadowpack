@@ -39,14 +39,8 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild -maxCpuCount:4 /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM_X64}} ${{env.SOLUTION_FILE_PATH}}
     
-    - name: Pre-Pack
-      run: .\pack.bat
-
     - name: Pack
-      uses: montudor/action-zip@v1
-      with:
-        files: Release/zip
-        dest: latest.zip
+      run: .\pack.bat
 
     - name: upload
       uses: marvinpinto/action-automatic-releases@latest

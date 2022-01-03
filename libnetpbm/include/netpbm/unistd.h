@@ -13,7 +13,7 @@
 typedef __int64 ssize_t;
 typedef __int64 pid_t;
 #else
-typedef unsigned int     ssize_t;
+typedef int     ssize_t;
 typedef int pid_t;
 #endif
 
