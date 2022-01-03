@@ -45,7 +45,8 @@ jobs:
     - name: Pack
       uses: montudor/action-zip@v1
       with:
-        args: zip -qq -r latest.zip Release/zip
+        files: Release/zip
+        dest: latest.zip
 
     - name: upload
       uses: marvinpinto/action-automatic-releases@latest
