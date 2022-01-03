@@ -8,6 +8,7 @@ CPNGFileMedia::CPNGFileMedia() :
 	m_strLastError(_T("")),
 	pProgress(NULL)
 {
+
 }
 
 CPNGFileMedia::~CPNGFileMedia()
@@ -16,7 +17,6 @@ CPNGFileMedia::~CPNGFileMedia()
 
 void CPNGFileMedia::ErrCallback(png_structp png_ptr, png_const_charp message)
 {
-	
 	CPNGFileMedia* pThis = (CPNGFileMedia*)png_get_error_ptr(png_ptr);
 	if (!pThis->m_bError) {
 		CA2CT szMessage(message);
@@ -50,6 +50,7 @@ BOOL CPNGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	png_infop	info_ptr = NULL;//png图像信息句柄
 	BYTE checkheader[PNG_BYTES_TO_CHECK]; //查询是否png头
 	png_bytepp row_pointers = NULL;
+	png_bytep  row_pointer_cache = NULL;
 	BOOL bRet = FALSE;
 
 	if (_tfopen_s(&fp, szFilePath, _T("rb")) != 0 || fp == NULL) {
@@ -142,11 +143,21 @@ BOOL CPNGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		row_pointers[i] = NULL;
 	}
 
-	for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
-		row_pointers[i] = (png_bytep)malloc(m_PNGInfo.nRowBytes);
-		if (!row_pointers[i]) {
-			Errors.SetError(CPackErrors::PE_NOMEM);
+	if (!m_bUseFileCache) {
+		for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
+			row_pointers[i] = (png_bytep)malloc(m_PNGInfo.nRowBytes);
+			if (!row_pointers[i]) {
+				Errors.SetError(CPackErrors::PE_NOMEM);
+				goto error;
+			}
+		}
+	} else {
+		row_pointer_cache = (png_bytep)m_FileCache.Alloc(m_PNGInfo.nRowBytes * m_PNGInfo.nHeight, Errors);
+		if (!row_pointer_cache) {
 			goto error;
+		}
+		for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
+			row_pointers[i] = row_pointer_cache + i * m_PNGInfo.nRowBytes;
 		}
 	}
 
@@ -176,6 +187,9 @@ BOOL CPNGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		CPixelImageMedia::SetScanline(i, row_pointers[i], m_PNGInfo.nChannels == 4 ? 
 			CPixelImageMedia::PIXEL_FORMAT_RGBA : CPixelImageMedia::PIXEL_FORMAT_RGB);
 		Progress.Increase(1);
+		if (Progress.IsCanceled(Errors)) {
+			goto error;
+		}
 	}
 
 	// test format
@@ -189,15 +203,27 @@ error:
 		fclose(fp);
 		fp = NULL;
 	}
-	if (row_pointers) {
-		for (UINT row = 0; row < m_PNGInfo.nHeight; row++) {
-			if (row_pointers[row]) {
-				free(row_pointers[row]);
-				row_pointers[row] = NULL;
+	if (!m_bUseFileCache) {
+		if (row_pointers) {
+			for (UINT row = 0; row < m_PNGInfo.nHeight; row++) {
+				if (row_pointers[row]) {
+					free(row_pointers[row]);
+					row_pointers[row] = NULL;
+				}
 			}
+			free(row_pointers);
+			row_pointers = NULL;
 		}
-		free(row_pointers);
-		row_pointers = NULL;
+	}
+	else {
+		if (row_pointers) {
+			free(row_pointers);
+			row_pointers = NULL;
+		}
+		if (row_pointer_cache) {
+			m_FileCache.Free(row_pointer_cache);
+			row_pointer_cache = NULL;
+		}
 	}
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 	if (!bRet)
@@ -212,6 +238,7 @@ BOOL CPNGFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 	png_infop	info_ptr = NULL;//png图像信息句柄
 	BOOL bRet = FALSE;
 	png_bytepp row_pointers = NULL;
+	png_bytep row_pointer_cache = NULL;
 
 	row_pointers = (png_bytepp)malloc(m_PNGInfo.nHeight * (sizeof(png_bytep)));
 	if (!row_pointers) {
@@ -227,11 +254,22 @@ BOOL CPNGFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		row_pointers[i] = NULL;
 	}
 
-	for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
-		row_pointers[i] = (png_bytep)malloc(m_PNGInfo.nRowBytes);
-		if (!row_pointers[i]) {
-			Errors.SetError(CPackErrors::PE_NOMEM);
+	if (!m_bUseFileCache) {
+		for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
+			row_pointers[i] = (png_bytep)malloc(m_PNGInfo.nRowBytes);
+			if (!row_pointers[i]) {
+				Errors.SetError(CPackErrors::PE_NOMEM);
+				goto error;
+			}
+		}
+	}
+	else {
+		row_pointer_cache = (png_bytep)m_FileCache.Alloc(m_PNGInfo.nRowBytes * m_PNGInfo.nHeight, Errors);
+		if (!row_pointer_cache) {
 			goto error;
+		}
+		for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
+			row_pointers[i] = row_pointer_cache + i * m_PNGInfo.nRowBytes;
 		}
 	}
 
@@ -274,6 +312,9 @@ BOOL CPNGFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		CPixelImageMedia::GetScanline(i, row_pointers[i], m_PNGInfo.nChannels == 4 ?
 			CPixelImageMedia::PIXEL_FORMAT_RGBA : CPixelImageMedia::PIXEL_FORMAT_RGB);
 		Progress.Increase(1);
+		if (Progress.IsCanceled(Errors)) {
+			goto error;
+		}
 	}
 
 	m_bError = FALSE;
@@ -305,15 +346,27 @@ error:
 		fclose(fp);
 		fp = NULL;
 	}
-	if (row_pointers) {
-		for (UINT row = 0; row < m_PNGInfo.nHeight; row++) {
-			if (row_pointers[row]) {
-				free(row_pointers[row]);
-				row_pointers[row] = NULL;
+	if (!m_bUseFileCache) {
+		if (row_pointers) {
+			for (UINT row = 0; row < m_PNGInfo.nHeight; row++) {
+				if (row_pointers[row]) {
+					free(row_pointers[row]);
+					row_pointers[row] = NULL;
+				}
 			}
+			free(row_pointers);
+			row_pointers = NULL;
 		}
-		free(row_pointers);
-		row_pointers = NULL;
+	}
+	else {
+		if (row_pointers) {
+			free(row_pointers);
+			row_pointers = NULL;
+		}
+		if (row_pointer_cache) {
+			m_FileCache.Free(row_pointer_cache);
+			row_pointer_cache = NULL;
+		}
 	}
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 	return bRet;
@@ -346,14 +399,14 @@ BOOL CPNGFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
-BOOL CPNGFileMedia::TestExt(LPCTSTR szExt)
+LPCTSTR CPNGFileMedia::GetName()
 {
-    return lstrcmpi(szExt, m_szExt) == 0;
+	return m_szName;
 }
 
-LPCTSTR CPNGFileMedia::GetExtFilter()
+LPCTSTR* CPNGFileMedia::GetExtTable()
 {
-    return m_szFilter;
+	return m_szExtTable;
 }
 
 CMediaBase* CPNGFileMedia::Factory()
@@ -361,5 +414,8 @@ CMediaBase* CPNGFileMedia::Factory()
     return new(std::nothrow) CPNGFileMedia();
 }
 
-LPCTSTR CPNGFileMedia::m_szFilter = _T("PNG Files (*.png)|*.png|");
-LPCTSTR CPNGFileMedia::m_szExt = _T("PNG");
+LPCTSTR CPNGFileMedia::m_szExtTable[] = {
+	_T("png"),
+	NULL
+};
+LPCTSTR CPNGFileMedia::m_szName = _T("Portable Network Graphic");

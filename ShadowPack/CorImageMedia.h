@@ -1,6 +1,7 @@
 #pragma once
 #include "BytePerBlockMedia.h"
 #include "OptPageBPBMedia.h"
+#include "FileCache.h"
 
 class CCorImageMedia :
     public CBytePerBlockMedia
@@ -74,6 +75,8 @@ private:
 
 protected:
 	CArray<CCoeffIndex, CCoeffIndex> m_CoeffIndex;
+	CFileCache m_FileCache;
+	BOOL m_bUseFileCache;
 	COptPageBPBMedia m_OptPageCorImageMedia;
 };
 

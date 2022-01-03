@@ -19,7 +19,7 @@ int main()
 	UINT nScanLineSize;
 	pixel* row_buffer = NULL;
 
-	pFile = fopen("Z:\\下载\\out.ppm", "wb");
+	pFile = fopen("out.ppm", "wb");
 	ppm_writeppminit(pFile, nWidth, nHeight, 255, 0);
 
 	row_buffer = ppm_allocrow(nWidth);
@@ -32,6 +32,7 @@ int main()
 
 	for (UINT i = 0; i < nHeight; i++) {
 		ppm_writeppmrow(pFile, row_buffer, nWidth, 255, 0);
+		printf("%f\n", ((double)(i) / nHeight));
 	}
 
 	fclose(pFile);

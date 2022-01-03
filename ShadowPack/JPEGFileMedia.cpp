@@ -93,8 +93,7 @@ BOOL CJPEGFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Password
                 }
             }
             currow++;
-            if (Progress.IsCanceled()) {
-                Errors.SetError(CPackErrors::PE_CANCELED);
+            if (Progress.IsCanceled(Errors)) {
                 goto err;
             }
         }
@@ -177,8 +176,7 @@ BOOL CJPEGFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPac
                 }
             }
             currow++;
-            if (Progress.IsCanceled()) {
-                Errors.SetError(CPackErrors::PE_CANCELED);
+            if (Progress.IsCanceled(Errors)) {
                 goto err;
             }
         }
@@ -282,20 +280,24 @@ UINT CJPEGFileMedia::GetHSampleFactor(UINT nComponents)
     return 0;
 }
 
-LPCTSTR CJPEGFileMedia::m_szFilter = _T("JPEG Files (*.jpg; *.jpeg)|*.jpg; *.jpeg|");
-LPCTSTR CJPEGFileMedia::m_szExt = _T("JPEG");
-
-BOOL CJPEGFileMedia::TestExt(LPCTSTR szExt)
-{
-    return (lstrcmpi(szExt, m_szExt) == 0 || lstrcmpi(szExt, _T("JPG")) == 0);
-}
-
-LPCTSTR CJPEGFileMedia::GetExtFilter()
-{
-    return m_szFilter;
-}
+LPCTSTR CJPEGFileMedia::m_szName = _T("Joint Photographic Experts Group");
+LPCTSTR CJPEGFileMedia::m_szExtTable[] = {
+    _T("jpg"),
+    _T("jpeg"),
+    NULL
+};
 
 CMediaBase* CJPEGFileMedia::Factory()
 {
     return new(std::nothrow) CJPEGFileMedia();
+}
+
+LPCTSTR CJPEGFileMedia::GetName()
+{
+    return m_szName;
+}
+
+LPCTSTR* CJPEGFileMedia::GetExtTable()
+{
+    return m_szExtTable;
 }

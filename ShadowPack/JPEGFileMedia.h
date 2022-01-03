@@ -32,10 +32,13 @@ public:
 
 public:
 	// 实现CMediaFactory的接口
-	static BOOL TestExt(LPCTSTR szExt);
-	static LPCTSTR GetExtFilter();
 	static CMediaBase* Factory();
+	static LPCTSTR GetName();
+	static LPCTSTR* GetExtTable();
 protected:
+	static LPCTSTR m_szName;
+	static LPCTSTR m_szExtTable[] ;
+
 	static void JStegErrorExit(j_common_ptr cinfo);
 	static LPCTSTR szJPEGColorSpace[];
 	static LPCTSTR szJFIFDensityUnit[];

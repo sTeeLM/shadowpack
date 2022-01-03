@@ -6,6 +6,7 @@
 #include "ShadowPack.h"
 #include "PackManager.h"
 #include "PackUtils.h"
+#include "ShadowPack.h"
 
 // CPackManager
 
@@ -14,7 +15,9 @@ IMPLEMENT_DYNAMIC(CPackManager, CListCtrl)
 CPackManager::CPackManager():
 	m_pMedia(NULL),
 	m_nTotalSize(0),
-	m_bDirty(FALSE)
+	m_bDirty(FALSE),
+	m_bUseDiskCache(FALSE),
+	m_strCachePath(_T(""))
 {
 
 }
@@ -29,6 +32,23 @@ void CPackManager::Initialize(CWnd* pParent, UINT nID)
 	CString strTemp;
 	INT nColInterval;
 	DWORD dwStyle;
+	CConfigManager::CONFIG_VALUE_T val;
+	BOOL bUseSystemCache = FALSE;
+
+	if (theApp.m_Config.GetConfig(_T("pack"), _T("pack_use_hd_cache"), val)) {
+		m_bUseDiskCache = val.n8;
+		if (theApp.m_Config.GetConfig(_T("pack"), _T("pack_use_system_cache"), val)) {
+			bUseSystemCache = val.n8;
+		}
+		if (theApp.m_Config.GetConfig(_T("pack"), _T("pack_custom_cache_path"), val)) {
+			m_strCachePath = val.str;
+			free(val.str);
+		}
+	}
+
+	if (bUseSystemCache) {
+		m_strCachePath = CPackUtils::GetTempPath();
+	}
 
 	SubclassDlgItem(nID, pParent);
 
@@ -89,11 +109,10 @@ BOOL CPackManager::LoadMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPassw
 	Progress.SetFullScale(m_pMedia->GetMediaUsedBytes());
 
 	while ((m_pMedia->GetMediaUsedBytes() - m_nTotalSize) > 0) {
-		if (Progress.IsCanceled()) {
-			Errors.SetError(CPackErrors::PE_CANCELED);
+		if (Progress.IsCanceled(Errors)) {
 			goto err;
 		}
-		if ((pPackItem = CPackItem::CreateItemFromStream(pStream, Progress, Errors)) != NULL) {
+		if ((pPackItem = CPackItem::CreateItemFromStream(pStream, m_strCachePath, m_bUseDiskCache, Progress, Errors)) != NULL) {
 			if (!InsertPackItem(pPackItem, Errors)) {
 				CPackItem::Free(pPackItem);
 				goto err;
@@ -141,8 +160,7 @@ BOOL CPackManager::SaveMedia(CProgressBase& Progress, CPackErrors& Errors)
 
 	nItems = CListCtrl::GetItemCount();
 	for (INT i = 0; i < nItems; i++) {
-		if (Progress.IsCanceled()) {
-			Errors.SetError(CPackErrors::PE_CANCELED);
+		if (Progress.IsCanceled(Errors)) {
 			goto err;
 		}
 		pItem = (CPackItem*)CListCtrl::GetItemData(i);
@@ -263,7 +281,7 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 	} else if (CPackUtils::GetFileSize(szItemPath, nSize)) {
 		if (nSize <= m_pMedia->GetMediaTotalBytes() - m_pMedia->GetMediaUsedBytes()) {
 			Progress.SetFullScale(nSize);
-			pPackItem = CPackItem::CreateItemFromFile(szItemPath, Progress, Errors);
+			pPackItem = CPackItem::CreateItemFromFile(szItemPath, m_strCachePath, m_bUseDiskCache, Progress, Errors);
 			if (pPackItem) {
 				if (pPackItem->GetTotalSize() > (m_pMedia->GetMediaTotalBytes() - m_nTotalSize)) {
 					Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
@@ -401,13 +419,13 @@ BOOL CPackManager::ItemExist(LPCTSTR szItemName)
 
 
 
-CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromStream(CStreamBase* pStream, CProgressBase& Progress, CPackErrors& Errors)
+CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromStream(CStreamBase* pStream, LPCTSTR szCacheDir, BOOL bUseFileCache, CProgressBase& Progress, CPackErrors& Errors)
 {
 	PACK_ITEM_T Header;
 	CPackItem* pPackItem = NULL;
 	LPBYTE* pData = NULL;
 	CHAR NameBuffer[MAX_PATH];
-
+	CString strTempFileName;
 	// read header
 	if (pStream->Read((LPBYTE)&Header, sizeof(Header), Progress, Errors)) {
 		if (Header.dwSign == PACK_ITEM_SIGN && Header.nNameSize < MAX_PATH) {
@@ -422,12 +440,23 @@ CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromStream(CStreamBa
 					pPackItem->m_Time = Header.nTime;
 					// read data
 					if (pPackItem->m_nSize) {
-						if ((pPackItem->m_pData = new (std::nothrow) BYTE[Header.nDataSize]) != NULL) {
-							if (pStream->Read((LPBYTE)pPackItem->m_pData, Header.nDataSize, Progress, Errors)) {
-								return pPackItem;
+						if (bUseFileCache) {
+							if ((pPackItem->m_hFile = CPackUtils::CreateTempFile(szCacheDir, strTempFileName)) != INVALID_HANDLE_VALUE) {
+								if (Stream2Handle(pStream, pPackItem->m_hFile, strTempFileName, Header.nDataSize, Progress, Errors)) {
+									return pPackItem;
+								}
+							} else {
+								Errors.SetError(CPackErrors::PE_IO, CPackUtils::GetLastError());
 							}
 						} else {
-							Errors.SetError(CPackErrors::PE_NOMEM);
+							if ((pPackItem->m_pData = new (std::nothrow) BYTE[Header.nDataSize]) != NULL) {
+								if (pStream->Read((LPBYTE)pPackItem->m_pData, Header.nDataSize, Progress, Errors)) {
+									return pPackItem;
+								}
+							}
+							else {
+								Errors.SetError(CPackErrors::PE_NOMEM);
+							}
 						}
 					} else {
 						return pPackItem;
@@ -446,53 +475,59 @@ CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromStream(CStreamBa
 	return NULL;
 }
 
-CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromFile(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors)
+CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromFile(LPCTSTR szFilePath, LPCTSTR szCacheDir, BOOL bUseFileCache, CProgressBase& Progress, CPackErrors& Errors)
 {
 	CFileException exFile;
 	CFile file;
 	ULONGLONG nLength;
-	ULONG nRead;
 	CPackItem* pPackItem = NULL;
-	LPBYTE pBuffer = NULL;
+	CString strTempFileName;
 	if (file.Open(szFilePath, CFile::modeRead | CFile::shareDenyWrite, &exFile)) {
 		nLength = file.GetLength();
-		pPackItem = new (std::nothrow) CPackItem();
-		if (pPackItem) {
-			pPackItem->m_strFileName = file.GetFileName();
-			pPackItem->m_nSize = (ULONG)nLength;
-			pPackItem->m_Time = CTime::GetCurrentTime();
-			if (pPackItem->m_nSize) {
-				// read data
-				pPackItem->m_pData = new (std::nothrow) BYTE[pPackItem->m_nSize];
-				if (pPackItem->m_pData) {
-					pBuffer = pPackItem->m_pData;
-					while (nLength) {
-						if (Progress.IsCanceled()) {
-							Errors.SetError(CPackErrors::PE_CANCELED);
-							break;
+		if (nLength > 4294967296L) {
+			file.Close();
+			Errors.SetError(CPackErrors::PE_TOO_LARGE_FILE, szFilePath);
+		}
+		else {
+			pPackItem = new (std::nothrow) CPackItem();
+			if (pPackItem) {
+				pPackItem->m_strFileName = file.GetFileName();
+				pPackItem->m_nSize = (ULONG)nLength;
+				pPackItem->m_Time = CTime::GetCurrentTime();
+				if (pPackItem->m_nSize) {
+					// read data
+					if (bUseFileCache) {
+						if ((pPackItem->m_hFile = CPackUtils::CreateTempFile(szCacheDir, strTempFileName)) != INVALID_HANDLE_VALUE) {
+							if (CFile2Handle(&file, pPackItem->m_hFile, strTempFileName, (UINT)nLength, Progress, Errors)) {
+								return pPackItem;
+							}
+							else {
+								Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastError());
+							}
 						}
-						nRead = READ_WRITE_BUFFER_SIZE;
-						nRead = nRead > nLength ? (ULONG)nLength : nRead;
-						if (file.Read(pBuffer, nRead) != nRead) {
+						else {
 							Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastError());
-							break;
 						}
-						nLength -= nRead;
-						pBuffer += nRead;
-						Progress.Increase(nRead);
 					}
-					if (nLength == 0) {
-						return pPackItem;
+					else {
+						if ((pPackItem->m_pData = new (std::nothrow) BYTE[pPackItem->m_nSize])) {
+							if (CFile2Memory(&file, pPackItem->m_pData, (UINT)nLength, Progress, Errors)) {
+								return pPackItem;
+							}
+						}
+						else {
+							Errors.SetError(CPackErrors::PE_NOMEM);
+						}
+						CPackItem::Free(pPackItem);
 					}
-				} else {
-					Errors.SetError(CPackErrors::PE_NOMEM);
 				}
-			} else {
-				return pPackItem;
+				else {
+					return pPackItem;
+				}
 			}
-			CPackItem::Free(pPackItem);
-		} else {
-			Errors.SetError(CPackErrors::PE_NOMEM);
+			else {
+				Errors.SetError(CPackErrors::PE_NOMEM);
+			}
 		}
 		file.Close();
 	} else {
@@ -503,6 +538,14 @@ CPackManager::CPackItem* CPackManager::CPackItem::CreateItemFromFile(LPCTSTR szF
 
 void CPackManager::CPackItem::Free(CPackItem* pItem)
 {
+	if (pItem->m_pData) {
+		delete[] pItem->m_pData;
+		pItem->m_pData = NULL;
+	}
+	if (pItem->m_hFile != INVALID_HANDLE_VALUE) {
+		::CloseHandle(pItem->m_hFile);
+		pItem->m_hFile = INVALID_HANDLE_VALUE;
+	}
 	delete pItem;
 }
 
@@ -516,10 +559,22 @@ BOOL CPackManager::CPackItem::WriteItemToStream(CStreamBase* pStream, CProgressB
 	Header.nNameSize = (UINT)strlen((LPSTR)sza);
 	Header.nTime = mktime(m_Time.GetLocalTm(&Tm));
 	if (pStream->Write(&Header, sizeof(Header), Progress, Errors)) {
-		if (pStream->Write((LPSTR)sza, Header.nNameSize, Progress, Errors)) {
-			if (pStream->Write(m_pData, Header.nDataSize, Progress, Errors)) {
-				return TRUE;
+		if (m_nSize) {
+			if (pStream->Write((LPSTR)sza, Header.nNameSize, Progress, Errors)) {
+				if (m_hFile != INVALID_HANDLE_VALUE) {
+					if (INVALID_SET_FILE_POINTER != ::SetFilePointer(m_hFile, 0, NULL, FILE_BEGIN)) {
+						return Handle2Stream(m_hFile, m_strFileName, pStream, Header.nDataSize, Progress, Errors);
+					}
+					else {
+						Errors.SetError(CPackErrors::PE_IO, m_strFileName, CPackUtils::GetLastError());
+					}
+				}
+				else if (pStream->Write(m_pData, Header.nDataSize, Progress, Errors)) {
+					return TRUE;
+				}
 			}
+		} else {
+			return TRUE;
 		}
 	}
 	return FALSE;
@@ -529,34 +584,170 @@ BOOL CPackManager::CPackItem::WriteItemToFile(LPCTSTR szFilePath, CProgressBase&
 {
 	CFileException exFile;
 	CFile file;
-	ULONGLONG nLength;
-	ULONG nWrite;
-	LPBYTE pBuffer = NULL;
+	BOOL bRet = FALSE;
 	if (file.Open(szFilePath, CFile::modeWrite | CFile::modeCreate, &exFile)) {
-		nLength = m_nSize;
-		pBuffer = m_pData;
-		while (nLength) {
-			nWrite = READ_WRITE_BUFFER_SIZE;
-			nWrite = nWrite > (ULONG) nLength ? (ULONG)nLength : nWrite;
-
-			try {
-				file.Write(pBuffer, nWrite);
-			} catch (CFileException* e) {
-				Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastError());
-				break;
+		if (m_nSize) {
+			if (m_hFile != INVALID_HANDLE_VALUE) {
+				if (INVALID_SET_FILE_POINTER != ::SetFilePointer(m_hFile, 0, NULL, FILE_BEGIN)) {
+					bRet = Handle2CFile(m_hFile, m_strFileName, &file, m_nSize, Progress, Errors);
+				} else {
+					Errors.SetError(CPackErrors::PE_IO, m_strFileName, CPackUtils::GetLastError());
+				}
 			}
-			nLength -= nWrite;
-			pBuffer += nWrite;
-			Progress.Increase(nWrite);
+			else if (m_pData) {
+				bRet = Memory2CFile(m_pData, &file, m_nSize, Progress, Errors);
+			}
+		}
+		else {
+			bRet = TRUE;
 		}
 		file.Close();
-		if (nLength == 0)
-			return TRUE;
 	} else {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, CPackUtils::GetLastError());
 	}
+	
+	return bRet;
+}
 
-	return FALSE;
+BYTE CPackManager::CPackItem::ReadWriteBuffer[READ_WRITE_BUFFER_SIZE];
+
+BOOL CPackManager::CPackItem::Stream2Handle(CStreamBase* pStream, HANDLE hFile, LPCTSTR szHandleFileName, UINT nSize, CProgressBase& Progress, CPackErrors& Errors)
+{	
+	UINT nWrite;
+	DWORD dwWrited;
+	
+	while (nSize) {
+		nWrite = nSize > READ_WRITE_BUFFER_SIZE ? READ_WRITE_BUFFER_SIZE : nSize;
+		if (!pStream->Read(ReadWriteBuffer, nWrite, Progress, Errors)) {
+			break;
+		}
+		dwWrited = 0;
+		if (!::WriteFile(hFile, ReadWriteBuffer, nWrite, &dwWrited, NULL) || dwWrited != nWrite) {
+			Errors.SetError(CPackErrors::PE_IO, szHandleFileName, CPackUtils::GetLastError());
+			break;
+		}
+		nSize -= nWrite;
+		if (Progress.IsCanceled(Errors)) {
+			break;
+		}
+	}
+	return nSize == 0;
+}
+
+BOOL CPackManager::CPackItem::Handle2Stream(HANDLE hFile, LPCTSTR szHandleFileName, CStreamBase* pStream, UINT nSize, CProgressBase& Progress, CPackErrors& Errors)
+{
+	UINT nWrite;
+	DWORD dwWrited;
+	while (nSize) {
+		nWrite = nSize > READ_WRITE_BUFFER_SIZE ? READ_WRITE_BUFFER_SIZE : nSize;
+		dwWrited = 0;
+		if (!::ReadFile(hFile, ReadWriteBuffer, nWrite, &dwWrited, NULL) || dwWrited != nWrite) {
+			Errors.SetError(CPackErrors::PE_IO, szHandleFileName, CPackUtils::GetLastError());
+			break;
+		}
+		if (!pStream->Write(ReadWriteBuffer, nWrite, Progress, Errors)) {
+			break;
+		}
+		nSize -= nWrite;
+		if (Progress.IsCanceled(Errors)) {
+			break;
+		}
+	}
+	return nSize == 0;
+}
+
+BOOL CPackManager::CPackItem::CFile2Handle(CFile* file, HANDLE hFile, LPCTSTR szHandleFileName, UINT nSize, CProgressBase& Progress, CPackErrors& Errors)
+{
+	UINT nWrite;
+	DWORD dwWrited;
+	while (nSize) {
+		nWrite = nSize > READ_WRITE_BUFFER_SIZE ? READ_WRITE_BUFFER_SIZE : nSize;
+		dwWrited = file->Read(ReadWriteBuffer, nWrite);
+		if (dwWrited != nWrite) {
+			Errors.SetError(CPackErrors::PE_IO, file->GetFileName(), CPackUtils::GetLastError());
+			break;
+		}
+		dwWrited = 0;
+		if (!::WriteFile(hFile, ReadWriteBuffer, nWrite, &dwWrited, NULL) || dwWrited != nWrite) {
+			Errors.SetError(CPackErrors::PE_IO, szHandleFileName, CPackUtils::GetLastError());
+			break;
+		}
+		nSize -= nWrite;
+		if (Progress.IsCanceled(Errors)) {
+			break;
+		}
+		Progress.Increase(nWrite);
+	}
+	return nSize == 0;
+}
+
+BOOL CPackManager::CPackItem::Handle2CFile(HANDLE hFile, LPCTSTR szHandleFileName, CFile* file, UINT nSize, CProgressBase& Progress, CPackErrors& Errors)
+{
+	UINT nWrite;
+	DWORD dwWrited;
+	while (nSize) {
+		nWrite = nSize > READ_WRITE_BUFFER_SIZE ? READ_WRITE_BUFFER_SIZE : nSize;
+		dwWrited = 0;
+		if (!::ReadFile(hFile, ReadWriteBuffer, nWrite, &dwWrited, NULL) || dwWrited != nWrite) {
+			Errors.SetError(CPackErrors::PE_IO, szHandleFileName, CPackUtils::GetLastError());
+			break;
+		}
+		try {
+			file->Write(ReadWriteBuffer, nWrite);
+		} catch (CFileException* e) {
+			Errors.SetError(CPackErrors::PE_IO, file->GetFileName(), CPackUtils::GetLastError(e));
+		}
+		nSize -= nWrite;
+		if (Progress.IsCanceled(Errors)) {
+			break;
+		}
+		Progress.Increase(nWrite);
+	}
+	return nSize == 0;
+}
+
+BOOL CPackManager::CPackItem::CFile2Memory(CFile* file, LPBYTE pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Errors)
+{
+	UINT nWrite;
+	DWORD dwWrited;
+	LPBYTE p = pBuffer;
+	while (nSize) {
+		nWrite = nSize > READ_WRITE_BUFFER_SIZE ? READ_WRITE_BUFFER_SIZE : nSize;
+		dwWrited = file->Read(p, nWrite);
+		if (dwWrited != nWrite) {
+			Errors.SetError(CPackErrors::PE_IO, file->GetFileName(), CPackUtils::GetLastError());
+			break;
+		}
+		nSize -= nWrite;
+		p += nWrite;
+		if (Progress.IsCanceled(Errors)) {
+			break;
+		}
+		Progress.Increase(nWrite);
+	}
+	return nSize == 0;
+}
+
+BOOL CPackManager::CPackItem::Memory2CFile(LPBYTE pBuffer, CFile* file, UINT nSize, CProgressBase& Progress, CPackErrors& Errors)
+{
+	UINT nWrite;
+	LPBYTE p = pBuffer;
+	while (nSize) {
+		nWrite = nSize > READ_WRITE_BUFFER_SIZE ? READ_WRITE_BUFFER_SIZE : nSize;
+		try {
+			file->Write(p, nWrite);
+		}
+		catch (CFileException* e) {
+			Errors.SetError(CPackErrors::PE_IO, file->GetFileName(), CPackUtils::GetLastError(e));
+		}
+		nSize -= nWrite;
+		p += nWrite;
+		if (Progress.IsCanceled(Errors)) {
+			break;
+		}
+		Progress.Increase(nWrite);
+	}
+	return nSize == 0;
 }
 
 CString CPackManager::CPackItem::GetName()

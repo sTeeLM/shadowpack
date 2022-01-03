@@ -1,4 +1,5 @@
 #pragma once
+#include "PackErrors.h"
 class CProgressBase
 {
 public:
@@ -10,6 +11,6 @@ public:
 	virtual void Increase(ULONGLONG nVal) = 0;
 	virtual void SetScale(ULONGLONG nVal) = 0;
 	virtual void Cancel() = 0;
-	virtual BOOL IsCanceled() = 0;
+	virtual BOOL IsCanceled(CPackErrors& Errors) = 0;
 	virtual void Show(BOOL bShow = TRUE) = 0;
 };

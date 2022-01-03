@@ -24,7 +24,7 @@ void CPixelImageMedia::Free()
 {
 	if (m_pBlockBuffer) {
 		if (m_bUseFileCache) {
-			m_FileCache.Free();
+			m_FileCache.Free(m_pBlockBuffer);
 		}else {
 			delete[] m_pBlockBuffer;
 		}

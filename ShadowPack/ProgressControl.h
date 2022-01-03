@@ -19,7 +19,7 @@ public:
 	void SetFullScale(ULONGLONG nVal);
 	void Increase(ULONGLONG nVal);
 	void Cancel(void);
-	BOOL IsCanceled(void);
+	BOOL IsCanceled(CPackErrors& Errors);
 	void Reset(UINT nIDS = 0);
 	void SetScale(ULONGLONG nVal);
 	void Show(BOOL bShow = TRUE);

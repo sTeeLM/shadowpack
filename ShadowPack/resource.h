@@ -45,7 +45,9 @@
 #define IDS_CACHE_PATH_CAN_NOT_NULL     131
 #define IDS_RELOAD_CONFIG               132
 #define IDD_PROPPAGE_PNG_FILE           133
+#define IDS_MEDIA_IMAGE_FILE            133
 #define IDD_PROPPAGE_BYTE_PER_BLOCK_MEDIA 134
+#define IDS_MEDIA_AUDIO_FILE            134
 #define IDD_PROPPAGE_JPEG_FILE          135
 #define IDD_PROPPAGE_TIFF_FILE          136
 #define IDD_PROPPAGE_PPM_FILE           137
@@ -60,6 +62,8 @@
 #define IDS_PE_EXISTED                  407
 #define IDS_PE_NOMEM                    408
 #define IDS_PE_INTERNAL                 409
+#define IDS_TOO_LARGE_FILE              410
+#define IDS_PE_TOO_LARGE_FILE           410
 #define IDS_LOCALE_UNKNOWN              599
 #define IDS_LOCALE_CHINESE_SC           600
 #define IDS_LOCALE_ENGLISH_US           601

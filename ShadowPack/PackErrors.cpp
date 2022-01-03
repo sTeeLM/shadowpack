@@ -48,6 +48,9 @@ void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPat
 	case PE_INTERNAL:       // other error, bug??
 		m_eString.Format(IDS_PE_INTERNAL);
 		break;
+	case PE_TOO_LARGE_FILE:
+		m_eString.Format(IDS_TOO_LARGE_FILE, szPath);
+		break;
 	default: m_eString = _T("ERROR!");
 	}
 }

@@ -17,6 +17,7 @@ public:
 			PE_NOMEM,          // no memory
 			PE_EOF,            // end of file
 			PE_INTERNAL,       // other error, bug??
+			PE_TOO_LARGE_FILE, // file too large!
 			PE_COUNT
 	}PACK_ERROR_T;
 

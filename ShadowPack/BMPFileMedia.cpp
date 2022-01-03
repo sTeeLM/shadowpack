@@ -89,6 +89,9 @@ BOOL CBMPFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		}
 		CPixelImageMedia::SetScanline(pinfoHeader->biHeight - i - 1, pScanLine, CPixelImageMedia::PIXEL_FORMAT_BGR);
 		Progress.Increase(1);
+		if (Progress.IsCanceled(Errors)) {
+			goto err;
+		}
 	}
 
 	// test format
@@ -173,6 +176,9 @@ BOOL CBMPFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 			goto err;
 		}
 		Progress.Increase(1);
+		if (Progress.IsCanceled(Errors)) {
+			goto err;
+		}
 	}
 	
 	// done!
@@ -239,22 +245,23 @@ BOOL CBMPFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
-
-LPCTSTR CBMPFileMedia::m_szFilter = _T("BMP Files (*.bmp)|*.bmp|");
-LPCTSTR CBMPFileMedia::m_szExt = _T("BMP");
-
-
-BOOL CBMPFileMedia::TestExt(LPCTSTR szExt)
-{
-	return lstrcmpi(szExt, m_szExt) == 0;
-}
-
-LPCTSTR CBMPFileMedia::GetExtFilter()
-{
-	return m_szFilter;
-}
+LPCTSTR CBMPFileMedia::m_szName = _T("bitmap image file");
+LPCTSTR CBMPFileMedia::m_szExtTable[] = {
+	_T("bmp"),
+	NULL
+};
 
 CMediaBase* CBMPFileMedia::Factory()
 {
 	return new(std::nothrow) CBMPFileMedia();
+}
+
+LPCTSTR CBMPFileMedia::GetName()
+{
+	return m_szName;
+}
+
+LPCTSTR* CBMPFileMedia::GetExtTable()
+{
+	return m_szExtTable;
 }

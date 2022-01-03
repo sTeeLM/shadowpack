@@ -230,6 +230,17 @@ CString CPackUtils::GetTempPath()
 	return strPath;
 }
 
+CString CPackUtils::GetTempFileName(LPCTSTR szPathName, LPCTSTR szPrefix)
+{
+	CString strRet = _T("");
+	TCHAR szTempFileName[MAX_PATH];
+	if (::GetTempFileName(szPathName, szPrefix, 0, szTempFileName)) {
+		szTempFileName[_countof(szTempFileName) - 1] = 0;
+		strRet = szTempFileName;
+	}
+	return strRet;
+}
+
 CString CPackUtils::CreateTempPath()
 {
 	CString strPath, strRet;
@@ -244,6 +255,22 @@ CString CPackUtils::CreateTempPath()
 	strPath.ReleaseBuffer();
 	strPath = _T("");
 	return strPath;
+}
+
+HANDLE CPackUtils::CreateTempFile(LPCTSTR szTempDir, CString & strTempFileName)
+{
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+
+	strTempFileName = GetTempFileName(szTempDir, NULL);
+	// create file
+	hFile = ::CreateFile((LPCTSTR)strTempFileName,
+		GENERIC_READ | GENERIC_WRITE,
+		0,
+		NULL,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
+		NULL);
+	return hFile;
 }
 
 BOOL CPackUtils::RemoveDir(LPCTSTR szPath)
@@ -264,6 +291,17 @@ BOOL CPackUtils::RemoveDir(LPCTSTR szPath)
 CString CPackUtils::GetLastError()
 {
 	return GetLastError(::GetLastError());
+}
+
+CString CPackUtils::GetLastError(CException* e)
+{
+	TCHAR Buffer[4096];
+	CString strRet;
+	if (e->GetErrorMessage(Buffer, _countof(Buffer))) {
+		Buffer[_countof(Buffer) - 1] = 0;
+		strRet = Buffer;
+	}
+	return strRet;
 }
 
 CString CPackUtils::GetLastError(DWORD dwError)

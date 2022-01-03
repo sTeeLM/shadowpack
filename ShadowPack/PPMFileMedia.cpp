@@ -93,6 +93,9 @@ BOOL CPPMFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 				CPixelImageMedia::SetPixel(j, i, row_buffer[j].r, row_buffer[j].g, row_buffer[j].b);
 			}
 			Progress.Increase(1);
+			if (Progress.IsCanceled(Errors)) {
+				goto err;
+			}
 		}
 	}
 	catch (CException* e) {
@@ -189,6 +192,9 @@ BOOL CPPMFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 			}
 			ppm_writeppmrow(pFile, row_buffer, m_nCols, maxval, m_nFormat == PPM_FORMAT);
 			Progress.Increase(1);
+			if (Progress.IsCanceled(Errors)) {
+				goto err;
+			}
 		}
 	}
 	catch (CException* e) {
@@ -236,21 +242,23 @@ BOOL CPPMFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 }
 
 
-LPCTSTR CPPMFileMedia::m_szFilter = _T("PPM Files (*.ppm)|*.ppm|");
-LPCTSTR CPPMFileMedia::m_szExt = _T("PPM");
-
-
-BOOL CPPMFileMedia::TestExt(LPCTSTR szExt)
+LPCTSTR CPPMFileMedia::GetName()
 {
-	return lstrcmpi(szExt, m_szExt) == 0;
+	return m_szName;
 }
 
-LPCTSTR CPPMFileMedia::GetExtFilter()
+LPCTSTR* CPPMFileMedia::GetExtTable()
 {
-	return m_szFilter;
+	return m_szExtTable;
 }
 
 CMediaBase* CPPMFileMedia::Factory()
 {
 	return new(std::nothrow) CPPMFileMedia();
 }
+
+LPCTSTR CPPMFileMedia::m_szExtTable[] = {
+	_T("ppm"),
+	NULL
+};
+LPCTSTR CPPMFileMedia::m_szName = _T("Portable PixMap");

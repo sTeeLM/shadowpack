@@ -317,14 +317,14 @@ BOOL CTIFFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
-BOOL CTIFFileMedia::TestExt(LPCTSTR szExt)
+LPCTSTR CTIFFileMedia::GetName()
 {
-	return (lstrcmpi(szExt, m_szExt) == 0 || lstrcmpi(szExt, _T("TIF")) == 0);
+	return m_szName;
 }
 
-LPCTSTR CTIFFileMedia::GetExtFilter()
+LPCTSTR* CTIFFileMedia::GetExtTable()
 {
-	return m_szFilter;
+	return m_szExtTable;
 }
 
 CMediaBase* CTIFFileMedia::Factory()
@@ -332,5 +332,9 @@ CMediaBase* CTIFFileMedia::Factory()
 	return new(std::nothrow) CTIFFileMedia();
 }
 
-LPCTSTR CTIFFileMedia::m_szFilter = _T("TIFF Files (*.tif; *.tiff)|*.tif; *.tiff|");
-LPCTSTR CTIFFileMedia::m_szExt = _T("TIFF");
+LPCTSTR CTIFFileMedia::m_szExtTable[] = {
+	_T("tif"),
+	_T("tiff"),
+	NULL
+};
+LPCTSTR CTIFFileMedia::m_szName = _T("Tagged Image File Format");

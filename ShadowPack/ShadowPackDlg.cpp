@@ -340,6 +340,7 @@ void CShadowPackDlg::OnBnClickedBtnMediaOpen()
 			else
 			{
 				CPackErrors Errors;
+				Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, m_szMediaPathName);
 				AfxMessageBox(Errors.ToString());
 			}
 		}

@@ -98,8 +98,9 @@ void CProgressControl::Cancel(void)
 	m_bCancel = TRUE;
 }
 
-BOOL CProgressControl::IsCanceled(void)
+BOOL CProgressControl::IsCanceled(CPackErrors& Errors)
 {
+	Errors.SetError(CPackErrors::PE_CANCELED);
 	return m_bCancel;
 }
 

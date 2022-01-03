@@ -19,9 +19,13 @@ protected:
 
 protected:
 	class CPackItem {
-		CPackItem() : m_nSize(0), m_pData(NULL){}
+		CPackItem() : 
+			m_nSize(0), 
+			m_pData(NULL),
+			m_hFile(INVALID_HANDLE_VALUE)
+		{}
 	public:
-		virtual ~CPackItem() { if(m_pData) delete[] m_pData; }
+		virtual ~CPackItem() { }
 	private:
 #define PACK_ITEM_SIGN 0x12345678
 #define READ_WRITE_BUFFER_SIZE (4096)
@@ -35,16 +39,25 @@ protected:
 		CTime m_Time;
 		UINT m_nSize;
 		LPBYTE m_pData;
+		HANDLE m_hFile;
 	public:
-		static CPackItem* CreateItemFromStream(CStreamBase* pStream, CProgressBase& Progress, CPackErrors& Errors);
-		static CPackItem* CreateItemFromFile(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors);
+		static CPackItem* CreateItemFromStream(CStreamBase* pStream, LPCTSTR szCacheDir, BOOL bUseFileCache, CProgressBase& Progress, CPackErrors& Errors);
+		static CPackItem* CreateItemFromFile(LPCTSTR szFilePath, LPCTSTR szCacheDir, BOOL bUseFileCache, CProgressBase& Progress, CPackErrors& Errors);
 		static void Free(CPackItem* pItem);
 		BOOL WriteItemToStream(CStreamBase* pStream, CProgressBase& Progress, CPackErrors& Errors);
 		BOOL WriteItemToFile(LPCTSTR szFilePath, CProgressBase& Progress, CPackErrors& Errors);
+		static BOOL Stream2Handle(CStreamBase* pStream, HANDLE hFile, LPCTSTR szHandleFileName, UINT nSize, CProgressBase& Progress, CPackErrors& Errors);
+		static BOOL Handle2Stream(HANDLE hFile, LPCTSTR szHandleFileName, CStreamBase* pStream, UINT nSize, CProgressBase& Progress, CPackErrors& Errors);
+		static BOOL CFile2Handle(CFile* file, HANDLE hFile, LPCTSTR szHandleFileName, UINT nSize, CProgressBase& Progress, CPackErrors& Errors);
+		static BOOL Handle2CFile(HANDLE hFile, LPCTSTR szHandleFileName, CFile* file, UINT nSize, CProgressBase& Progress, CPackErrors& Errors);
+		static BOOL CFile2Memory(CFile* file, LPBYTE pBuffer, UINT nSize, CProgressBase& Progress, CPackErrors& Errors);
+		static BOOL Memory2CFile(LPBYTE pBuffer, CFile* file, UINT nSize, CProgressBase& Progress, CPackErrors& Errors);
 		CString GetName();
 		ULONGLONG GetDataSize();
 		ULONGLONG GetTotalSize();
 		CString FormatDateItme();
+	private:
+		static BYTE ReadWriteBuffer[READ_WRITE_BUFFER_SIZE];
 	};
 
 public:
@@ -82,6 +95,9 @@ private:
 	CString m_strMediaPath;
 	ULONGLONG m_nTotalSize;
 	BOOL m_bDirty;
+	BOOL m_bUseDiskCache;
+	CString m_strCachePath;
+	
 };
 
 

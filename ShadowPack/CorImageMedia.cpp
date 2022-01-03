@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CorImageMedia.h"
+#include "ShadowPack.h"
 #include "resource.h"
 
 CCorImageMedia::CCorImageMedia() :
@@ -9,7 +10,8 @@ CCorImageMedia::CCorImageMedia() :
     m_nDummy(0),
     m_nComponents(0),
     m_nTotalCoeffs(0),
-    m_OptPageCorImageMedia(NULL, IDS_OPT_COFF_MEDIA)
+    m_OptPageCorImageMedia(NULL, IDS_OPT_COFF_MEDIA),
+    m_bUseFileCache(FALSE)
 {
 }
 
@@ -27,6 +29,11 @@ BOOL CCorImageMedia::Alloc(UINT nWidth, UINT nHeight, UINT nComponents, CPackErr
 {
     USHORT max_v_samp_factor = 0;
     USHORT max_h_samp_factor = 0;
+    CConfigManager::CONFIG_VALUE_T val;
+
+    if (theApp.m_Config.GetConfig(_T("media"), _T("media_use_hd_cache"), val)) {
+        m_bUseFileCache = val.n8;
+    }
 
     m_nComponents = nComponents;
 
@@ -66,10 +73,18 @@ BOOL CCorImageMedia::Alloc(UINT nWidth, UINT nHeight, UINT nComponents, CPackErr
     }
 
     for (USHORT icomp = 0; icomp < nComponents; icomp++) {
-        m_pCoeffBuffer[icomp] = new(std::nothrow) SHORT[m_pHeightInBlocks[icomp] * m_pWidthInBlocks[icomp] * GetCoeffPerBlock()];
-        if (!m_pCoeffBuffer[icomp]) {
-            Error.SetError(CPackErrors::PE_NOMEM);
-            goto err;
+        if (!m_bUseFileCache) {
+            m_pCoeffBuffer[icomp] = new(std::nothrow) SHORT[m_pHeightInBlocks[icomp] * m_pWidthInBlocks[icomp] * GetCoeffPerBlock()];
+            if (!m_pCoeffBuffer[icomp]) {
+                Error.SetError(CPackErrors::PE_NOMEM);
+                goto err;
+            }
+        } else {
+            if ((m_pCoeffBuffer[icomp] = (SHORT*)m_FileCache.Alloc(
+                (m_pHeightInBlocks[icomp] * m_pWidthInBlocks[icomp] * GetCoeffPerBlock()) * sizeof(SHORT), Error)
+                ) == NULL) {
+                goto err;
+            }
         }
     }
     m_nTotalCoeffs = 0;
@@ -97,9 +112,15 @@ void CCorImageMedia::Free()
     }
     if (m_pCoeffBuffer) {
         for (USHORT icomp = 0; icomp < m_nComponents; icomp++) {
-            if (m_pCoeffBuffer[icomp]) {
-                delete[] m_pCoeffBuffer[icomp];
-                m_pCoeffBuffer[icomp] = NULL;
+            if (!m_bUseFileCache) {
+                if (m_pCoeffBuffer[icomp]) {
+                    delete[] m_pCoeffBuffer[icomp];
+                    m_pCoeffBuffer[icomp] = NULL;
+                }
+            } else {
+                if (m_pCoeffBuffer[icomp]) {
+                    m_FileCache.Free(m_pCoeffBuffer[icomp]);
+                }
             }
         }
         delete[] m_pCoeffBuffer;

@@ -9,12 +9,9 @@
 ¹þ²ªÍûÔ¶¾µÅÄµÄÃ´£¿
 */
 
-CFileCache::CFileCache() :
-	m_hFile(INVALID_HANDLE_VALUE),
-	m_hFileMap(NULL),
-	m_pMap(NULL),
-	m_strCacheFile(_T(""))
+CFileCache::CFileCache()
 {
+
 }
 
 CFileCache::~CFileCache()
@@ -26,6 +23,10 @@ LPVOID CFileCache::Alloc(ULONGLONG nSize, CPackErrors& Errors)
 	CConfigManager::CONFIG_VALUE_T val;
 	BOOL bUseSystemCache = FALSE;
 	LARGE_INTEGER li;
+	CString strCacheFile;
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	HANDLE hFileMap = NULL;
+	LPVOID pMap = NULL;
 
 	if (!theApp.m_Config.GetConfig(_T("media"), _T("media_use_system_cache"), val)) {
 		Errors.SetError(CPackErrors::PE_INTERNAL);
@@ -37,79 +38,84 @@ LPVOID CFileCache::Alloc(ULONGLONG nSize, CPackErrors& Errors)
 		Errors.SetError(CPackErrors::PE_INTERNAL);
 		goto error;
 	}
-	m_strCacheFile = val.str;
+	strCacheFile = val.str;
 	free(val.str);
 
 	if (bUseSystemCache) {
-		m_strCacheFile = CPackUtils::GetTempPath() + _T("FileCache.bin");
-	} else {
-		m_strCacheFile += _T("FileCache.bin");
+		strCacheFile = CPackUtils::GetTempPath();
 	}
 
+	strCacheFile = CPackUtils::GetTempFileName(strCacheFile, _T("FileCache_"));
+
+	TRACE(_T("use file cache %s\n"), strCacheFile);
+
 	// create file
-	if ((m_hFile = ::CreateFile((LPCTSTR)m_strCacheFile,
+	if ((hFile = ::CreateFile((LPCTSTR)strCacheFile,
 		GENERIC_READ | GENERIC_WRITE,
 		0,
 		NULL,
 		CREATE_ALWAYS,
 		FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
 		NULL)) == INVALID_HANDLE_VALUE) {
-		Errors.SetError(CPackErrors::PE_IO, m_strCacheFile, CPackUtils::GetLastError());
+		Errors.SetError(CPackErrors::PE_IO, strCacheFile, CPackUtils::GetLastError());
 		goto error;
 	}
 
 	// set size
 	li.QuadPart = nSize;
-	if (INVALID_SET_FILE_POINTER == ::SetFilePointer(m_hFile, li.LowPart, &li.HighPart, FILE_BEGIN)
+	if (INVALID_SET_FILE_POINTER == ::SetFilePointer(hFile, li.LowPart, &li.HighPart, FILE_BEGIN)
 		&& ::GetLastError() != NO_ERROR) {
-		Errors.SetError(CPackErrors::PE_IO, m_strCacheFile, CPackUtils::GetLastError());
+		Errors.SetError(CPackErrors::PE_IO, strCacheFile, CPackUtils::GetLastError());
 		goto error;
 	}
 
 	// create map
 	li.QuadPart = nSize;
-	if (NULL == (m_hFileMap = ::CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, li.HighPart, li.LowPart, NULL))) {
-		Errors.SetError(CPackErrors::PE_IO, m_strCacheFile, CPackUtils::GetLastError());
+	if (NULL == (hFileMap = ::CreateFileMapping(hFile, NULL, PAGE_READWRITE, li.HighPart, li.LowPart, NULL))) {
+		Errors.SetError(CPackErrors::PE_IO, strCacheFile, CPackUtils::GetLastError());
 		goto error;
 	}
 
-	if (NULL == (m_pMap = ::MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0))) {
-		Errors.SetError(CPackErrors::PE_IO, m_strCacheFile, CPackUtils::GetLastError());
+	if (NULL == (pMap = ::MapViewOfFile(hFileMap, FILE_MAP_WRITE, 0, 0, 0))) {
+		Errors.SetError(CPackErrors::PE_IO, strCacheFile, CPackUtils::GetLastError());
 		goto error;
 	}
 
-	return m_pMap;
+	m_pCacheEntry.SetAt((ULONGLONG)pMap, CFileCacheEntry(hFile, hFileMap, pMap, strCacheFile));
+
+	return pMap;
 
 error:
-	if (m_hFile != INVALID_HANDLE_VALUE) {
-		::CloseHandle(m_hFile);
-		m_hFile = INVALID_HANDLE_VALUE;
+	if (hFile != INVALID_HANDLE_VALUE) {
+		::CloseHandle(hFile);
+		hFile = INVALID_HANDLE_VALUE;
 	}
-	if (m_hFileMap != NULL) {
-		::CloseHandle(m_hFileMap);
-		m_hFileMap = NULL;
+	if (hFileMap != NULL) {
+		::CloseHandle(hFileMap);
+		hFileMap = NULL;
 	}
 	return NULL;
 }
 
-void CFileCache::Free()
+void CFileCache::Free(LPVOID pAddress)
 {
-	if (m_pMap) {
-		::UnmapViewOfFile(m_pMap);
-		m_pMap = NULL;
-	}
+	CFileCacheEntry Entry;
+	if (m_pCacheEntry.Lookup((ULONGLONG)pAddress, Entry)){
+		if (Entry.m_pMap) {
+			::UnmapViewOfFile(Entry.m_pMap);
+		}
 
-	if (m_hFileMap != NULL) {
-		::CloseHandle(m_hFileMap);
-		m_hFileMap = NULL;
-	}
+		if (Entry.m_hFileMap != NULL) {
+			::CloseHandle(Entry.m_hFileMap);
+		}
 
-	if (m_hFile != INVALID_HANDLE_VALUE) {
-		::CloseHandle(m_hFile);
-		m_hFile = INVALID_HANDLE_VALUE;
-	}
+		if (Entry.m_hFile != INVALID_HANDLE_VALUE) {
+			::CloseHandle(Entry.m_hFile);
+		}
 
-	if (m_strCacheFile.GetLength()) {
-		m_strCacheFile = _T("");
+		if (Entry.m_strCacheFile.GetLength()) {
+			Entry.m_strCacheFile = _T("");
+		}
+		m_pCacheEntry.RemoveKey((ULONGLONG)Entry.m_pMap);
 	}
 }
