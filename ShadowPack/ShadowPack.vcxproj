@@ -101,7 +101,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win32\static_debug\include;..\libnetpbm\include;..\libaudiofile\libaudiofile;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win32\static_debug\include;..\libnetpbm\include;..\libaudiofile\libaudiofile;..\libsndfile\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -216,7 +216,7 @@
     <ClInclude Include="CorImageMedia.h" />
     <ClInclude Include="crypto_warpper.h" />
     <ClInclude Include="FileCache.h" />
-    <ClInclude Include="FrameAudioMedia.h" />
+    <ClInclude Include="PCMAudioMedia.h" />
     <ClInclude Include="JPEGFileMedia.h" />
     <ClInclude Include="LocaleManager.h" />
     <ClInclude Include="MediaOptionDlg.h" />
@@ -249,7 +249,7 @@
     <ClInclude Include="StreamBase.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TIFFileMedia.h" />
-    <ClInclude Include="WAVAudioMedia.h" />
+    <ClInclude Include="MiscAudioMedia.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BMPFileMedia.cpp" />
@@ -264,7 +264,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="FileCache.cpp" />
-    <ClCompile Include="FrameAudioMedia.cpp" />
+    <ClCompile Include="PCMAudioMedia.cpp" />
     <ClCompile Include="JPEGFileMedia.cpp" />
     <ClCompile Include="LocaleManager.cpp" />
     <ClCompile Include="MediaBase.cpp" />
@@ -295,7 +295,7 @@
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="ShadowPackDlg.cpp" />
     <ClCompile Include="TIFFileMedia.cpp" />
-    <ClCompile Include="WAVAudioMedia.cpp" />
+    <ClCompile Include="MiscAudioMedia.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ShadowPack.rc" />

@@ -132,10 +132,10 @@
     <ClInclude Include="FileCache.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="FrameAudioMedia.h">
+    <ClInclude Include="PCMAudioMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WAVAudioMedia.h">
+    <ClInclude Include="MiscAudioMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -236,10 +236,10 @@
     <ClCompile Include="FileCache.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FrameAudioMedia.cpp">
+    <ClCompile Include="PCMAudioMedia.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WAVAudioMedia.cpp">
+    <ClCompile Include="MiscAudioMedia.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

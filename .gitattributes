@@ -1,0 +1,15 @@
+demos/008.wav filter=lfs diff=lfs merge=lfs -text
+demos/Luis[[:space:]]Royo028.1.ppm filter=lfs diff=lfs merge=lfs -text
+demos/Luis[[:space:]]Royo028.bmp filter=lfs diff=lfs merge=lfs -text
+demos/新建位图图像[[:space:]]-[[:space:]]副本[[:space:]]-[[:space:]]副本.jpg filter=lfs diff=lfs merge=lfs -text
+demos/新建位图图像.ppm filter=lfs diff=lfs merge=lfs -text
+demos/008.mp3 filter=lfs diff=lfs merge=lfs -text
+demos/UpgradeLog.tif filter=lfs diff=lfs merge=lfs -text
+demos/Luis[[:space:]]Royo028.png filter=lfs diff=lfs merge=lfs -text
+demos/Luis[[:space:]]Royo028.1[[:space:]]-[[:space:]]副本.ppm filter=lfs diff=lfs merge=lfs -text
+demos/Luis[[:space:]]Royo028.ppm filter=lfs diff=lfs merge=lfs -text
+demos/Luis[[:space:]]Royo028.tif filter=lfs diff=lfs merge=lfs -text
+demos/a.jpg filter=lfs diff=lfs merge=lfs -text
+demos/out.jpeg filter=lfs diff=lfs merge=lfs -text
+demos/Luis[[:space:]]Royo028[[:space:]]-[[:space:]]副本.ppm filter=lfs diff=lfs merge=lfs -text
+demos/新建位图图像.bmp filter=lfs diff=lfs merge=lfs -text

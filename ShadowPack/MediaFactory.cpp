@@ -7,7 +7,7 @@
 #include "TIFFileMedia.h"
 #include "PPMFileMedia.h"
 
-#include "WAVAudioMedia.h"
+#include "MiscAudioMedia.h"
 
 
 CMediaFactory::MEDIA_INFO_T CMediaFactory::m_MediaInfoImageFile[] = {
@@ -20,7 +20,7 @@ CMediaFactory::MEDIA_INFO_T CMediaFactory::m_MediaInfoImageFile[] = {
 };
 
 CMediaFactory::MEDIA_INFO_T CMediaFactory::m_MediaInfoAudioFile[] = {
-	{CWAVAudioMedia::GetName, CWAVAudioMedia::GetExtTable, CWAVAudioMedia::Factory},
+	{CMiscAudioMedia::GetName, CMiscAudioMedia::GetExtTable, CMiscAudioMedia::Factory},
 	{NULL, NULL, NULL}
 };
 
