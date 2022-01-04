@@ -136,7 +136,6 @@ void CConfigDlg::OnBnClickedBtnSelPackHdCache()
 void CConfigDlg::UpdateUI()
 {
 	
-	CString strTemp = CPackUtils::GetTempPath();
 	BOOL bMediaCacheHDEnable = IsDlgButtonChecked(IDC_CHECK_MEDIA_HD_CACHE);
 	BOOL bCustomMediaHDCacheDirEnable = bMediaCacheHDEnable
 		&& !IsDlgButtonChecked(IDC_CHECK_MEDIA_HD_CACHE_USE_TMP);

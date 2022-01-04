@@ -162,7 +162,7 @@ BOOL CShadowPackDlg::ShowConfigDlg()
 	dlgConfig.m_strMediaCacheCustomDir = val.str;
 	free(val.str);
 
-	dlgConfig.m_strMediaCacheTmpDir = CPackUtils::GetTempPath() + _T("ShadowPack\\Media\\");
+	dlgConfig.m_strMediaCacheTmpDir = CPackUtils::GetTempPath();
 
 
 	if (!theApp.m_Config.GetConfig(_T("pack"), _T("pack_use_hd_cache"), val)) {
@@ -181,7 +181,7 @@ BOOL CShadowPackDlg::ShowConfigDlg()
 	dlgConfig.m_strPackCacheCustomDir = val.str;
 	free(val.str);
 
-	dlgConfig.m_strPackCacheTmpDir = CPackUtils::GetTempPath() + _T("ShadowPack\\Content\\");
+	dlgConfig.m_strPackCacheTmpDir = CPackUtils::GetTempPath();
 
 	if (dlgConfig.DoModal() == IDOK) {
 		val.n8 = dlgConfig.m_nCurrentLocale;

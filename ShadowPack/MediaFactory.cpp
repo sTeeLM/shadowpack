@@ -7,9 +7,10 @@
 #include "TIFFileMedia.h"
 #include "PPMFileMedia.h"
 
+#include "WAVAudioMedia.h"
 
-CMediaFactory::MEDIA_INFO_T CMediaFactory::m_MediaInfoImageFile[] =
-{
+
+CMediaFactory::MEDIA_INFO_T CMediaFactory::m_MediaInfoImageFile[] = {
 	{CBMPFileMedia::GetName, CBMPFileMedia::GetExtTable, CBMPFileMedia::Factory},
 	{CJPEGFileMedia::GetName, CJPEGFileMedia::GetExtTable, CJPEGFileMedia::Factory},
 	{CPNGFileMedia::GetName, CPNGFileMedia::GetExtTable, CPNGFileMedia::Factory},
@@ -18,9 +19,15 @@ CMediaFactory::MEDIA_INFO_T CMediaFactory::m_MediaInfoImageFile[] =
 	{NULL, NULL, NULL}
 };
 
+CMediaFactory::MEDIA_INFO_T CMediaFactory::m_MediaInfoAudioFile[] = {
+	{CWAVAudioMedia::GetName, CWAVAudioMedia::GetExtTable, CWAVAudioMedia::Factory},
+	{NULL, NULL, NULL}
+};
+
 CMediaFactory::MEDIA_DESC_T CMediaFactory::m_MediaDescTable[] =
 {
 	{IDS_MEDIA_IMAGE_FILE, m_MediaInfoImageFile},
+	{IDS_MEDIA_AUDIO_FILE, m_MediaInfoAudioFile},
 };
 
 CMediaFactory::CMediaFactory(void)

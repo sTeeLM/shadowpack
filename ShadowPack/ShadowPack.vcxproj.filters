@@ -132,6 +132,12 @@
     <ClInclude Include="FileCache.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="FrameAudioMedia.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WAVAudioMedia.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShadowPack.cpp">
@@ -228,6 +234,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FileCache.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameAudioMedia.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WAVAudioMedia.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

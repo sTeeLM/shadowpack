@@ -31,5 +31,6 @@ public:
 	static CString CreateExtTable();
 private:
 	static MEDIA_INFO_T m_MediaInfoImageFile[];
+	static MEDIA_INFO_T m_MediaInfoAudioFile[];
 	static MEDIA_DESC_T m_MediaDescTable[];
 };
