@@ -1,6 +1,8 @@
-1. 添加更多的加密算法 [DONE]
+﻿1. 添加更多的加密算法 [DONE]
 2. jpeg支持 [DONE]
 3. png支持 [DONE]
 4. tiff支持 [DONE]
 5. 不能添加重复项目 [DONE]
 6. 各种bugfix [DONE]
+7. PCM音频支持
+8. MP3音频支持
