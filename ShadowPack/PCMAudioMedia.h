@@ -26,5 +26,9 @@ public:
 protected:
 	CFileCache m_FileCache;
 	BOOL m_bUseFileCache;
+	ULONGLONG m_nSampleCnt;
+	LPBYTE m_pSampleBuffer;
+	UINT m_nBitsPerSample;
+	UINT m_nChannels;
 };
 

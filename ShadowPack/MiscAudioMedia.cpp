@@ -10,14 +10,82 @@ CMiscAudioMedia::~CMiscAudioMedia()
 {
 }
 
-BOOL CMiscAudioMedia::GetMeta(SNDFILE * file, MISC_AUDIO_META_T& meta, CPackErrors& Errors)
+
+BOOL CMiscAudioMedia::GetMeta(SNDFILE * infile, CAudioMeta& meta, CPackErrors& Errors)
 {
+
+	const char* str;
+	int k;
+
+	for (k = SF_STR_FIRST; k <= SF_STR_LAST; k++)
+	{
+		str = sf_get_string(infile, k);
+		if (str != NULL) {
+			meta.meta_str.SetAt(k, CStringA(str));
+		}
+	};
+
+	memset(&meta.inst, 0, sizeof(meta.inst));
+	memset(&meta.cues, 0, sizeof(meta.cues));
+	memset(&meta.binfo, 0, sizeof(meta.binfo));
+
+	if (meta.snd_info.channels < _countof(meta.chanmap))
+	{
+		size_t size = meta.snd_info.channels * sizeof(meta.chanmap[0]);
+		meta.bChanMapSet = (sf_command(infile, SFC_GET_CHANNEL_MAP_INFO, meta.chanmap, size) == SF_TRUE);
+	};
+	meta.bCuesSet = (sf_command(infile, SFC_GET_CUE, &meta.cues, sizeof(meta.cues)) == SF_TRUE);
+	meta.bInstSet = (sf_command(infile, SFC_GET_INSTRUMENT, &meta.inst, sizeof(meta.inst)) == SF_TRUE);
+	meta.bBinfoSet = (sf_command(infile, SFC_GET_BROADCAST_INFO, &meta.binfo, sizeof(meta.binfo)) == SF_TRUE);
+	meta.bCartInfoSet = (sf_command(infile, SFC_GET_CART_INFO, &meta.cart_info, sizeof(meta.cart_info)) == SF_TRUE);
+
 	return TRUE;
 }
 
-BOOL CMiscAudioMedia::SetMeta(SNDFILE* file, MISC_AUDIO_META_T& meta, CPackErrors& Errors)
+BOOL CMiscAudioMedia::SetMeta(SNDFILE* outfile, CAudioMeta& meta, CPackErrors& Errors)
 {
-	return TRUE;
+	int k;
+	CStringA str;
+	BOOL bRet = FALSE;
+	for (k = SF_STR_FIRST; k <= SF_STR_LAST; k++)
+	{
+		if(meta.meta_str.Lookup(k, str)) {
+			sf_set_string(outfile, k, (LPCSTR)str);
+		}
+	};
+
+	if (meta.snd_info.channels < _countof(meta.chanmap))
+	{
+		size_t size = meta.snd_info.channels * sizeof(meta.chanmap[0]);
+		if (meta.bChanMapSet) {
+			if (sf_command(outfile, SFC_SET_CHANNEL_MAP_INFO, meta.chanmap, size) != SF_TRUE) {
+				goto err;
+			}
+		}
+	};
+
+	if (meta.bCuesSet && (sf_command(outfile, SFC_SET_CUE, &meta.cues, sizeof(meta.cues)) != SF_TRUE)) {
+		goto err;
+	}
+
+	if (meta.bInstSet && (sf_command(outfile, SFC_SET_INSTRUMENT, &meta.inst, sizeof(meta.inst)) != SF_TRUE)) {
+		goto err;
+	}
+
+	if (meta.bCartInfoSet && (sf_command(outfile, SFC_SET_CART_INFO, &meta.cart_info, sizeof(meta.cart_info)) != SF_TRUE)) {
+		goto err;
+	}
+
+	if (meta.bCartInfoSet && (sf_command(outfile, SFC_SET_CART_INFO, &meta.cart_info, sizeof(meta.cart_info)) != SF_TRUE)) {
+		goto err;
+	}
+
+	bRet = TRUE;
+err:
+	if (!bRet) {
+		Errors.SetError(CPackErrors::PE_IO, CA2CT(sf_strerror(outfile)), meta.strFilePath);
+	}
+	return bRet;
 }
 
 BOOL CMiscAudioMedia::IsFloat(INT nFormat)
@@ -75,9 +143,11 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 	sf_count_t nTotalFrames, nRet, nRead, nFrameOffset;
 
 
-	::ZeroMemory(&m_FileMeta, sizeof(m_FileMeta));
+	m_FileMeta.Free();
+	m_FileMeta.strFilePath = szFilePath;
 
 	if ((file = sf_open(filepath, SFM_READ, &m_FileMeta.snd_info)) == NULL) {
+		Errors.SetError(CPackErrors::PE_IO, CA2CT(sf_strerror(file)), szFilePath);
 		goto err;
 	}
 
@@ -92,8 +162,16 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 
 	// check format
 	if ((nBitsPerSample = GetBitsPerSample(m_FileMeta.snd_info.format)) == -1) {
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
+
+	TRACE(_T("Audio format %x, nContainer = %x, nCodec = %x, nEndian = %x nBitsPerSample = %d\n"),
+		m_FileMeta.snd_info.format, 
+		nContainer,
+		nCodec,
+		nEndian,
+		nBitsPerSample);
 
 	// alloc buffer
 	if (!CPCMAudioMedia::Alloc(m_FileMeta.snd_info.frames, m_FileMeta.snd_info.channels, nBitsPerSample, Errors)) {
@@ -101,18 +179,22 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 	}
 
 	if (IsFloat(m_FileMeta.snd_info.format)) {
-		if ((pBuffer = (LPBYTE)malloc(ONE_PASS_FRAMES * nBitsPerSample * m_FileMeta.snd_info.channels)) == NULL) {
+		if ((pBuffer = (LPBYTE)malloc(ONE_PASS_FRAMES * nBitsPerSample / 8 * m_FileMeta.snd_info.channels)) == NULL) {
+			Errors.SetError(CPackErrors::PE_NOMEM);
 			goto err;
 		}
 	}
 	else {
-		if ((pBuffer = (LPBYTE)malloc(ONE_PASS_FRAMES * 32 * m_FileMeta.snd_info.channels)) == NULL) {
+		if ((pBuffer = (LPBYTE)malloc(ONE_PASS_FRAMES * sizeof(INT) * m_FileMeta.snd_info.channels)) == NULL) {
+			Errors.SetError(CPackErrors::PE_NOMEM);
 			goto err;
 		}
 	}
 
 	nTotalFrames = m_FileMeta.snd_info.frames;
 	nFrameOffset = 0;
+	Progress.Reset(IDS_READ_FILE);
+	Progress.SetFullScale(nTotalFrames);
 	while (nTotalFrames > 0) {
 		nRead = nTotalFrames > ONE_PASS_FRAMES ? ONE_PASS_FRAMES : nTotalFrames;
 		if (IsFloat(m_FileMeta.snd_info.format) && nBitsPerSample == 32) {
@@ -125,11 +207,16 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 			nRet = sf_readf_int(file, (int*)pBuffer, nRead);
 		}
 		if (nRet != nRead) {
+			Errors.SetError(CPackErrors::PE_IO, CA2CT(sf_strerror(file)), szFilePath);
 			goto err;
 		}
 		CPCMAudioMedia::SetFrame(pBuffer, nFrameOffset, (UINT)nRead);
 		nTotalFrames -= nRead;
 		nFrameOffset += nRead;
+		Progress.Increase(nRead);
+		if (Progress.IsCanceled(Errors)) {
+			goto err;
+		}
 	}
 	
 	// test format
@@ -158,7 +245,6 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 	CT2CA filepath(szFilePath);
 	BOOL bRet = FALSE;
 	SNDFILE* file = NULL;
-	SF_INFO snd_info;
 	LPBYTE pBuffer = NULL;
 	INT nBitsPerSample;
 	sf_count_t nTotalFrames, nRet, nWrite, nFrameOffset;
@@ -166,6 +252,7 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 	if (!CBytePerBlockMedia::SaveMeta(Errors)) {
 		goto err;
 	}
+
 	Progress.Reset(IDS_FILL_EMPTY_SPACE);
 	Progress.SetFullScale(GetMediaTotalBytes() - GetMediaUsedBytes());
 
@@ -175,10 +262,12 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 
 	// check format
 	if ((nBitsPerSample = GetBitsPerSample(m_FileMeta.snd_info.format)) == -1) {
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
 
-	if ((file = sf_open(filepath, SFM_WRITE, &snd_info)) == NULL) {
+	if ((file = sf_open(filepath, SFM_WRITE, &m_FileMeta.snd_info)) == NULL) {
+		Errors.SetError(CPackErrors::PE_IO, CA2CT(sf_strerror(file)), szFilePath);
 		goto err;
 	}
 
@@ -189,22 +278,27 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 
 	// alloc buffer
 	if (IsFloat(m_FileMeta.snd_info.format)) {
-		if ((pBuffer = (LPBYTE)malloc(ONE_PASS_FRAMES * nBitsPerSample * m_FileMeta.snd_info.channels)) == NULL) {
+		if ((pBuffer = (LPBYTE)malloc(ONE_PASS_FRAMES * nBitsPerSample / 8 * m_FileMeta.snd_info.channels)) == NULL) {
+			Errors.SetError(CPackErrors::PE_NOMEM);
 			goto err;
 		}
 	}
 	else {
-		if ((pBuffer = (LPBYTE)malloc(ONE_PASS_FRAMES * 32 * m_FileMeta.snd_info.channels)) == NULL) {
+		if ((pBuffer = (LPBYTE)malloc(ONE_PASS_FRAMES * sizeof(INT) * m_FileMeta.snd_info.channels)) == NULL) {
+			Errors.SetError(CPackErrors::PE_NOMEM);
 			goto err;
 		}
 	}
 
 	if (sf_seek(file, 0, SEEK_SET) < 0) {
+		Errors.SetError(CPackErrors::PE_IO, CA2CT(sf_strerror(file)), szFilePath);
 		goto err;
 	}
 
 	nTotalFrames = m_FileMeta.snd_info.frames;
 	nFrameOffset = 0;
+	Progress.Reset(IDS_WRITE_FILE);
+	Progress.SetFullScale(nTotalFrames);
 	while (nTotalFrames > 0) {
 		nWrite = nTotalFrames > ONE_PASS_FRAMES ? ONE_PASS_FRAMES : nTotalFrames;
 		CPCMAudioMedia::GetFrame(pBuffer, nFrameOffset, (UINT)nWrite);
@@ -218,10 +312,15 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 			nRet = sf_writef_int(file, (int*)pBuffer, nWrite);
 		}
 		if (nRet != nWrite) {
+			Errors.SetError(CPackErrors::PE_IO, CA2CT(sf_strerror(file)), szFilePath);
 			goto err;
 		}
 		nTotalFrames -= nWrite;
 		nFrameOffset += nWrite;
+		Progress.Increase(nWrite);
+		if (Progress.IsCanceled(Errors)) {
+			goto err;
+		}
 	}
 	// done!
 	ClearMediaDirty();
@@ -241,6 +340,7 @@ err:
 
 void CMiscAudioMedia::CloseMedia()
 {
+	m_FileMeta.Free();
 	CPCMAudioMedia::Free();
 }
 
@@ -250,7 +350,7 @@ void CMiscAudioMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 
 BOOL CMiscAudioMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 {
-	return 0;
+	return FALSE;
 }
 
 LPCTSTR CMiscAudioMedia::m_szName = _T("wav audio file");
