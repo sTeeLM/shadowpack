@@ -33,9 +33,9 @@ BOOL CPCMAudioMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return 0;
 }
 
-BOOL CPCMAudioMedia::Alloc(ULONGLONG nFrames, UINT nChannels, PCM_FORMAT_T Fmt, CPackErrors& Error)
+BOOL CPCMAudioMedia::Alloc(ULONGLONG nFrames, UINT nChannels, UINT nBitsPerSample, CPackErrors& Error)
 {
-	return 0;
+	return TRUE;
 }
 
 void CPCMAudioMedia::Free()
@@ -43,10 +43,10 @@ void CPCMAudioMedia::Free()
 
 }
 
-void CPCMAudioMedia::SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt, UINT nChannel, PCM_FORMAT_T Fmt)
+void CPCMAudioMedia::SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt)
 {
 }
 
-void CPCMAudioMedia::GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt, UINT nChannel, PCM_FORMAT_T Fmt)
+void CPCMAudioMedia::GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt)
 {
 }

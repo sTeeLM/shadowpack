@@ -19,21 +19,10 @@ public:
 	virtual BOOL UpdateOpts(CMFCPropertySheet* pPropertySheet);
 
 public:
-	typedef enum {
-		PCM_FORMAT_I8 = 0,
-		PCM_FORMAT_BEI16,
-		PCM_FORMAT_LEI16,
-		PCM_FORMAT_BEI32,
-		PCM_FORMAT_LEI32,
-		PCM_FORMAT_BEF32,
-		PCM_FORMAT_LEF32,
-		PCM_FORMAT_BEF64,
-		PCM_FORMAT_LEF64,
-	}PCM_FORMAT_T;
-	BOOL Alloc(ULONGLONG nFrames, UINT nChannels, PCM_FORMAT_T Fmt, CPackErrors& Error);
+	BOOL Alloc(ULONGLONG nFrames, UINT nChannels, UINT nBitsPerSample, CPackErrors& Error);
 	void Free();
-	void SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt, UINT nChannel, PCM_FORMAT_T Fmt);
-	void GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt, UINT nChannel, PCM_FORMAT_T Fmt);
+	void SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
+	void GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
 protected:
 	CFileCache m_FileCache;
 	BOOL m_bUseFileCache;

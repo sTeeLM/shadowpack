@@ -33,12 +33,18 @@ protected:
 	static LPCTSTR m_szExtTable[];
 
 protected:
-	typedef struct _MISC_AUDIO_INFO_T {
+	typedef struct _MISC_AUDIO_META_T {
 		SF_INFO snd_info;
 		BOOL bCartInfoSet;
 		SF_CART_INFO cart_info;
-	}MISC_AUDIO_INFO_T;
+	}MISC_AUDIO_META_T;
 
-	MISC_AUDIO_INFO_T m_Info;
+	MISC_AUDIO_META_T m_FileMeta;
+protected:
+#define ONE_PASS_FRAMES 64
+	INT GetBitsPerSample(INT nFormat);
+	BOOL IsFloat(INT nFormat);
+	BOOL GetMeta(SNDFILE* file, MISC_AUDIO_META_T& info, CPackErrors& Errors);
+	BOOL SetMeta(SNDFILE* file, MISC_AUDIO_META_T& info, CPackErrors& Errors);
 };
 
