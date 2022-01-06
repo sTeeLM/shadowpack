@@ -191,6 +191,13 @@ BOOL CTIFFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto err;
 	}
 
+	Progress.Reset(IDS_FILL_EMPTY_SPACE);
+	Progress.SetFullScale(GetMediaTotalBytes() - GetMediaUsedBytes());
+
+	if (!CBytePerBlockMedia::FillEmptySpace(Progress, Errors)) {
+		goto err;
+	}
+
 #ifdef _UNICODE
 	pTiff = TIFFOpenW(szFilePath, "w");
 #else

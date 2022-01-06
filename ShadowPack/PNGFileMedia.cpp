@@ -250,6 +250,13 @@ BOOL CPNGFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto error;
 	}
 
+	Progress.Reset(IDS_FILL_EMPTY_SPACE);
+	Progress.SetFullScale(GetMediaTotalBytes() - GetMediaUsedBytes());
+
+	if (!CBytePerBlockMedia::FillEmptySpace(Progress, Errors)) {
+		goto error;
+	}
+
 	for (UINT i = 0; i < m_PNGInfo.nHeight; i++) {
 		row_pointers[i] = NULL;
 	}
