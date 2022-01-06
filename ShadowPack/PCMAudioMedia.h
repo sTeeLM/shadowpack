@@ -1,6 +1,8 @@
 #pragma once
 #include "BytePerBlockMedia.h"
 #include "FileCache.h"
+#include "OptPageBPBMedia.h"
+
 class CPCMAudioMedia :
     public CBytePerBlockMedia
 {
@@ -24,11 +26,27 @@ public:
 	void SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
 	void GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
 protected:
+	BYTE GetByteFromBlocks8(ULONGLONG nOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks16(ULONGLONG nOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks20(ULONGLONG nOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks24(ULONGLONG nOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks32(ULONGLONG nOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks64(ULONGLONG nOffset, UINT nBlockPerByte);
+
+	void SetByteFromBlocks8(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks16(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks20(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks24(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks32(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks64(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+
+protected:
 	CFileCache m_FileCache;
 	BOOL m_bUseFileCache;
 	ULONGLONG m_nSampleCnt;
 	LPBYTE m_pSampleBuffer;
 	UINT m_nBitsPerSample;
 	UINT m_nChannels;
+	COptPageBPBMedia m_OptPCMAudioMedia;
 };
 

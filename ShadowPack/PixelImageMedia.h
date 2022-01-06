@@ -56,8 +56,6 @@ protected:
 	IMAGE_PIXEL_T * m_pBlockBuffer;
 	CFileCache m_FileCache;
 	BOOL m_bUseFileCache;
-	static BYTE F5LookupTable[4][8];
-	static BYTE F5RevLookupTable[8];
 	COptPageBPBMedia m_OptPagePixelImageMedia;
 	BYTE m_nEmpty;
 };

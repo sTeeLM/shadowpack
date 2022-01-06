@@ -248,6 +248,7 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 	LPBYTE pBuffer = NULL;
 	INT nBitsPerSample;
 	sf_count_t nTotalFrames, nRet, nWrite, nFrameOffset;
+	nTotalFrames = m_FileMeta.snd_info.frames;
 
 	if (!CBytePerBlockMedia::SaveMeta(Errors)) {
 		goto err;
@@ -290,12 +291,12 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 		}
 	}
 
-	if (sf_seek(file, 0, SEEK_SET) < 0) {
-		Errors.SetError(CPackErrors::PE_IO, CA2CT(sf_strerror(file)), szFilePath);
-		goto err;
-	}
+//	if (sf_seek(file, 0, SEEK_SET) < 0) {
+//		Errors.SetError(CPackErrors::PE_IO, CA2CT(sf_strerror(file)), szFilePath);
+//		goto err;
+//	}
 
-	nTotalFrames = m_FileMeta.snd_info.frames;
+	
 	nFrameOffset = 0;
 	Progress.Reset(IDS_WRITE_FILE);
 	Progress.SetFullScale(nTotalFrames);
@@ -346,11 +347,12 @@ void CMiscAudioMedia::CloseMedia()
 
 void CMiscAudioMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
+	CPCMAudioMedia::AddOptPage(pPropertySheet);
 }
 
 BOOL CMiscAudioMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 {
-	return FALSE;
+	return CPCMAudioMedia::UpdateOpts(pPropertySheet);;
 }
 
 LPCTSTR CMiscAudioMedia::m_szName = _T("wav audio file");

@@ -49,7 +49,10 @@
 #define IDD_PROPPAGE_BYTE_PER_BLOCK_MEDIA 134
 #define IDS_MEDIA_AUDIO_FILE            134
 #define IDD_PROPPAGE_JPEG_FILE          135
+#define IDS_OPT_PCM_MEDIA               135
 #define IDD_PROPPAGE_TIFF_FILE          136
+#define IDS_OPT_PCM_MEDIA_UNIT          136
+#define IDS_OPT_PCM_MEDIA_BLOCK_UNIT    136
 #define IDD_PROPPAGE_PPM_FILE           137
 #define IDD_CONFIGBOX                   138
 #define IDS_PE_CANCELED                 400

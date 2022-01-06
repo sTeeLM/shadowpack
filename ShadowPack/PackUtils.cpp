@@ -377,3 +377,92 @@ BOOL CPackUtils::CancelWindowTop(CWnd* pWnd)
 		return FALSE;
 	}
 }
+
+/*
+// embed 2bit data into 3 bit target
+// x2,x1                     a3,a2,a1
+BYTE CPixelImageMedia::CPixelBlock::F5Embed(BYTE nData, BYTE nTarget)
+{
+	BYTE s = 0, dig, mask;
+	// cal s
+
+	nData &= 0x3;
+	nTarget &= 0x7;
+
+	mask = nTarget;
+	for (INT i = 0; i < 3; i++) {
+		s ^= (mask & 0x1) * (i + 1);
+		mask >>= 1;
+	}
+
+	dig = s ^ nData;
+
+	nTarget = nTarget ^ (1 << (dig - 1));
+
+	return nTarget;
+
+}
+// extract 2bit data from 3 bit target
+BYTE CPixelImageMedia::CPixelBlock::F5Extract(BYTE nTarget)
+{
+	BYTE s = 0;
+	for (INT i = 0; i < 3; i++) {
+		s ^= (nTarget & 0x1) * (i + 1);
+		nTarget >>= 1;
+	}
+
+	return s & 0x3;
+}
+*/
+
+/*
+
+data = 0, target = 0, res = 0, res ^ target = 0, ext = 0
+data = 0, target = 1, res = 0, res ^ target = 1, ext = 0
+data = 0, target = 2, res = 0, res ^ target = 2, ext = 0
+data = 0, target = 3, res = 7, res ^ target = 4, ext = 0
+data = 0, target = 4, res = 0, res ^ target = 4, ext = 0
+data = 0, target = 5, res = 7, res ^ target = 2, ext = 0
+data = 0, target = 6, res = 7, res ^ target = 1, ext = 0
+data = 0, target = 7, res = 7, res ^ target = 0, ext = 0
+
+data = 1, target = 0, res = 1, res ^ target = 1, ext = 1
+data = 1, target = 1, res = 1, res ^ target = 0, ext = 1
+data = 1, target = 2, res = 6, res ^ target = 4, ext = 1
+data = 1, target = 3, res = 1, res ^ target = 2, ext = 1
+data = 1, target = 4, res = 6, res ^ target = 2, ext = 1
+data = 1, target = 5, res = 1, res ^ target = 4, ext = 1
+data = 1, target = 6, res = 6, res ^ target = 0, ext = 1
+data = 1, target = 7, res = 6, res ^ target = 1, ext = 1
+
+data = 2, target = 0, res = 2, res ^ target = 2, ext = 2
+data = 2, target = 1, res = 5, res ^ target = 4, ext = 2
+data = 2, target = 2, res = 2, res ^ target = 0, ext = 2
+data = 2, target = 3, res = 2, res ^ target = 1, ext = 2
+data = 2, target = 4, res = 5, res ^ target = 1, ext = 2
+data = 2, target = 5, res = 5, res ^ target = 0, ext = 2
+data = 2, target = 6, res = 2, res ^ target = 4, ext = 2
+data = 2, target = 7, res = 5, res ^ target = 2, ext = 2
+
+data = 3, target = 0, res = 4, res ^ target = 4, ext = 3
+data = 3, target = 1, res = 3, res ^ target = 2, ext = 3
+data = 3, target = 2, res = 3, res ^ target = 1, ext = 3
+data = 3, target = 3, res = 3, res ^ target = 0, ext = 3
+data = 3, target = 4, res = 4, res ^ target = 0, ext = 3
+data = 3, target = 5, res = 4, res ^ target = 1, ext = 3
+data = 3, target = 6, res = 4, res ^ target = 2, ext = 3
+data = 3, target = 7, res = 3, res ^ target = 4, ext = 3
+
+*/
+
+const BYTE CPackUtils::F5LookupTable[4][8] = {
+	{0,1,2,4,4,2,1,0},
+	{1,0,4,2,2,4,0,1},
+	{2,4,0,1,1,0,4,2},
+	{4,2,1,0,0,1,2,4},
+};
+
+const BYTE CPackUtils::F5RevLookupTable[8] = {
+	/*0,1,2,3,4,5,6,7 */
+	  0,1,2,3,3,2,1,0
+};

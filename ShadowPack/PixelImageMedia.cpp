@@ -2,6 +2,7 @@
 #include "PixelImageMedia.h"
 #include "ShadowPack.h"
 #include "ConfigManager.h"
+#include "PackUtils.h"
 #include "resource.h"
 
 CPixelImageMedia::CPixelImageMedia() :
@@ -307,95 +308,6 @@ BOOL CPixelImageMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 }
 
 
-/*
-// embed 2bit data into 3 bit target
-// x2,x1                     a3,a2,a1
-BYTE CPixelImageMedia::CPixelBlock::F5Embed(BYTE nData, BYTE nTarget)
-{
-	BYTE s = 0, dig, mask;
-	// cal s
-
-	nData &= 0x3;
-	nTarget &= 0x7;
-
-	mask = nTarget;
-	for (INT i = 0; i < 3; i++) {
-		s ^= (mask & 0x1) * (i + 1);
-		mask >>= 1;
-	}
-
-	dig = s ^ nData;
-
-	nTarget = nTarget ^ (1 << (dig - 1));
-
-	return nTarget;
-
-}
-// extract 2bit data from 3 bit target
-BYTE CPixelImageMedia::CPixelBlock::F5Extract(BYTE nTarget) 
-{
-	BYTE s = 0;
-	for (INT i = 0; i < 3; i++) {
-		s ^= (nTarget & 0x1) * (i + 1);
-		nTarget >>= 1;
-	}
-
-	return s & 0x3;
-}
-*/
-
-/*
-
-data = 0, target = 0, res = 0, res ^ target = 0, ext = 0
-data = 0, target = 1, res = 0, res ^ target = 1, ext = 0
-data = 0, target = 2, res = 0, res ^ target = 2, ext = 0
-data = 0, target = 3, res = 7, res ^ target = 4, ext = 0
-data = 0, target = 4, res = 0, res ^ target = 4, ext = 0
-data = 0, target = 5, res = 7, res ^ target = 2, ext = 0
-data = 0, target = 6, res = 7, res ^ target = 1, ext = 0
-data = 0, target = 7, res = 7, res ^ target = 0, ext = 0
-
-data = 1, target = 0, res = 1, res ^ target = 1, ext = 1
-data = 1, target = 1, res = 1, res ^ target = 0, ext = 1
-data = 1, target = 2, res = 6, res ^ target = 4, ext = 1
-data = 1, target = 3, res = 1, res ^ target = 2, ext = 1
-data = 1, target = 4, res = 6, res ^ target = 2, ext = 1
-data = 1, target = 5, res = 1, res ^ target = 4, ext = 1
-data = 1, target = 6, res = 6, res ^ target = 0, ext = 1
-data = 1, target = 7, res = 6, res ^ target = 1, ext = 1
-
-data = 2, target = 0, res = 2, res ^ target = 2, ext = 2
-data = 2, target = 1, res = 5, res ^ target = 4, ext = 2
-data = 2, target = 2, res = 2, res ^ target = 0, ext = 2
-data = 2, target = 3, res = 2, res ^ target = 1, ext = 2
-data = 2, target = 4, res = 5, res ^ target = 1, ext = 2
-data = 2, target = 5, res = 5, res ^ target = 0, ext = 2
-data = 2, target = 6, res = 2, res ^ target = 4, ext = 2
-data = 2, target = 7, res = 5, res ^ target = 2, ext = 2
-
-data = 3, target = 0, res = 4, res ^ target = 4, ext = 3
-data = 3, target = 1, res = 3, res ^ target = 2, ext = 3
-data = 3, target = 2, res = 3, res ^ target = 1, ext = 3
-data = 3, target = 3, res = 3, res ^ target = 0, ext = 3
-data = 3, target = 4, res = 4, res ^ target = 0, ext = 3
-data = 3, target = 5, res = 4, res ^ target = 1, ext = 3
-data = 3, target = 6, res = 4, res ^ target = 2, ext = 3
-data = 3, target = 7, res = 3, res ^ target = 4, ext = 3
-
-*/
-
-BYTE CPixelImageMedia::F5LookupTable[4][8] = {
-	{0,1,2,4,4,2,1,0},
-	{1,0,4,2,2,4,0,1},
-	{2,4,0,1,1,0,4,2},
-	{4,2,1,0,0,1,2,4},
-};
-
-BYTE CPixelImageMedia::F5RevLookupTable[8] = {
-  /*0,1,2,3,4,5,6,7 */
-	0,1,2,3,3,2,1,0
-};
-
 BYTE CPixelImageMedia::GetByteFromBlocks(ULONGLONG nOffset, UINT nBlockPerByte)
 {
 	ASSERT(nBlockPerByte <= MAX_BPB_MEDIA_BPB_SIZE && nBlockPerByte >= MIN_BPB_MEDIA_BPB_SIZE);
@@ -443,7 +355,6 @@ BYTE CPixelImageMedia::GetByteFromBlocks(ULONGLONG nOffset, UINT nBlockPerByte)
 		nRet |= pPixelBlock[2].m_nBlue & 0x1;
 	} else if (nBlockPerByte == 4) {  
 		/* F5 algo , every pixel offer 3 bits as target hide 2 bits data, max 1 bit of target changed */
-		nRet = 0;
 		for (INT i = 0; i < 4; i++) {
 			nRet <<= 2;
 			nTarget = pPixelBlock[i].m_nRed & 0x1;
@@ -451,7 +362,7 @@ BYTE CPixelImageMedia::GetByteFromBlocks(ULONGLONG nOffset, UINT nBlockPerByte)
 			nTarget |= pPixelBlock[i].m_nGreen & 0x1;
 			nTarget <<= 1;
 			nTarget |= pPixelBlock[i].m_nBlue & 0x1;
-			nRet |= F5RevLookupTable[nTarget];
+			nRet |= CPackUtils::F5RevLookupTable[nTarget];
 		}
 	}
 
@@ -531,7 +442,7 @@ void CPixelImageMedia::SetByteToBlocks(BYTE nData, ULONGLONG nOffset, UINT nBloc
 			nTarget |= pPixelBlock[i].m_nGreen & 0x1;
 			nTarget <<= 1;
 			nTarget |= pPixelBlock[i].m_nBlue & 0x1;
-			nRes = F5LookupTable[((nData & nRet) >> ((3 - i) * 2))][nTarget];
+			nRes = CPackUtils::F5LookupTable[((nData & nRet) >> ((3 - i) * 2))][nTarget];
 			if (nRes == 4) {
 				pPixelBlock[i].m_nRed ^= 0x1;
 			} else if (nRes == 2) {
