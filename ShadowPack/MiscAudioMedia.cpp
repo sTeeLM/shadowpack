@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "MiscAudioMedia.h"
+#include "PackUtils.h"
 #include "resource.h"
 
 CMiscAudioMedia::CMiscAudioMedia()
@@ -102,6 +103,7 @@ BOOL CMiscAudioMedia::IsFloat(INT nFormat)
 	return bRet;
 }
 
+
 INT CMiscAudioMedia::GetBitsPerSample(INT nFormat)
 {
 	INT nRet = -1;
@@ -129,6 +131,71 @@ INT CMiscAudioMedia::GetBitsPerSample(INT nFormat)
 	return nRet;
 }
 
+CString CMiscAudioMedia::GenerateDurationStr(SF_INFO& snd_info)
+{
+	double seconds;
+	double total_seconds = 0;
+
+	if (snd_info.samplerate < 1)
+		return _T("unknown");
+
+	if (snd_info.frames / snd_info.samplerate > 0x7FFFFFFF)
+		return _T("unknown");
+
+	seconds = (1.0 * snd_info.frames) / snd_info.samplerate;
+
+	/* Accumulate the total of all known file durations */
+	total_seconds += seconds;
+
+	return CPackUtils::FormatSecond(total_seconds);
+}
+CString CMiscAudioMedia::ReadLog(SNDFILE* file, SF_INFO &snd_info)
+{
+	CString strTemp;
+	CString strRet;
+	LPSTR pLogBuffer = NULL, pTok, pContext = NULL;
+	// get log
+	if (pLogBuffer = (LPSTR)malloc(PCM_LOG_BUFFER_SIZE)) {
+
+		memset(pLogBuffer, 0, PCM_LOG_BUFFER_SIZE);
+		sf_command(file, SFC_GET_LOG_INFO, pLogBuffer, PCM_LOG_BUFFER_SIZE);
+		pLogBuffer[PCM_LOG_BUFFER_SIZE - 1] = 0;
+		pTok = strtok_s(pLogBuffer, "\n", &pContext);
+		while (pTok != NULL) {
+			strRet += CA2CT(pTok);
+			strRet += _T("\r\n");
+			pTok = strtok_s(NULL, "\n", &pContext);
+		}
+		if (snd_info.frames == SF_COUNT_MAX) {
+			strTemp.Format(_T("Frames      : unknown\r\n"));
+			strRet += strTemp;
+		}
+		else {
+			strTemp.Format(_T("Frames      : %I64d\r\n"), snd_info.frames);
+			strRet += strTemp;
+
+			strTemp.Format(_T("Channels    : %d\r\n"), snd_info.channels);
+			strRet += strTemp;
+
+			strTemp.Format(_T("Format      : 0x%08X\r\n"), snd_info.format);
+			strRet += strTemp;
+
+			strTemp.Format(_T("Sections    : %d\r\n"), snd_info.sections);
+			strRet += strTemp;
+
+			strTemp.Format(_T("Seekable    : %s\r\n"), snd_info.seekable ? _T("TRUE") : _T("FALSE"));
+			strRet += strTemp;
+
+			strTemp.Format(_T("Duration    : %s\r\n"), (LPCTSTR)GenerateDurationStr(snd_info));
+			strRet += strTemp;
+		}
+		free(pLogBuffer);
+		pLogBuffer = NULL;
+	}
+	TRACE(_T("%s"), strRet);
+	return strRet;
+}
+
 BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordGetter, CProgressBase& Progress, CPackErrors& Errors)
 {
 	CT2CA filepath(szFilePath);
@@ -142,7 +209,6 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 	LPBYTE pBuffer = NULL;
 	sf_count_t nTotalFrames, nRet, nRead, nFrameOffset;
 
-
 	m_FileMeta.Free();
 	m_FileMeta.strFilePath = szFilePath;
 
@@ -151,10 +217,17 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 		goto err;
 	}
 
+	if (m_FileMeta.snd_info.frames == SF_COUNT_MAX) {
+		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
+		goto err;
+	}
+
 	// get metas
 	if (!GetMeta(file, m_FileMeta, Errors)) {
 		goto err;
 	}
+
+	m_OptPagePCMFileProperty.m_strPCMProperty = ReadLog(file, m_FileMeta.snd_info);
 
 	nContainer = ((m_FileMeta.snd_info.format) & SF_FORMAT_TYPEMASK);
 	nCodec     = ((m_FileMeta.snd_info.format) & SF_FORMAT_SUBMASK);
@@ -248,6 +321,8 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 	LPBYTE pBuffer = NULL;
 	INT nBitsPerSample;
 	sf_count_t nTotalFrames, nRet, nWrite, nFrameOffset;
+
+
 	nTotalFrames = m_FileMeta.snd_info.frames;
 
 	if (!CBytePerBlockMedia::SaveMeta(Errors)) {
@@ -342,11 +417,14 @@ err:
 void CMiscAudioMedia::CloseMedia()
 {
 	m_FileMeta.Free();
+	m_OptPagePCMFileProperty.m_strPCMProperty = _T("");
 	CPCMAudioMedia::Free();
 }
 
 void CMiscAudioMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
+
+	pPropertySheet->AddPage(&m_OptPagePCMFileProperty);
 	CPCMAudioMedia::AddOptPage(pPropertySheet);
 }
 

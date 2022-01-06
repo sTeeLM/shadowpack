@@ -31,6 +31,7 @@ public:
 	static void FillBufferRand(LPBYTE pBuffer, ULONGLONG nSize);
 	static BOOL SetWindowTop(CWnd* pWnd);
 	static BOOL CancelWindowTop(CWnd* pWnd);
+	static CString FormatSecond(DOUBLE dSeconds);
 	static const BYTE F5LookupTable[4][8];
 	static const BYTE F5RevLookupTable[8];
 };

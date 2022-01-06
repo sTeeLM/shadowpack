@@ -11,6 +11,7 @@ CPCMAudioMedia::CPCMAudioMedia() :
 	m_nChannels(0),
 	m_OptPCMAudioMedia(NULL, IDS_OPT_PCM_MEDIA)
 {
+
 }
 
 CPCMAudioMedia::~CPCMAudioMedia()
@@ -143,7 +144,7 @@ ULONGLONG CPCMAudioMedia::GetTotalBlocks()
 	if (m_nBitsPerSample == 8) {
 		return m_nSampleCnt / 3;
 	}
-	else if (m_nBitsPerSample == 16 || m_nBitsPerSample == 20) {
+	else if (m_nBitsPerSample == 16 || m_nBitsPerSample == 20 ) {
 		return m_nSampleCnt / 2;
 	}
 	else {

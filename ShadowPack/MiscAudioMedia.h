@@ -1,5 +1,6 @@
 #pragma once
 #include "PCMAudioMedia.h"
+#include "OptPagePCMFileProperty.h"
 #include "sndfile.h"
 
 class CMiscAudioMedia :
@@ -70,10 +71,14 @@ protected:
 	};
 
 	CAudioMeta m_FileMeta;
+#define PCM_LOG_BUFFER_SIZE 1024
+	COptPagePCMFileProperty m_OptPagePCMFileProperty;
 protected:
 #define ONE_PASS_FRAMES 64
 	INT GetBitsPerSample(INT nFormat);
 	BOOL IsFloat(INT nFormat);
+	CString ReadLog(SNDFILE* file, SF_INFO &snd_info);
+	CString GenerateDurationStr(SF_INFO& snd_info);
 	BOOL GetMeta(SNDFILE* file, CAudioMeta& info, CPackErrors& Errors);
 	BOOL SetMeta(SNDFILE* file, CAudioMeta& info, CPackErrors& Errors);
 };

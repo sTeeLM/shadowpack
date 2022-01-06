@@ -51,10 +51,10 @@
 #define IDD_PROPPAGE_JPEG_FILE          135
 #define IDS_OPT_PCM_MEDIA               135
 #define IDD_PROPPAGE_TIFF_FILE          136
-#define IDS_OPT_PCM_MEDIA_UNIT          136
 #define IDS_OPT_PCM_MEDIA_BLOCK_UNIT    136
 #define IDD_PROPPAGE_PPM_FILE           137
 #define IDD_CONFIGBOX                   138
+#define IDD_PROPPAGE_PCM_FILE           139
 #define IDS_PE_CANCELED                 400
 #define IDS_PE_IO                       401
 #define IDS_PE_CORRUPT_DATA             402
@@ -147,6 +147,7 @@
 #define IDC_STATIC_MEDIA_TEMP_DIR       1067
 #define IDC_STATIC_PACK_TEMP_DIR        1069
 #define IDC_STATIC_PACK_CUSTOM_TEMP_DIR 1070
+#define IDC_EDIT_PCM_AUDIO_PROPERTY     1071
 #define IDC_STATIC_MEDIA_CUSTOM_TEMP_DIR 1078
 
 // Next default values for new objects
@@ -155,7 +156,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1071
+#define _APS_NEXT_CONTROL_VALUE         1072
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

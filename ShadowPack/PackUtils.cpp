@@ -378,6 +378,22 @@ BOOL CPackUtils::CancelWindowTop(CWnd* pWnd)
 	}
 }
 
+CString CPackUtils::FormatSecond(DOUBLE dSeconds)
+{
+	INT nHrs, nMin, nDay;
+	DOUBLE dSec;
+	CString strRet;
+
+	nDay = (INT)(dSeconds / 86400.0);
+	nHrs = (INT)((dSeconds - (nDay * 86400.0)) / 3600.0);
+	nMin = (INT)((dSeconds - (nHrs * 3600.0)) / 60.0);
+	dSec = dSeconds - (nHrs * 3600.0) - (nMin * 60.0);
+
+	strRet.Format(_T("%02d[D]:%02d[H]:%02d[M]:%06.3f[S]"), nDay, nHrs, nMin, dSec);
+
+	return strRet;
+}
+
 /*
 // embed 2bit data into 3 bit target
 // x2,x1                     a3,a2,a1

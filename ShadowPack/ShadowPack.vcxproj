@@ -214,6 +214,7 @@
     <ClInclude Include="ChartControl.h" />
     <ClInclude Include="ConfigDlg.h" />
     <ClInclude Include="CorImageMedia.h" />
+    <ClInclude Include="OptPagePCMFileProperty.h" />
     <ClInclude Include="crypto_warpper.h" />
     <ClInclude Include="FileCache.h" />
     <ClInclude Include="PCMAudioMedia.h" />
@@ -257,6 +258,7 @@
     <ClCompile Include="ChartControl.cpp" />
     <ClCompile Include="ConfigDlg.cpp" />
     <ClCompile Include="CorImageMedia.cpp" />
+    <ClCompile Include="OptPagePCMFileProperty.cpp" />
     <ClCompile Include="crypto_warpper.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
