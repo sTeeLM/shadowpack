@@ -27,16 +27,12 @@ public:
 	void GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
 protected:
 	BYTE GetByteFromBlocks8(ULONGLONG nOffset, UINT nBlockPerByte);
-	BYTE GetByteFromBlocks16(ULONGLONG nOffset, UINT nBlockPerByte);
-	BYTE GetByteFromBlocks20(ULONGLONG nOffset, UINT nBlockPerByte);
-	BYTE GetByteFromBlocks24(ULONGLONG nOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks162024(ULONGLONG nOffset, UINT nBlockPerByte);
 	BYTE GetByteFromBlocks32(ULONGLONG nOffset, UINT nBlockPerByte);
 	BYTE GetByteFromBlocks64(ULONGLONG nOffset, UINT nBlockPerByte);
 
 	void SetByteFromBlocks8(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
-	void SetByteFromBlocks16(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
-	void SetByteFromBlocks20(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
-	void SetByteFromBlocks24(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks162024(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
 	void SetByteFromBlocks32(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
 	void SetByteFromBlocks64(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
 

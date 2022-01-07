@@ -134,7 +134,7 @@ m_nBitsPerSample:
 8  : m_nSampleCnt / 3;
 16 : m_nSampleCnt / 2;
 20 : m_nSampleCnt / 2;
-24 : m_nSampleCnt
+24 : m_nSampleCnt / 2
 32 : m_nSampleCnt
 64 : m_nSampleCnt
 */
@@ -144,7 +144,7 @@ ULONGLONG CPCMAudioMedia::GetTotalBlocks()
 	if (m_nBitsPerSample == 8) {
 		return m_nSampleCnt / 3;
 	}
-	else if (m_nBitsPerSample == 16 || m_nBitsPerSample == 20 ) {
+	else if (m_nBitsPerSample == 16 || m_nBitsPerSample == 20 || m_nBitsPerSample == 24) {
 		return m_nSampleCnt / 2;
 	}
 	else {
@@ -158,17 +158,31 @@ BYTE CPCMAudioMedia::GetByteFromBlocks(ULONGLONG nBlockOffset, UINT nBlockPerByt
 		case 8:
 			return GetByteFromBlocks8(nBlockOffset, nBlockPerByte);
 		case 16:
-			return GetByteFromBlocks16(nBlockOffset, nBlockPerByte);
 		case 20:
-			return GetByteFromBlocks20(nBlockOffset, nBlockPerByte);
 		case 24:
-			return GetByteFromBlocks24(nBlockOffset, nBlockPerByte);
+			return GetByteFromBlocks162024(nBlockOffset, nBlockPerByte);
 		case 32:
 			return GetByteFromBlocks32(nBlockOffset, nBlockPerByte);
 		case 64:
 			return GetByteFromBlocks64(nBlockOffset, nBlockPerByte);
 	}
 	return 0;
+}
+
+void CPCMAudioMedia::SetByteToBlocks(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte)
+{
+	switch (m_nBitsPerSample) {
+	case 8:
+		return SetByteFromBlocks8(nData, nBlockOffset, nBlockPerByte);
+	case 16:
+	case 20:
+	case 24:
+		return SetByteFromBlocks162024(nData, nBlockOffset, nBlockPerByte);
+	case 32:
+		return SetByteFromBlocks32(nData, nBlockOffset, nBlockPerByte);
+	case 64:
+		return SetByteFromBlocks64(nData, nBlockOffset, nBlockPerByte);
+	}
 }
 
 // 每个sample 4 字节，最高字节有数据，其他为0，一个block 3 个 sample
@@ -317,30 +331,34 @@ else if (nBlockPerByte == 4) {
 }
 }
 
-// 每个sample 4 字节，最高2字节有数据，其他为0，一个block 2 个 sample
-BYTE CPCMAudioMedia::GetByteFromBlocks16(ULONGLONG nBlockOffset, UINT nBlockPerByte)
+// 16： 每个sample 4 字节，最高2字节有数据，其他为0，一个block 2 个 sample
+// 20： 每个sample 4 字节，最高20位有数据，其他为0，一个block 2 个 sample
+// 24： 每个sample 4 字节，最高3字节有数据，其他为0，一个block 2 个 sample
+BYTE CPCMAudioMedia::GetByteFromBlocks162024(ULONGLONG nBlockOffset, UINT nBlockPerByte)
 {
 	ULONGLONG nByteOffset = nBlockOffset * nBlockPerByte * 4 * 2;
 	LPBYTE p = m_pSampleBuffer + nByteOffset;
 	BYTE nRet = 0;
 	ULONGLONG nTarget = 0;
 	ULONGLONG nMask = 0;
+	UINT nIndexShift = (m_nBitsPerSample == 16) ? 2 : 1;
+  UINT nMaskShift = (m_nBitsPerSample == 20) ? 4 : 0;
 	if (nBlockPerByte == 1) {
 		for (UINT i = 0; i < 2; i++) { /* 1 byte in 2 bits block, 4 | 4 */
 			nRet <<= 4;
-			nRet |= p[2 + i * 4] & 0xF;
+			nRet |= (p[nIndexShift + i * 4] & (0xF << nMaskShift)) >> nMaskShift;
 		}
 	}
 	else if (nBlockPerByte == 2) { /* 1 byte in 4 16 bits , 2 | 2 | 2 | 2 */
 		for (INT i = 0; i < 4; i++) {
 			nRet <<= 2;
-			nRet |= (p[2 + i * 4] & 0x3);
+			nRet |= (p[nIndexShift + i * 4] & (0x3 << nMaskShift)) >> nMaskShift;
 		}
 	}
 	else if (nBlockPerByte == 3) { /* F5算法，每一个16bis 的最后两位作为target */
 		for (UINT i = 0; i < 6; i++) {
 			nTarget <<= 2;
-			nTarget |= p[2 + i * 4] & 0x3;
+			nTarget |= (p[nIndexShift + i * 4] & (0x3 << nMaskShift)) >> nMaskShift;
 		}
 		nMask = 0xE00L;
 		for (UINT i = 0; i < 4; i++) {
@@ -351,36 +369,38 @@ BYTE CPCMAudioMedia::GetByteFromBlocks16(ULONGLONG nBlockOffset, UINT nBlockPerB
 	else if (nBlockPerByte == 4) { /* every 16bit use last 1 bits */
 		for (UINT i = 0; i < 8; i++) {
 			nRet <<= 1;
-			nRet |= p[2 + i * 4] & 0x1;
+			nRet |= (p[nIndexShift + i * 4] & (0x1 << nMaskShift)) >> nMaskShift;
 		}
 	}
 	return nRet;
 }
 
-void CPCMAudioMedia::SetByteFromBlocks16(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte)
+void CPCMAudioMedia::SetByteFromBlocks162024(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte)
 {
 	ULONGLONG nByteOffset = nBlockOffset * nBlockPerByte * 4 * 2;
 	LPBYTE p = m_pSampleBuffer + nByteOffset;
 	ULONGLONG nTarget = 0;
 	ULONGLONG nMask = 0;
 	BYTE nMask1 = 0;
+	UINT nIndexShift = (m_nBitsPerSample == 16) ? 2 : 1;
+  UINT nMaskShift = (m_nBitsPerSample == 20) ? 4 : 0;
 	BYTE nRes;
 	if (nBlockPerByte == 1) {
 		for (UINT i = 0; i < 2; i++) {  /* 1 byte in 2 bits block, 4 | 4 */
-			p[2 + i * 4] &= ~0xF;
-			p[2 + i * 4] |= ((nData >> (4 - i * 4)) & 0xF);
+			p[nIndexShift + i * 4] &= ~(0xF << nMaskShift);
+			p[nIndexShift + i * 4] |= ((nData >> (4 - i * 4)) & 0xF) << nMaskShift;
 		}
 	}
 	else if (nBlockPerByte == 2) {
 		for (INT i = 0; i < 4; i++) { /* 1 byte in 4 16 bits , 2 | 2 | 2 | 2 */
-			p[2 + i * 4] &= ~0x3;
-			p[2 + i * 4] |= ((nData >> (6 - i * 2)) & 0x3);
+			p[nIndexShift + i * 4] &= ~(0x3 << nMaskShift);
+			p[nIndexShift + i * 4] |= ((nData >> (6 - i * 2)) & 0x3) << nMaskShift;
 		}
 	}
 	else if (nBlockPerByte == 3) { 
 		for (UINT i = 0; i < 6; i++) {
 			nTarget <<= 2;
-			nTarget |= p[2 + i * 4] & 0x3;
+			nTarget |= (p[nIndexShift + i * 4] & (0x3 << nMaskShift)) >> nMaskShift;
 		}
 		nMask = 0xE00L;
 		nMask1 = 0xC0;
@@ -388,148 +408,150 @@ void CPCMAudioMedia::SetByteFromBlocks16(BYTE nData, ULONGLONG nBlockOffset, UIN
 			nRes = CPackUtils::F5LookupTable[((nData & (nMask1 >> (2 * i))) >> ((3 - i) * 2))]
 				[(BYTE)((nTarget & (nMask >> (i * 3))) >> (9 - i * 3))];
 			if (nRes == 4) {
-				p[2 + i * 6] ^= 0x2;
+				p[nIndexShift + i * 6] ^= (0x2 << nMaskShift);
 			}
 			else if (nRes == 2) {
-				p[2 + i * 6] ^= 0x1;
+				p[nIndexShift + i * 6] ^= (0x1 << nMaskShift);
 			}
 			else if (nRes == 1) {
-				p[6 + i * 6] ^= 0x2;
+				p[nIndexShift + 4 + i * 6] ^= (0x2 << nMaskShift);
 			}
 		}
 		for (UINT i = 1; i < 4; i+=2) {
 			nRes = CPackUtils::F5LookupTable[((nData & (nMask1 >> (2 * i) )) >> ((3 - i) * 2))]
 				[(BYTE)((nTarget & (nMask >> (i * 3))) >> (9 - i * 3))];
 			if (nRes == 4) {
-				p[i * 6] ^= 0x1; 
+				p[nIndexShift - 2 + i * 6] ^= (0x1 << nMaskShift);
 			}
 			else if (nRes == 2) {
-				p[4 + i * 6] ^= 0x2;
+				p[nIndexShift + 2 + i * 6] ^= (0x2 << nMaskShift); // 2:4, 1:3
 			}
 			else if (nRes == 1) {
-				p[4 + i * 6] ^= 0x1;
+				p[nIndexShift + 2 + i * 6] ^= (0x1 << nMaskShift);
 			}
 		}
 	}
 	else if (nBlockPerByte == 4) { /* every 16bit use last 1 bits */
 		for (INT i = 0; i < 8; i++) {
-			p[2 + i * 4] &= ~0x1;
-			p[2 + i * 4] |= ((nData >> (7 - i)) & 0x1);
+			p[nIndexShift + i * 4] &= ~(0x1 << nMaskShift);
+			p[nIndexShift + i * 4] |= ((nData >> (7 - i)) & 0x1) << nMaskShift;
 		}
 	}
 }
+
 
 // 每个sample 4 字节，最高20位有数据，其他为0，一个block 2 个 sample
-BYTE CPCMAudioMedia::GetByteFromBlocks20(ULONGLONG nBlockOffset, UINT nBlockPerByte)
-{
-	ULONGLONG nByteOffset = nBlockOffset * nBlockPerByte * 4 * 2;
-	LPBYTE p = m_pSampleBuffer + nByteOffset;
-	BYTE nRet = 0;
-	ULONGLONG nTarget = 0;
-	ULONGLONG nMask = 0;
-	if (nBlockPerByte == 1) {
-		for (UINT i = 0; i < 2; i++) { /* 1 byte in 2 bits block, 4 | 4 */
-			nRet <<= 4;
-			nRet |= ((p[1 + i * 4] & 0xF0) >> 4);
-		}
-	}
-	else if (nBlockPerByte == 2) { /* 1 byte in 4 16 bits , 2 | 2 | 2 | 2 */
-		for (INT i = 0; i < 4; i++) {
-			nRet <<= 2;
-			nRet |= ((p[1 + i * 4] & 0x30) >> 4);
-		}
-	}
-	else if (nBlockPerByte == 3) { /* F5算法，每一个16bis 的最后两位作为target */
-		for (UINT i = 0; i < 6; i++) {
-			nTarget <<= 2;
-			nTarget |= (p[1 + i * 4] & 0x30) >> 4;
-		}
-		nMask = 0xE00L;
-		for (UINT i = 0; i < 4; i++) {
-			nRet <<= 2;
-			nRet |= CPackUtils::F5RevLookupTable[(BYTE)((nTarget & (nMask >> (i * 3))) >> (9 - i * 3))];
-		}
-	}
-	else if (nBlockPerByte == 4) { /* every 16bit use last 1 bits */
-		for (UINT i = 0; i < 8; i++) {
-			nRet <<= 1;
-			nRet |= p[2 + i * 4] & 0x1;
-		}
-	}
-	return nRet;
-}
 
-// 每个sample 4 字节，最高20位有数据，其他为0，一个block 2 个 sample
-void CPCMAudioMedia::SetByteFromBlocks20(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte)
-{
-	ULONGLONG nByteOffset = nBlockOffset * nBlockPerByte * 4 * 2;
-	LPBYTE p = m_pSampleBuffer + nByteOffset;
-	ULONGLONG nTarget = 0;
-	ULONGLONG nMask = 0;
-	BYTE nMask1 = 0;
-	BYTE nRes;
-	if (nBlockPerByte == 1) {
-		for (UINT i = 0; i < 2; i++) {  /* 1 byte in 2 bits block, 4 | 4 */
-			p[1 + i * 4] &= ~0xF0;
-			p[1 + i * 4] |= (((nData >> (4 - i * 4)) & 0xF) << 4);
-		}
-	}
-	else if (nBlockPerByte == 2) {
-		for (INT i = 0; i < 4; i++) { /* 1 byte in 4 16 bits , 2 | 2 | 2 | 2 */
-			p[1 + i * 4] &= ~0x30;
-			p[1 + i * 4] |= (((nData >> (6 - i * 2)) & 0x3) << 4);
-		}
-	}
-	else if (nBlockPerByte == 3) {
-		for (UINT i = 0; i < 6; i++) {
-			nTarget <<= 2;
-			nTarget |= (p[1 + i * 4] & 0x30) >> 4;
-		}
-		nMask = 0xE00L;
-		nMask1 = 0xC0;
-		for (UINT i = 0; i < 4; i += 2) {
-			nRes = CPackUtils::F5LookupTable[((nData & (nMask1 >> (2 * i))) >> ((3 - i) * 2))]
-				[(BYTE)((nTarget & (nMask >> (i * 3))) >> (9 - i * 3))];
-			if (nRes == 4) {
-				p[1 + i * 6] ^= 0x20;
-			}
-			else if (nRes == 2) {
-				p[1 + i * 6] ^= 0x10;
-			}
-			else if (nRes == 1) {
-				p[5 + i * 6] ^= 0x20;
-			}
-		}
-		for (UINT i = 1; i < 4; i += 2) {
-			nRes = CPackUtils::F5LookupTable[((nData & (nMask1 >> (2 * i))) >> ((3 - i) * 2))]
-				[(BYTE)((nTarget & (nMask >> (i * 3))) >> (9 - i * 3))];
-			if (nRes == 4) {
-				p[i * 6 - 1] ^= 0x10;
-			}
-			else if (nRes == 2) {
-				p[4 + i * 6 - 1] ^= 0x20;
-			}
-			else if (nRes == 1) {
-				p[4 + i * 6 - 1] ^= 0x10;
-			}
-		}
-	}
-	else if (nBlockPerByte == 4) { /* every 16bit use last 1 bits */
-		for (INT i = 0; i < 8; i++) {
-			p[2 + i * 4] &= ~0x1;
-			p[2 + i * 4] |= ((nData >> (7 - i)) & 0x1);
-		}
-	}
-}
+//BYTE CPCMAudioMedia::GetByteFromBlocks20(ULONGLONG nBlockOffset, UINT nBlockPerByte)
+//{
+//	ULONGLONG nByteOffset = nBlockOffset * nBlockPerByte * 4 * 2;
+//	LPBYTE p = m_pSampleBuffer + nByteOffset;
+//	BYTE nRet = 0;
+//	ULONGLONG nTarget = 0;
+//	ULONGLONG nMask = 0;
+//	if (nBlockPerByte == 1) {
+//		for (UINT i = 0; i < 2; i++) { /* 1 byte in 2 bits block, 4 | 4 */
+//			nRet <<= 4;
+//			nRet |= ((p[1 + i * 4] & 0xF0) >> 4);
+//		}
+//	}
+//	else if (nBlockPerByte == 2) { /* 1 byte in 4 16 bits , 2 | 2 | 2 | 2 */
+//		for (INT i = 0; i < 4; i++) {
+//			nRet <<= 2;
+//			nRet |= ((p[1 + i * 4] & 0x30) >> 4);
+//		}
+//	}
+//	else if (nBlockPerByte == 3) { /* F5算法，每一个16bis 的最后两位作为target */
+//		for (UINT i = 0; i < 6; i++) {
+//			nTarget <<= 2;
+//			nTarget |= (p[1 + i * 4] & 0x30) >> 4;
+//		}
+//		nMask = 0xE00L;
+//		for (UINT i = 0; i < 4; i++) {
+//			nRet <<= 2;
+//			nRet |= CPackUtils::F5RevLookupTable[(BYTE)((nTarget & (nMask >> (i * 3))) >> (9 - i * 3))];
+//		}
+//	}
+//	else if (nBlockPerByte == 4) { /* every 16bit use last 1 bits */
+//		for (UINT i = 0; i < 8; i++) {
+//			nRet <<= 1;
+//			nRet |= p[2 + i * 4] & 0x1;
+//		}
+//	}
+//	return nRet;
+//}
+//
+//// 每个sample 4 字节，最高20位有数据，其他为0，一个block 2 个 sample
+//void CPCMAudioMedia::SetByteFromBlocks20(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte)
+//{
+//	ULONGLONG nByteOffset = nBlockOffset * nBlockPerByte * 4 * 2;
+//	LPBYTE p = m_pSampleBuffer + nByteOffset;
+//	ULONGLONG nTarget = 0;
+//	ULONGLONG nMask = 0;
+//	BYTE nMask1 = 0;
+//	BYTE nRes;
+//	if (nBlockPerByte == 1) {
+//		for (UINT i = 0; i < 2; i++) {  /* 1 byte in 2 bits block, 4 | 4 */
+//			p[1 + i * 4] &= ~0xF0;
+//			p[1 + i * 4] |= (((nData >> (4 - i * 4)) & 0xF) << 4);
+//		}
+//	}
+//	else if (nBlockPerByte == 2) {
+//		for (INT i = 0; i < 4; i++) { /* 1 byte in 4 16 bits , 2 | 2 | 2 | 2 */
+//			p[1 + i * 4] &= ~0x30;
+//			p[1 + i * 4] |= (((nData >> (6 - i * 2)) & 0x3) << 4);
+//		}
+//	}
+//	else if (nBlockPerByte == 3) {
+//		for (UINT i = 0; i < 6; i++) {
+//			nTarget <<= 2;
+//			nTarget |= (p[1 + i * 4] & 0x30) >> 4;
+//		}
+//		nMask = 0xE00L;
+//		nMask1 = 0xC0;
+//		for (UINT i = 0; i < 4; i += 2) {
+//			nRes = CPackUtils::F5LookupTable[((nData & (nMask1 >> (2 * i))) >> ((3 - i) * 2))]
+//				[(BYTE)((nTarget & (nMask >> (i * 3))) >> (9 - i * 3))];
+//			if (nRes == 4) {
+//				p[1 + i * 6] ^= 0x20;
+//			}
+//			else if (nRes == 2) {
+//				p[1 + i * 6] ^= 0x10;
+//			}
+//			else if (nRes == 1) {
+//				p[5 + i * 6] ^= 0x20;
+//			}
+//		}
+//		for (UINT i = 1; i < 4; i += 2) {
+//			nRes = CPackUtils::F5LookupTable[((nData & (nMask1 >> (2 * i))) >> ((3 - i) * 2))]
+//				[(BYTE)((nTarget & (nMask >> (i * 3))) >> (9 - i * 3))];
+//			if (nRes == 4) {
+//				p[i * 6 - 1] ^= 0x10;
+//			}
+//			else if (nRes == 2) {
+//				p[3 + i * 6] ^= 0x20;
+//			}
+//			else if (nRes == 1) {
+//				p[3 + i * 6] ^= 0x10;
+//			}
+//		}
+//	}
+//	else if (nBlockPerByte == 4) { /* every 16bit use last 1 bits */
+//		for (INT i = 0; i < 8; i++) {
+//			p[2 + i * 4] &= ~0x1;
+//			p[2 + i * 4] |= ((nData >> (7 - i)) & 0x1);
+//		}
+//	}
+//}
 
-BYTE CPCMAudioMedia::GetByteFromBlocks24(ULONGLONG nBlockOffset, UINT nBlockPerByte)
-{
-	return 0;
-}
 
 BYTE CPCMAudioMedia::GetByteFromBlocks32(ULONGLONG nBlockOffset, UINT nBlockPerByte)
 {
 	return 0;
+}
+
+void CPCMAudioMedia::SetByteFromBlocks32(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte)
+{
 }
 
 BYTE CPCMAudioMedia::GetByteFromBlocks64(ULONGLONG nBlockOffset, UINT nBlockPerByte)
@@ -537,34 +559,12 @@ BYTE CPCMAudioMedia::GetByteFromBlocks64(ULONGLONG nBlockOffset, UINT nBlockPerB
 	return 0;
 }
 
-void CPCMAudioMedia::SetByteToBlocks(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte)
-{
-	switch (m_nBitsPerSample) {
-	case 8:
-		return SetByteFromBlocks8(nData, nBlockOffset, nBlockPerByte);
-	case 16:
-		return SetByteFromBlocks16(nData, nBlockOffset, nBlockPerByte);
-	case 20:
-		return SetByteFromBlocks20(nData, nBlockOffset, nBlockPerByte);
-	case 24:
-		return SetByteFromBlocks24(nData, nBlockOffset, nBlockPerByte);
-	case 32:
-		return SetByteFromBlocks32(nData, nBlockOffset, nBlockPerByte);
-	case 64:
-		return SetByteFromBlocks64(nData, nBlockOffset, nBlockPerByte);
-	}
-}
-
-
-void CPCMAudioMedia::SetByteFromBlocks24(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte)
+void CPCMAudioMedia::SetByteFromBlocks64(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte)
 {
 }
 
-void CPCMAudioMedia::SetByteFromBlocks32(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte)
-{
-}
 
-void CPCMAudioMedia::SetByteFromBlocks64(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte)
-{
-}
+
+
+
 
