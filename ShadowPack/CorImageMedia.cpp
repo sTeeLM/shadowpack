@@ -252,7 +252,6 @@ BYTE CCorImageMedia::GetByteFromBlocks(ULONGLONG nOffset, UINT nBlockPerByte)
             nRet <<= 1;
             nRet |= (GetCorFromIndex((nOffset * 8) + i) & 0x1);
         }
-        
     }
     return nRet;
 }

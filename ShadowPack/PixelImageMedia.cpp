@@ -375,7 +375,7 @@ void CPixelImageMedia::SetByteToBlocks(BYTE nData, ULONGLONG nOffset, UINT nBloc
 	IMAGE_PIXEL_T * pPixelBlock = m_pBlockBuffer; // this always is first object!
 	pPixelBlock += nOffset * nBlockPerByte;
 	BYTE nTarget = 0;
-	BYTE nRet = 0;
+	BYTE nMask = 0;
 	BYTE nRes;
 	if (nBlockPerByte == 1) {          /* R: 3, G 2, B 3*/
 		pPixelBlock[0].m_nRed &= ~0x7;
@@ -435,14 +435,14 @@ void CPixelImageMedia::SetByteToBlocks(BYTE nData, ULONGLONG nOffset, UINT nBloc
 
 	} else if (nBlockPerByte == 4) {  /* F5 algo */
 		/* F5 algo , every pixel offer 3 bits as target hide 2 bits data, max 1 bit of target changed */
-		nRet = 0xC0;
+		nMask = 0xC0;
 		for (INT i = 0; i < 4; i++) {
 			nTarget = pPixelBlock[i].m_nRed & 0x1;
 			nTarget <<= 1;
 			nTarget |= pPixelBlock[i].m_nGreen & 0x1;
 			nTarget <<= 1;
 			nTarget |= pPixelBlock[i].m_nBlue & 0x1;
-			nRes = CPackUtils::F5LookupTable[((nData & nRet) >> ((3 - i) * 2))][nTarget];
+			nRes = CPackUtils::F5LookupTable[((nData & nMask) >> ((3 - i) * 2))][nTarget];
 			if (nRes == 4) {
 				pPixelBlock[i].m_nRed ^= 0x1;
 			} else if (nRes == 2) {
@@ -450,7 +450,7 @@ void CPixelImageMedia::SetByteToBlocks(BYTE nData, ULONGLONG nOffset, UINT nBloc
 			} else if (nRes == 1) { 
 				pPixelBlock[i].m_nBlue ^= 0x1;
 			} 
-			nRet >>= 2;
+			nMask >>= 2;
 		}
 	}
 }
