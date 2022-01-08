@@ -101,7 +101,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win32\static_debug\include;..\libnetpbm\include;..\libaudiofile\libaudiofile;..\libsndfile\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win32\static_debug\include;..\libnetpbm\include;..\libsndfile\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -128,7 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win64\static_debug\include;..\libnetpbm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win64\static_debug\include;..\libnetpbm\include;..\libsndfile\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -156,7 +156,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win32\static\include;..\libnetpbm\include;..\libaudiofile\libaudiofile;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win32\static\include;..\libnetpbm\include;..\libsndfile\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -187,7 +187,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win64\static\include;..\libnetpbm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\win64\static\include;..\libnetpbm\include;..\libsndfile\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

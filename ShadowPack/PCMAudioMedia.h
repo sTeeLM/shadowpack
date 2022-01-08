@@ -26,15 +26,13 @@ public:
 	void SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
 	void GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
 protected:
-	BYTE GetByteFromBlocks8(ULONGLONG nOffset, UINT nBlockPerByte);
-	BYTE GetByteFromBlocks162024(ULONGLONG nOffset, UINT nBlockPerByte);
-	BYTE GetByteFromBlocks32(ULONGLONG nOffset, UINT nBlockPerByte);
-	BYTE GetByteFromBlocks64(ULONGLONG nOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks8(ULONGLONG nBlockOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks162024(ULONGLONG nBlockOffset, UINT nBlockPerByte);
+	BYTE GetByteFromBlocks3264(ULONGLONG nBlockOffset, UINT nBlockPerByte);
 
-	void SetByteFromBlocks8(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
-	void SetByteFromBlocks162024(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
-	void SetByteFromBlocks32(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
-	void SetByteFromBlocks64(BYTE nData, ULONGLONG nOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks8(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks162024(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte);
+	void SetByteFromBlocks3264(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte);
 
 protected:
 	CFileCache m_FileCache;
