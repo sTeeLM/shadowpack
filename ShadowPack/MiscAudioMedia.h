@@ -41,10 +41,29 @@ protected:
 protected:
 	class CAudioMeta {
 	public:
+		CAudioMeta() :
+			m_pFormatCtx(NULL),
+			m_pCodecCtx(NULL),
+			m_pCodec(NULL),
+			m_TotalFrames(0)
+		{
 
+		}
+		AVFormatContext* m_pFormatCtx;
+		AVCodecContext* m_pCodecCtx;
+		AVCodec* m_pCodec;
+		ULONGLONG m_TotalFrames;
 	public:
 		void Free() 
 		{
+			if (m_pFormatCtx) {
+				avformat_close_input(&m_pFormatCtx);
+			}
+			if (m_pCodecCtx) {
+				avcodec_free_context(&m_pCodecCtx);
+			}
+			m_pCodec = NULL;
+			m_TotalFrames = 0;
 		}
 	};
 
@@ -55,7 +74,8 @@ protected:
 #define ONE_PASS_FRAMES 64
 	INT CheckCodecID(INT nCodecID);
 	BOOL IsFloat(INT nFormat);
-	BOOL ProbeTotalFrames(AVFormatContext* pFormatCtx, LPCTSTR szFilePath,
+	BOOL ProbeTotalFrames(AVFormatContext* pFormatCtx, AVCodecContext* pCodecCtx, LPCTSTR szFilePath,
 		ULONGLONG& nTotalFrames, CPackErrors& Errors);
+	INT EncodeFrame(AVFormatContext* pFormatCtx, AVCodecContext* pCodecCtx, AVFrame* pFrame, AVPacket* pPacket);
 };
 
