@@ -37,8 +37,6 @@ BOOL CMiscAudioMedia::CheckCodecID(INT nCodecID)
 	case AV_CODEC_ID_PCM_U16BE:
 	case AV_CODEC_ID_PCM_S8:
 	case AV_CODEC_ID_PCM_U8:
-	case AV_CODEC_ID_PCM_MULAW:
-	case AV_CODEC_ID_PCM_ALAW:
 	case AV_CODEC_ID_PCM_S32LE:
 	case AV_CODEC_ID_PCM_S32BE:
 	case AV_CODEC_ID_PCM_U32LE:
@@ -226,7 +224,7 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 	nBitsPerSample = av_get_bits_per_sample(m_FileMeta.m_pCodec->id);
 	if (nBitsPerSample == 0 && m_FileMeta.m_pCodecCtx->bits_per_raw_sample != 0) {
 		nBitsPerSample = m_FileMeta.m_pCodecCtx->bits_per_raw_sample;
-	} else {
+	} else if(nBitsPerSample == 0){
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
