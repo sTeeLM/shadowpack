@@ -9,7 +9,7 @@ CPCMAudioMedia::CPCMAudioMedia() :
 	m_bUseFileCache(FALSE),
 	m_pSampleBuffer(NULL),
 	m_nBitsPerSample(0),
-	m_nSampleCnt(0),
+	m_nFrameCnt(0),
 	m_nChannels(0),
 	m_OptPCMAudioMedia(NULL, IDS_OPT_PCM_MEDIA)
 {
@@ -80,6 +80,8 @@ BOOL CPCMAudioMedia::Alloc(ULONGLONG nFrames, UINT nChannels, UINT nBitsPerSampl
 
 	nSize *= (nFrames * nChannels);
 
+	TRACE(_T("alloc buffer size %I64u\n"), nSize);
+
 	if (m_bUseFileCache) {
 		m_pSampleBuffer = (LPBYTE)m_FileCache.Alloc(nSize, Error);
 	} else {
@@ -87,7 +89,7 @@ BOOL CPCMAudioMedia::Alloc(ULONGLONG nFrames, UINT nChannels, UINT nBitsPerSampl
 			Error.SetError(CPackErrors::PE_NOMEM);
 			goto err;
 		}
-		m_pSampleBuffer = new (std::nothrow) BYTE[nSize];
+		m_pSampleBuffer = new (std::nothrow) BYTE[(size_t)nSize];
 		if (!m_pSampleBuffer) {
 			Error.SetError(CPackErrors::PE_NOMEM);
 		}
@@ -97,7 +99,7 @@ BOOL CPCMAudioMedia::Alloc(ULONGLONG nFrames, UINT nChannels, UINT nBitsPerSampl
 		goto err;
 	}
 
-	m_nSampleCnt = nFrames * nChannels;
+	m_nFrameCnt = nFrames;
 	m_nBitsPerSample = nBitsPerSample;
 	m_nChannels = nChannels;
 	bRet = TRUE;
@@ -117,7 +119,7 @@ void CPCMAudioMedia::Free()
 		m_pSampleBuffer = NULL;
 	}
 	m_nBitsPerSample = 0;
-	m_nSampleCnt = 0;
+	m_nFrameCnt = 0;
 	m_nChannels = 0;
 }
 
@@ -155,44 +157,213 @@ void CPCMAudioMedia::GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFram
 	memcpy(pBuffer, m_pSampleBuffer + nOffset, nSize);
 }
 
-void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, UINT nLineSize, SAMPLE_FORMAT_T Format, INT& nSamples, INT nChannels)
+BOOL CPCMAudioMedia::SampleFmtMatchBitWidth(UINT nBitsPerSample, SAMPLE_FORMAT_T Format) 
 {
 	switch (Format) {
-	SAMPLE_FMT_U8:          ///< unsigned 8 bits
-	SAMPLE_FMT_S16:         ///< signed 16 bits
-	SAMPLE_FMT_S32:         ///< signed 32 bits
-	SAMPLE_FMT_FLT:         ///< float
-	SAMPLE_FMT_DBL:         ///< double
-	SAMPLE_FMT_S64:         ///< signed 64 bits
-
-	SAMPLE_FMT_U8P:         ///< unsigned 8 bits, planar
-	SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
-	SAMPLE_FMT_S32P:        ///< signed 32 bits, planar
-	SAMPLE_FMT_FLTP:        ///< float, planar
-	SAMPLE_FMT_DBLP:        ///< double, planar
-	SAMPLE_FMT_S64P:        ///< signed 64 bits, planar
+	case SAMPLE_FMT_U8:          ///< unsigned 8 bits
+		return nBitsPerSample == 8;
+	case SAMPLE_FMT_S16:         ///< signed 16 bits
+		return nBitsPerSample == 16;
+	case SAMPLE_FMT_S32:         ///< signed 32 bits
+	case SAMPLE_FMT_FLT:         ///< float
+		return nBitsPerSample <= 32 && nBitsPerSample >= 20;
+	case SAMPLE_FMT_DBL:         ///< double
+	case SAMPLE_FMT_S64:         ///< signed 64 bits
+		return nBitsPerSample == 64;
+	case SAMPLE_FMT_U8P:         ///< unsigned 8 bits, planar
+		return nBitsPerSample == 8 && m_nChannels > 1;
+	case SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
+		return nBitsPerSample == 16 && m_nChannels > 1;
+	case SAMPLE_FMT_S32P:        ///< signed 32 bits, planar
+	case SAMPLE_FMT_FLTP:        ///< float, planar
+		return nBitsPerSample <= 32 && nBitsPerSample >= 20 && m_nChannels > 1;
+	case SAMPLE_FMT_DBLP:        ///< double, planar
+	case SAMPLE_FMT_S64P:        ///< signed 64 bits, planar
+		return nBitsPerSample == 64 && m_nChannels > 1;
+	default:
+		ASSERT(FALSE);
 		break;
+	}
+	return FALSE;
+}
+
+void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT nSamples, INT nChannels)
+{
+	if (nFrameOffset + nSamples > m_nFrameCnt) {
+		nSamples = (INT)(m_nFrameCnt - nFrameOffset);
+	}
+
+	ASSERT(nChannels == m_nChannels);
+	if (nChannels != m_nChannels) {
+		return;
+	}
+
+	ASSERT(SampleFmtMatchBitWidth(m_nBitsPerSample, Format));
+	if (!SampleFmtMatchBitWidth(m_nBitsPerSample, Format)) {
+		return;
+	}
+
+	TRACE(_T("nFrameOffset = %I64u, nLineSize = %d, Format = %d, nSamples = %d, nChannels = %d\n"),
+		nFrameOffset, nLineSize, Format, nSamples, nChannels);
+	if (m_pSampleBuffer) {
+		switch (Format) {
+		case SAMPLE_FMT_U8:          ///< unsigned 8 bits
+			// 3 7 11 15
+			for (INT i = 0; i < nSamples * nChannels; i++) {
+				m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 3] = pBuffer[0][i];
+			}
+			break;
+		case SAMPLE_FMT_S16:         ///< signed 16 bits
+			// 2-3 6-7 10-11 14-15
+			for (INT i = 0; i < nSamples * nChannels; i++) {
+				m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 2] = pBuffer[0][i * 2];
+				m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 3] = pBuffer[0][i * 2 + 1];
+			}
+			break;
+		case SAMPLE_FMT_S32:         ///< signed 32 bits
+		case SAMPLE_FMT_FLT:         ///< float
+			for (INT i = 0; i < nSamples * nChannels; i++) {
+				DWORD* p  = (DWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4];
+				DWORD* p1 = (DWORD*)&pBuffer[0][i * 4];
+				*p = *p1;
+			}
+			break;
+		case SAMPLE_FMT_DBL:         ///< double
+		case SAMPLE_FMT_S64:         ///< signed 64 bits
+			for (INT i = 0; i < nSamples * nChannels; i++) {
+				QWORD* p = (QWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 8 + i * 8];
+				QWORD* p1 = (QWORD*)&pBuffer[0][i * 8];
+				*p = *p1;
+			}
+			break;
+		case SAMPLE_FMT_U8P:         ///< unsigned 8 bits, planar
+			for (int j = 0; j < nChannels; j++) {
+				for (INT i = 0; i < nSamples; i++) {
+					m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 3] = pBuffer[j][i];
+				}
+			}
+			break;
+		case SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
+			for (int j = 0; j < nChannels; j++) {
+				for (INT i = 0; i < nSamples; i++) {
+					m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 2] = pBuffer[j][i * 2];
+					m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 3] = pBuffer[j][i * 2 + 1];
+				}
+			}
+			break;
+		case SAMPLE_FMT_S32P:        ///< signed 32 bits, planar
+		case SAMPLE_FMT_FLTP:        ///< float, planar
+			for (int j = 0; j < nChannels; j++) {
+				for (INT i = 0; i < nSamples; i++) {
+					DWORD* p = (DWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4];
+					DWORD* p1 = (DWORD*)&pBuffer[j][i * 4];
+					*p = *p1;
+				}
+			}break;
+		case SAMPLE_FMT_DBLP:        ///< double, planar
+		case SAMPLE_FMT_S64P:        ///< signed 64 bits, planar
+			for (int j = 0; j < nChannels; j++) {
+				for (INT i = 0; i < nSamples; i++) {
+					QWORD* p = (QWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 8 + j * nChannels * 8 + i * 8];
+					QWORD* p1 = (QWORD*)&pBuffer[j][i * 8];
+					*p = *p1;
+				}
+			}break;
+		default:
+			ASSERT(FALSE);
+			break;
+		}
 	}
 
 }
 
-void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, UINT nLineSize, SAMPLE_FORMAT_T Format, INT& nSamples, INT nChannels)
+void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT& nSamples, INT nChannels)
 {
-	switch (Format) {
-	SAMPLE_FMT_U8:          ///< unsigned 8 bits
-	SAMPLE_FMT_S16:         ///< signed 16 bits
-	SAMPLE_FMT_S32:         ///< signed 32 bits
-	SAMPLE_FMT_FLT:         ///< float
-	SAMPLE_FMT_DBL:         ///< double
-	SAMPLE_FMT_U8P:         ///< unsigned 8 bits, planar
-	SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
-	SAMPLE_FMT_S32P:        ///< signed 32 bits, planar
-	SAMPLE_FMT_FLTP:        ///< float, planar
-	SAMPLE_FMT_DBLP:        ///< double, planar
-	SAMPLE_FMT_S64:         ///< signed 64 bits
-	SAMPLE_FMT_S64P:        ///< signed 64 bits, planar
-		break;
+	if (nFrameOffset + nSamples > m_nFrameCnt) {
+		nSamples = (INT)(m_nFrameCnt - nFrameOffset);
 	}
+
+	ASSERT(nChannels == m_nChannels);
+	if (nChannels != m_nChannels) {
+		return;
+	}
+
+	ASSERT(SampleFmtMatchBitWidth(m_nBitsPerSample, Format));
+	if (!SampleFmtMatchBitWidth(m_nBitsPerSample, Format)) {
+		return;
+	}
+
+	if (m_pSampleBuffer) {
+		switch (Format) {
+		case SAMPLE_FMT_U8:          ///< unsigned 8 bits
+			// 3 7 11 15
+			for (INT i = 0; i < nSamples * nChannels; i++) {
+				pBuffer[0][i] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 3];
+			}
+			break;
+		case SAMPLE_FMT_S16:         ///< signed 16 bits
+			// 2-3 6-7 10-11 14-15
+			for (INT i = 0; i < nSamples * nChannels; i++) {
+				pBuffer[0][i * 2] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 2];
+				pBuffer[0][i * 2 + 1] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 3];
+			}
+			break;
+		case SAMPLE_FMT_S32:         ///< signed 32 bits
+		case SAMPLE_FMT_FLT:         ///< float
+			for (INT i = 0; i < nSamples * nChannels; i++) {
+				DWORD* p = (DWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4];
+				DWORD* p1 = (DWORD*)&pBuffer[0][i * 4];
+				*p1 = *p;
+			}
+			break;
+		case SAMPLE_FMT_DBL:         ///< double
+		case SAMPLE_FMT_S64:         ///< signed 64 bits
+			for (INT i = 0; i < nSamples * nChannels; i++) {
+				QWORD* p = (QWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 8 + i * 8];
+				QWORD* p1 = (QWORD*)&pBuffer[0][i * 8];
+				*p1 = *p;
+			}
+			break;
+		case SAMPLE_FMT_U8P:         ///< unsigned 8 bits, planar
+			for (int j = 0; j < nChannels; j++) {
+				for (INT i = 0; i < nSamples; i++) {
+					pBuffer[j][i] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 3];
+				}
+			}
+			break;
+		case SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
+			for (int j = 0; j < nChannels; j++) {
+				for (INT i = 0; i < nSamples; i++) {
+					pBuffer[j][i * 2] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 2];
+					pBuffer[j][i * 2 + 1] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 3];
+				}
+			}
+			break;
+		case SAMPLE_FMT_S32P:        ///< signed 32 bits, planar
+		case SAMPLE_FMT_FLTP:        ///< float, planar
+			for (int j = 0; j < nChannels; j++) {
+				for (INT i = 0; i < nSamples; i++) {
+					DWORD* p = (DWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4];
+					DWORD* p1 = (DWORD*)&pBuffer[j][i * 4];
+					*p1 = *p;
+				}
+			}break;
+		case SAMPLE_FMT_DBLP:        ///< double, planar
+		case SAMPLE_FMT_S64P:        ///< signed 64 bits, planar
+			for (int j = 0; j < nChannels; j++) {
+				for (INT i = 0; i < nSamples; i++) {
+					QWORD* p = (QWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 8 + j * nChannels * 8 + i * 8];
+					QWORD* p1 = (QWORD*)&pBuffer[j][i * 8];
+					*p1 = *p;
+				}
+			}break;
+		default:
+			ASSERT(FALSE);
+			break;
+		}
+	}
+	TRACE(_T("nFrameOffset = %I64u, nLineSize = %d, Format = %d, nSamples = %d, nChannels = %d\n"),
+		nFrameOffset, nLineSize, Format, nSamples, nChannels);
 }
 
 /*
@@ -208,13 +379,13 @@ m_nBitsPerSample:
 ULONGLONG CPCMAudioMedia::GetTotalBlocks()
 {
 	if (m_nBitsPerSample == 8) {
-		return m_nSampleCnt / 3;
+		return m_nFrameCnt * m_nChannels / 3;
 	}
 	else if (m_nBitsPerSample == 16 || m_nBitsPerSample == 20 || m_nBitsPerSample == 24) {
-		return m_nSampleCnt / 2;
+		return m_nFrameCnt * m_nChannels / 2;
 	}
 	else {
-		return m_nSampleCnt;
+		return m_nFrameCnt * m_nChannels;
 	}
 }
 
@@ -257,7 +428,7 @@ BYTE CPCMAudioMedia::GetByteFromBlocks8(ULONGLONG nBlockOffset, UINT nBlockPerBy
 	BYTE nRet = 0;
 	BYTE nTarget = 0;
 	if (nBlockPerByte == 1) { /* 0: 3, 1: 2, 2: 3 */
-		ASSERT(nByteOffset + 12 < m_nSampleCnt * 4);
+		ASSERT(nByteOffset + 12 < (m_nFrameCnt * m_nChannels) * 4);
 		nRet = p[3] & 0x7;
 		nRet <<= 2;
 		nRet |= p[7] & 0x3;
@@ -317,10 +488,10 @@ void CPCMAudioMedia::SetByteFromBlocks8(BYTE nData, ULONGLONG nBlockOffset, UINT
 	BYTE nMask = 0;
 	BYTE nRes;
 	if (nBlockPerByte == 1) { /* 0: 3, 1: 2, 2: 3 */
-		ASSERT(nByteOffset + 12 < m_nSampleCnt * 4);
+		ASSERT(nByteOffset + 12 < (m_nFrameCnt * m_nChannels) * 4);
 		p[3] &= ~0x7;
 		p[3] |= ((nData >> 5) & 0x7);
-
+		
 		p[7] &= ~0x3;
 		p[7] |= ((nData >> 3) & 0x3);
 

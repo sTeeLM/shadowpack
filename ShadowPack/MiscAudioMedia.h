@@ -38,6 +38,7 @@ protected:
 	static CString m_strLastLog;
 	static void CBLogger(void* avcl, int level, const char* fmt, va_list vl);
 	static CString GetErrorString(INT nErr);
+	
 protected:
 	class CAudioMeta {
 	public:
@@ -68,14 +69,15 @@ protected:
 	};
 
 	CAudioMeta m_FileMeta;
-#define PCM_LOG_BUFFER_SIZE 1024
 	COptPagePCMFileProperty m_OptPagePCMFileProperty;
 protected:
-#define ONE_PASS_FRAMES 64
+#define ONE_PASS_FRAMES 4096
 	INT CheckCodecID(INT nCodecID);
-	BOOL IsFloat(INT nFormat);
 	BOOL ProbeTotalFrames(AVFormatContext* pFormatCtx, AVCodecContext* pCodecCtx, LPCTSTR szFilePath,
 		ULONGLONG& nTotalFrames, CPackErrors& Errors);
-	INT EncodeFrame(AVFormatContext* pFormatCtx, AVCodecContext* pCodecCtx, AVFrame* pFrame, AVPacket* pPacket);
+	INT EncodeFrame(AVFormatContext* pEncodeFormatCtx,
+		AVCodecContext* pEncodeCodecCtx, AVCodecContext* pDecodeCodecCtx,
+		AVFrame* pFrame, AVPacket* pPacket);
+	CString FillInfoStr();
 };
 

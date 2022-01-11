@@ -21,6 +21,7 @@ public:
 	virtual BOOL UpdateOpts(CMFCPropertySheet* pPropertySheet);
 
 public:
+	// 和ffmpeg定义一致
 	typedef enum _SAMPLE_FORMAT_T {
 		SAMPLE_FMT_NONE = -1,
 		SAMPLE_FMT_U8,          ///< unsigned 8 bits
@@ -41,10 +42,10 @@ public:
 	}SAMPLE_FORMAT_T;
 	BOOL Alloc(ULONGLONG nFrames, UINT nChannels, UINT nBitsPerSample, CPackErrors& Error);
 	void Free();
-	void SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
+	void SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt); 
 	void GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
-	void SetSample(LPBYTE* pBuffer, UINT nLineSize, SAMPLE_FORMAT_T Format, INT &nSamples, INT nChannels);
-	void GetSample(LPBYTE* pBuffer, UINT nLineSize, SAMPLE_FORMAT_T Format, INT &nSamples, INT nChannels);
+	void SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT nSamples, INT nChannels);
+	void GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT& nSamples, INT nChannels);
 protected:
 	BYTE GetByteFromBlocks8(ULONGLONG nBlockOffset, UINT nBlockPerByte);
 	BYTE GetByteFromBlocks162024(ULONGLONG nBlockOffset, UINT nBlockPerByte);
@@ -53,11 +54,11 @@ protected:
 	void SetByteFromBlocks8(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte);
 	void SetByteFromBlocks162024(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte);
 	void SetByteFromBlocks3264(BYTE nData, ULONGLONG nBlockOffset, UINT nBlockPerByte);
-
+	BOOL SampleFmtMatchBitWidth(UINT nBitsPerSample, SAMPLE_FORMAT_T Format);
 protected:
 	CFileCache m_FileCache;
 	BOOL m_bUseFileCache;
-	ULONGLONG m_nSampleCnt;
+	ULONGLONG m_nFrameCnt;
 	LPBYTE m_pSampleBuffer;
 	UINT m_nBitsPerSample;
 	UINT m_nChannels;
