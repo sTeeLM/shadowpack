@@ -1,5 +1,6 @@
 #pragma once
 #include "PixelImageMedia.h"
+#include "MediaFactory.h"
 #include "OptPagePPMFile.h"
 
 class CPPMFileMedia :
@@ -36,11 +37,7 @@ protected:
 public:
 	// 实现CMediaFactory的接口
 	static CMediaBase* Factory();
-	static LPCTSTR GetName();
-	static LPCTSTR* GetExtTable();
-protected:
-	static LPCTSTR m_szName;
-	static LPCTSTR m_szExtTable[];
+	static void GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray);
 
 };
 

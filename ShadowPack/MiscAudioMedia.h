@@ -1,6 +1,8 @@
 #pragma once
 #include "PCMAudioMedia.h"
 #include "OptPagePCMFileProperty.h"
+#include "MediaFactory.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
@@ -29,12 +31,14 @@ public:
 	virtual BOOL UpdateOpts(CMFCPropertySheet* pPropertySheet);
 public:
 	// 实现CMediaFactory的接口
+	typedef struct _MISC_AUDIO_EXT {
+		LPCTSTR szExts;
+		LPCTSTR szName;
+	} MISC_AUDIO_EXT;
 	static CMediaBase* Factory();
-	static LPCTSTR GetName();
-	static LPCTSTR* GetExtTable();
+	static void GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray);
+	static MISC_AUDIO_EXT m_szExtTable[];
 protected:
-	static LPCTSTR m_szName;
-	static LPCTSTR m_szExtTable[];
 	static CString m_strLastLog;
 	static void CBLogger(void* avcl, int level, const char* fmt, va_list vl);
 	static CString GetErrorString(INT nErr);
@@ -55,7 +59,7 @@ protected:
 		AVCodec* m_pCodec;
 		ULONGLONG m_TotalFrames;
 	public:
-		void Free() 
+		void Free()
 		{
 			if (m_pFormatCtx) {
 				avformat_close_input(&m_pFormatCtx);
@@ -72,7 +76,7 @@ protected:
 	COptPagePCMFileProperty m_OptPagePCMFileProperty;
 protected:
 #define ONE_PASS_FRAMES 4096
-	INT CheckCodecID(INT nCodecID);
+	static INT CheckCodecID(INT nCodecID);
 	BOOL ProbeTotalFrames(AVFormatContext* pFormatCtx, AVCodecContext* pCodecCtx, LPCTSTR szFilePath,
 		ULONGLONG& nTotalFrames, CPackErrors& Errors);
 	INT EncodeFrame(AVFormatContext* pEncodeFormatCtx,

@@ -68,7 +68,7 @@ CString  CMiscAudioMedia::FillInfoStr()
 	strRet += strTmp;
 
 	strRet += _T("Codec:       ");
-	strTmp.Format(_T("%s\r\n"), CA2CT(m_FileMeta.m_pCodec->long_name));
+	strTmp.Format(_T("%s\r\n"), (LPCTSTR)CA2CT(m_FileMeta.m_pCodec->long_name));
 	strRet += strTmp;
 
 	strRet += _T("Meta:       \r\n");
@@ -608,58 +608,52 @@ BOOL CMiscAudioMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return CPCMAudioMedia::UpdateOpts(pPropertySheet);;
 }
 
-LPCTSTR CMiscAudioMedia::m_szName = _T("wav audio file");
-LPCTSTR CMiscAudioMedia::m_szExtTable[] = {
-	_T("wav"),
-	_T("aif"),
-	_T("au"),
-	_T("snd"),
-	_T("raw"),
-	_T("gsm"),
-	_T("vox"),
-	_T("paf"),
-	_T("fap"),
-	_T("svx"),
-	_T("nist"),
-	_T("sph"),
-	_T("voc"),
-	_T("ircam"),
-	_T("sf"),
-	_T("w64"),
-	_T("mat"),
-	_T("mat4"),
-	_T("mat5"),
-	_T("pvf"),
-	_T("xi"),
-	_T("htk"),
-	_T("sds"),
-	_T("avr"),
-	_T("wavex"),
-	_T("sd2"),
-	_T("flac"),
-	_T("caf"),
-	_T("wve"),
-	_T("prc"),
-	_T("ogg"),
-	_T("oga"),
-	_T("mpc"),
-	_T("rf64"),
-	_T("m4a"),
-	_T("mp3"),
-	NULL
-};
-
 CMediaBase* CMiscAudioMedia::Factory()
 {
 	return new(std::nothrow) CMiscAudioMedia();
 }
 
-LPCTSTR CMiscAudioMedia::GetName()
+CMiscAudioMedia::MISC_AUDIO_EXT CMiscAudioMedia::m_szExtTable[] = {
+	{_T("wav"),_T("Waveform Audio File Format") },
+	{_T("aif,aiff,aifc"),_T("Audio Interchange File Format")},
+	{_T("au,snd"),_T("NeXT/Sun")},
+	{_T("m4a,m4r"),_T("Apple MPEG - 4 Audio")},
+	{_T("caf"),_T("Core Audio Format")},
+	{_T("flac"),_T("Free Lossless Audio Codec") },
+	{_T("dts"), _T("Digital Theater Systems") },
+	{_T("mlp"), _T("Meridian Lossless Packing") },
+	{_T("ogg,oga"), _T("OGG Container Format") },
+	{_T("wv"), _T("Wave Pack") },
+	{_T("w64"), _T("Sony Wave64") },
+	{_T("tta"), _T("True Audio") },
+	{_T("oma,aa3"), _T("Sony OpenMG Audio") },
+	{_T("thd"), _T("Muxer truehd") },
+};
+
+void CMiscAudioMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
-	return m_szName;
+	CMediaFactory::CMediaInfo Info;
+	TCHAR szBuffer[1024];
+	TCHAR* context = NULL;
+	TCHAR* token;
+	for (INT i = 0; i < _countof(m_szExtTable); i++) {
+		context = NULL;
+		Info.Exts.RemoveAll();
+		_tcsncpy_s(szBuffer, m_szExtTable[i].szExts, lstrlen(m_szExtTable[i].szExts));
+		szBuffer[_countof(szBuffer) - 1] = 0;
+		token = _tcstok_s(szBuffer, _T(","), &context);
+		while (token) {
+			Info.Exts.Add(token);
+			token = _tcstok_s(NULL, _T(","), &context);
+		}
+		Info.fnFactory = Factory;
+		Info.nCatagory = IDS_MEDIA_AUDIO_FILE;
+		Info.strName = m_szExtTable[i].szName;
+		InfoArray.Add(Info);
+	}
 }
 
-LPCTSTR* CMiscAudioMedia::GetExtTable()
-{
-	return m_szExtTable;
-}
+
+
+
+

@@ -1,6 +1,7 @@
 #pragma once
 #include "CorImageMedia.h"
 #include "OptPageJPEGFile.h"
+#include "MediaFactory.h"
 #include "jpeglib.h"
 
 
@@ -33,11 +34,9 @@ public:
 public:
 	// 实现CMediaFactory的接口
 	static CMediaBase* Factory();
-	static LPCTSTR GetName();
-	static LPCTSTR* GetExtTable();
+	static void GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray);
+
 protected:
-	static LPCTSTR m_szName;
-	static LPCTSTR m_szExtTable[] ;
 
 	static void JStegErrorExit(j_common_ptr cinfo);
 	static LPCTSTR szJPEGColorSpace[];

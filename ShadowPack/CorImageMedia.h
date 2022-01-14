@@ -74,7 +74,7 @@ private:
 	};
 
 protected:
-	CArray<CCoeffIndex, CCoeffIndex> m_CoeffIndex;
+	CArray<CCoeffIndex> m_CoeffIndex;
 	CFileCache m_FileCache;
 	BOOL m_bUseFileCache;
 	COptPageBPBMedia m_OptPageCorImageMedia;

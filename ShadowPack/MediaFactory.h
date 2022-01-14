@@ -10,27 +10,39 @@ public:
 	virtual ~CMediaFactory(void);
 
 public:
-
 	typedef CMediaBase* (*FN_MEDIA_FACTORY)();
-	typedef LPCTSTR(*FN_MEDIA_GET_NAME)();
-	typedef LPCTSTR* (*FN_MEDIA_GET_EXTTABLE)();
-	typedef struct _MEDIA_INFO_T
+	class CMediaInfo : public CObject
 	{
-		FN_MEDIA_GET_NAME fnGetName;
-		FN_MEDIA_GET_EXTTABLE fnGetExtTable;
-		FN_MEDIA_FACTORY fnFatory;
-	}MEDIA_INFO_T;
-
-	typedef struct _MEDIA_DESC_T {
-		UINT Catagory;
-		MEDIA_INFO_T* Infos;
-	}MEDIA_DESC_T;
-
+	public:
+		UINT nCatagory;
+		CString strName;
+		CStringArray Exts;
+		FN_MEDIA_FACTORY fnFactory;
+		const CMediaInfo& operator=(const CMediaInfo& src) {
+			nCatagory = src.nCatagory;
+			strName = src.strName;
+			fnFactory = src.fnFactory;
+			Exts.Copy(src.Exts);
+			return *this;
+		}
+	};
+	
+	typedef void (*FN_MEDIA_GET_MEDIA_INFO)(CArray<CMediaInfo>& InfoArray);
 public:
 	static CMediaBase* CreateMediaFromExt(LPCTSTR szExt);
 	static CString CreateExtTable();
+	static void LoadMediaInfo();
+	static void DestoryMediaInfo();
 private:
-	static MEDIA_INFO_T m_MediaInfoImageFile[];
-	static MEDIA_INFO_T m_MediaInfoAudioFile[];
-	static MEDIA_DESC_T m_MediaDescTable[];
+	static FN_MEDIA_GET_MEDIA_INFO m_InfoTable[];
+	static CArray<CMediaInfo> m_AllInfo;
+
+	// 扩展名对CMediaInfo，CMediaInfo可能有多个， value是CObArray，array item是CMediaInfo
+	static CMapStringToOb m_ExtFactoryMap;
+
+	// nCatagory对扩展名列表，扩展名有多个， value是CStringArray, array item是Ext
+	static CMapWordToOb  m_CatagorExtMap;
+
+	// dlgfile的filter
+	static CString m_strFilter;
 };

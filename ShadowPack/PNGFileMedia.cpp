@@ -406,23 +406,17 @@ BOOL CPNGFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
-LPCTSTR CPNGFileMedia::GetName()
+void CPNGFileMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
-	return m_szName;
-}
-
-LPCTSTR* CPNGFileMedia::GetExtTable()
-{
-	return m_szExtTable;
+	CMediaFactory::CMediaInfo Info;
+	Info.Exts.Add(_T("png"));
+	Info.fnFactory = Factory;
+	Info.nCatagory = IDS_MEDIA_IMAGE_FILE;
+	Info.strName = _T("Portable Network Graphic");
+	InfoArray.Add(Info);
 }
 
 CMediaBase* CPNGFileMedia::Factory()
 {
     return new(std::nothrow) CPNGFileMedia();
 }
-
-LPCTSTR CPNGFileMedia::m_szExtTable[] = {
-	_T("png"),
-	NULL
-};
-LPCTSTR CPNGFileMedia::m_szName = _T("Portable Network Graphic");

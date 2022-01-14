@@ -7,6 +7,7 @@
 #include "ShadowPack.h"
 #include "ShadowPackDlg.h"
 #include "PackUtils.h"
+#include "MediaFactory.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -69,6 +70,8 @@ BOOL CShadowPackApp::InitInstance()
 		goto err;
 	}
 
+	CMediaFactory::LoadMediaInfo();
+
 	//m_Config.SetConfigReg(HKEY_CURRENT_USER, _T("Software\\ShadowPack"));
 
 	strIniFilePath = CPackUtils::GetWorkingPath();
@@ -112,6 +115,8 @@ BOOL CShadowPackApp::InitInstance()
 	if (m_bRestart) {
 		RestartApp();
 	}
+
+	CMediaFactory::DestoryMediaInfo();
 err:
 	return FALSE;
 }

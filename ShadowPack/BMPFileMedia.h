@@ -1,6 +1,7 @@
 #pragma once
 #include "PixelImageMedia.h"
 #include "OptPageBMPFile.h"
+#include "MediaFactory.h"
 
 class CBMPFileMedia :
     public CPixelImageMedia
@@ -27,11 +28,9 @@ public:
 public:
 	// 实现CMediaFactory的接口
 	static CMediaBase* Factory();
-	static LPCTSTR GetName();
-	static LPCTSTR* GetExtTable();
+	static void GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray);
+
 protected:
-	static LPCTSTR m_szName;
-	static LPCTSTR m_szExtTable[];
 
 	LPBITMAPFILEHEADER m_pfileHeader;
 	COptPageBMPFile m_OptPageBMPFile;

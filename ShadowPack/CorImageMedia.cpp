@@ -13,6 +13,7 @@ CCorImageMedia::CCorImageMedia() :
     m_OptPageCorImageMedia(NULL, IDS_OPT_COFF_MEDIA),
     m_bUseFileCache(FALSE)
 {
+
 }
 
 CCorImageMedia::~CCorImageMedia()

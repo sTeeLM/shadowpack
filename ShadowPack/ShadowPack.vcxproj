@@ -136,13 +136,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\$(PlatformName)\static_debug\include;..\libnetpbm\include;..\libsndfile\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\$(PlatformName)\static_debug\include;..\libnetpbm\include;..\ffmpeg\$(PlatformName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static_debug\lib;..\libnetpbm\win64\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;libnetpbm.lib;libsndfile.lib;libaudiofile.lib;libFLAC.lib;libogg.lib;libvorbis.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static_debug\lib;..\libnetpbm\win64\lib;..\$(Configuration)\$(PlatformName)\lib;..\ffmpeg\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;libnetpbm.lib;avformat.lib;avcodec.lib;avutil.lib;uafxcwd.lib;LIBCMTD.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;uafxcwd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -164,16 +164,17 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\$(PlatformName)\static\include;..\libnetpbm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\$(PlatformName)\static\include;..\libnetpbm\include;..\ffmpeg\$(PlatformName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\libnetpbm\win32\lib;..\openssl\$(PlatformName)\static\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;libnetpbm.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\libnetpbm\win32\lib;..\openssl\$(PlatformName)\static\lib;..\$(Configuration)\$(PlatformName)\lib;..\ffmpeg\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;libnetpbm.lib;avformat.lib;avcodec.lib;avutil.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;uafxcw.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -195,16 +196,17 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\$(PlatformName)\static\include;..\libnetpbm\include;..\libsndfile\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libtiff;..\libpng;..\libjbig;..\libjpeg;..\openssl\$(PlatformName)\static\include;..\libnetpbm\include;..\ffmpeg\$(PlatformName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static\lib;..\libnetpbm\win64\lib;..\$(Configuration)\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;libnetpbm.lib;libsndfile.lib;libaudiofile.lib;libFLAC.lib;libogg.lib;libvorbis.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\openssl\$(PlatformName)\static\lib;..\libnetpbm\win64\lib;..\$(Configuration)\$(PlatformName)\lib;..\ffmpeg\$(PlatformName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcrypto.lib;libjpeg.lib;libpng.lib;libzlib.lib;libtiff.lib;libjbig.lib;liblzma.lib;libnetpbm.lib;avformat.lib;avcodec.lib;avutil.lib;uafxcw.lib;LIBCMT.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;uafxcw.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

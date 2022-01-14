@@ -324,24 +324,19 @@ BOOL CTIFFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
-LPCTSTR CTIFFileMedia::GetName()
-{
-	return m_szName;
-}
-
-LPCTSTR* CTIFFileMedia::GetExtTable()
-{
-	return m_szExtTable;
-}
 
 CMediaBase* CTIFFileMedia::Factory()
 {
 	return new(std::nothrow) CTIFFileMedia();
 }
 
-LPCTSTR CTIFFileMedia::m_szExtTable[] = {
-	_T("tif"),
-	_T("tiff"),
-	NULL
-};
-LPCTSTR CTIFFileMedia::m_szName = _T("Tagged Image File Format");
+void CTIFFileMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
+{
+	CMediaFactory::CMediaInfo Info;
+	Info.Exts.Add(_T("tif"));
+	Info.Exts.Add(_T("tiff"));
+	Info.fnFactory = Factory;
+	Info.nCatagory = IDS_MEDIA_IMAGE_FILE;
+	Info.strName = _T("Tagged Image File Format");
+	InfoArray.Add(Info);
+}

@@ -242,23 +242,17 @@ BOOL CPPMFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 }
 
 
-LPCTSTR CPPMFileMedia::GetName()
-{
-	return m_szName;
-}
-
-LPCTSTR* CPPMFileMedia::GetExtTable()
-{
-	return m_szExtTable;
-}
-
 CMediaBase* CPPMFileMedia::Factory()
 {
 	return new(std::nothrow) CPPMFileMedia();
 }
 
-LPCTSTR CPPMFileMedia::m_szExtTable[] = {
-	_T("ppm"),
-	NULL
-};
-LPCTSTR CPPMFileMedia::m_szName = _T("Portable PixMap");
+void CPPMFileMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
+{
+	CMediaFactory::CMediaInfo Info;
+	Info.Exts.Add(_T("ppm"));
+	Info.fnFactory = Factory;
+	Info.nCatagory = IDS_MEDIA_IMAGE_FILE;
+	Info.strName = _T("Portable PixMap");
+	InfoArray.Add(Info);
+}

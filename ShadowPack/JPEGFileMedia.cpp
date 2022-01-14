@@ -280,24 +280,18 @@ UINT CJPEGFileMedia::GetHSampleFactor(UINT nComponents)
     return 0;
 }
 
-LPCTSTR CJPEGFileMedia::m_szName = _T("Joint Photographic Experts Group");
-LPCTSTR CJPEGFileMedia::m_szExtTable[] = {
-    _T("jpg"),
-    _T("jpeg"),
-    NULL
-};
-
 CMediaBase* CJPEGFileMedia::Factory()
 {
     return new(std::nothrow) CJPEGFileMedia();
 }
 
-LPCTSTR CJPEGFileMedia::GetName()
+void CJPEGFileMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
-    return m_szName;
-}
-
-LPCTSTR* CJPEGFileMedia::GetExtTable()
-{
-    return m_szExtTable;
+    CMediaFactory::CMediaInfo Info;
+    Info.Exts.Add(_T("jpg"));
+    Info.Exts.Add(_T("jpeg"));
+    Info.fnFactory = Factory;
+    Info.nCatagory = IDS_MEDIA_IMAGE_FILE;
+    Info.strName = _T("Joint Photographic Experts Group");
+    InfoArray.Add(Info);
 }

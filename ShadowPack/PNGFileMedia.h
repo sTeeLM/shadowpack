@@ -2,6 +2,7 @@
 #include "PixelImageMedia.h"
 #include "png.h"
 #include "OptPagePNGFile.h"
+#include "MediaFactory.h"
 #include "FileCache.h"
 
 class CPNGFileMedia :
@@ -30,12 +31,8 @@ public:
 public:
 	// 实现CMediaFactory的接口
 	static CMediaBase* Factory();
-	static LPCTSTR GetName();
-	static LPCTSTR* GetExtTable();
+	static void GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray);
 protected:
-	static LPCTSTR m_szName;
-	static LPCTSTR m_szExtTable[];
-
 	static void ErrCallback(png_structp png_ptr, png_const_charp message);
 	static void RowCallback(png_structp p, png_uint_32 u, int n);
 protected:

@@ -245,23 +245,20 @@ BOOL CBMPFileMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return CPixelImageMedia::UpdateOpts(pPropertySheet);
 }
 
-LPCTSTR CBMPFileMedia::m_szName = _T("bitmap image file");
-LPCTSTR CBMPFileMedia::m_szExtTable[] = {
-	_T("bmp"),
-	NULL
-};
 
 CMediaBase* CBMPFileMedia::Factory()
 {
 	return new(std::nothrow) CBMPFileMedia();
 }
 
-LPCTSTR CBMPFileMedia::GetName()
+void CBMPFileMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
-	return m_szName;
+	CMediaFactory::CMediaInfo Info;
+	Info.Exts.Add(_T("bmp"));
+	Info.Exts.Add(_T("dib"));
+	Info.fnFactory = Factory;
+	Info.nCatagory = IDS_MEDIA_IMAGE_FILE;
+	Info.strName = _T("Bitmap Image");
+	InfoArray.Add(Info);
 }
 
-LPCTSTR* CBMPFileMedia::GetExtTable()
-{
-	return m_szExtTable;
-}

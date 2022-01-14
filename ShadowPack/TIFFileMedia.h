@@ -1,6 +1,7 @@
 #pragma once
 #include "PixelImageMedia.h"
 #include "OptPageTIFFFile.h"
+#include "MediaFactory.h"
 #include "libtiff\tiff.h"
 #include "libtiff\tiffio.h"
 
@@ -31,11 +32,8 @@ protected:
 public:
 	// 实现CMediaFactory的接口
 	static CMediaBase* Factory();
-	static LPCTSTR GetName();
-	static LPCTSTR* GetExtTable();
+	static void GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray);
 protected:
-	static LPCTSTR m_szName;
-	static LPCTSTR m_szExtTable[];
 
 	static CString m_strLastError;
 	static CHAR szBuffer[];
