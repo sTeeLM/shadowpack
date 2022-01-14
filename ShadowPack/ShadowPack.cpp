@@ -70,8 +70,6 @@ BOOL CShadowPackApp::InitInstance()
 		goto err;
 	}
 
-	CMediaFactory::LoadMediaInfo();
-
 	//m_Config.SetConfigReg(HKEY_CURRENT_USER, _T("Software\\ShadowPack"));
 
 	strIniFilePath = CPackUtils::GetWorkingPath();
@@ -87,6 +85,8 @@ BOOL CShadowPackApp::InitInstance()
 	} else {
 		goto err;
 	}
+	
+	CMediaFactory::LoadMediaInfo();
 
 	AfxEnableControlContainer();
 
