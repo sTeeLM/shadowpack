@@ -72,6 +72,7 @@ CString  CMiscAudioMedia::FillInfoStr()
 	strRet += strTmp;
 
 	strRet += _T("Meta:       \r\n");
+	strTmp = _T("");
 	if (m_FileMeta.m_pFormatCtx->metadata) {
 		const AVDictionaryEntry* tag = NULL;
 		while ((tag = av_dict_get(m_FileMeta.m_pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
