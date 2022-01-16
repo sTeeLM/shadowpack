@@ -62,7 +62,7 @@ BOOL CPackUtils::BackupFile(LPCTSTR szPath, LPCTSTR szToDir, CString& strError)
 
 	strPath += strFileName;
 
-	if (MoveFile(szPath, strPath)) {
+	if (::MoveFileEx(szPath, strPath, MOVEFILE_COPY_ALLOWED|MOVEFILE_REPLACE_EXISTING)) {
 		return TRUE;
 	}
 

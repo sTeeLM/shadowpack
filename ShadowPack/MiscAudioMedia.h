@@ -47,27 +47,28 @@ protected:
 	class CAudioMeta {
 	public:
 		CAudioMeta() :
-			m_pFormatCtx(NULL),
 			m_pCodecCtx(NULL),
 			m_pCodec(NULL),
-			m_TotalFrames(0)
+			m_TotalFrames(0),
+			m_pMetaData(NULL)
 		{
 
 		}
-		AVFormatContext* m_pFormatCtx;
 		AVCodecContext* m_pCodecCtx;
 		AVCodec* m_pCodec;
+		AVDictionary* m_pMetaData;
 		ULONGLONG m_TotalFrames;
 	public:
 		void Free()
 		{
-			if (m_pFormatCtx) {
-				avformat_close_input(&m_pFormatCtx);
-			}
 			if (m_pCodecCtx) {
 				avcodec_free_context(&m_pCodecCtx);
 			}
+			if (m_pMetaData) {
+				av_dict_free(&m_pMetaData);
+			}
 			m_pCodec = NULL;
+			m_pMetaData = NULL;
 			m_TotalFrames = 0;
 		}
 	};
@@ -82,6 +83,6 @@ protected:
 	INT EncodeFrame(AVFormatContext* pEncodeFormatCtx,
 		AVCodecContext* pEncodeCodecCtx, AVCodecContext* pDecodeCodecCtx,
 		AVFrame* pFrame, AVPacket* pPacket);
-	CString FillInfoStr();
+	CString FillInfoStr(AVFormatContext* pFormatCtx);
 };
 

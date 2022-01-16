@@ -11,13 +11,13 @@ CMiscAudioMedia::~CMiscAudioMedia()
 {
 }
 
-CString  CMiscAudioMedia::FillInfoStr()
+CString  CMiscAudioMedia::FillInfoStr(AVFormatContext* pFormatCtx)
 {
 	CString strRet,strTmp;
-	AVFormatContext* ic = m_FileMeta.m_pFormatCtx;
+	AVFormatContext* ic = pFormatCtx;
 
 	strRet += _T("Format:    ");
-	strTmp.Format(_T("%s\r\n"), (LPCTSTR)CA2CT(m_FileMeta.m_pFormatCtx->iformat->long_name));
+	strTmp.Format(_T("%s\r\n"), (LPCTSTR)CA2CT(pFormatCtx->iformat->long_name));
 	strRet += strTmp;
 
 	strRet += _T("Duration:    ");
@@ -73,9 +73,9 @@ CString  CMiscAudioMedia::FillInfoStr()
 
 	strRet += _T("Meta:       \r\n");
 	strTmp = _T("");
-	if (m_FileMeta.m_pFormatCtx->metadata) {
+	if (m_FileMeta.m_pMetaData) {
 		const AVDictionaryEntry* tag = NULL;
-		while ((tag = av_dict_get(m_FileMeta.m_pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+		while ((tag = av_dict_get(m_FileMeta.m_pMetaData, "", tag, AV_DICT_IGNORE_SUFFIX))) {
 			strTmp.Format(_T("  [%s] : [%s]\r\n"), (LPCTSTR)CA2CT(tag->key), (LPCTSTR)CA2CT(tag->value));
 		}
 	}
@@ -205,33 +205,36 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 	INT nRet;
 	INT nBitsPerSample;
 	ULONGLONG nTotalFramesSave;
+	AVFormatContext* pFormatCtx = NULL;
 //	AVDictionary * pOptions = NULL;
 //	AVCodecParserContext* pParserCtx = NULL;
 	AVPacket* input_packet = NULL;
 	AVFrame* input_frame = NULL;
 
-	if ((nRet = avformat_open_input(&m_FileMeta.m_pFormatCtx, filepath, NULL, NULL)) < 0) {
+	if ((nRet = avformat_open_input(&pFormatCtx, filepath, NULL, NULL)) < 0) {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, GetErrorString(nRet));
 		goto err;
 	}
 
-	if ((nRet = avformat_find_stream_info(m_FileMeta.m_pFormatCtx, NULL)) < 0) {
+	if ((nRet = avformat_find_stream_info(pFormatCtx, NULL)) < 0) {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, GetErrorString(nRet));
 		goto err;
 	}
 
-	//GetMeta();
+	if (pFormatCtx->metadata) {
+		av_dict_copy(&m_FileMeta.m_pMetaData, pFormatCtx->metadata, AV_DICT_IGNORE_SUFFIX);
+	}
 
 	av_log_set_callback(CBLogger);
-	av_dump_format(m_FileMeta.m_pFormatCtx, 0, filepath, 0);
+	av_dump_format(pFormatCtx, 0, filepath, 0);
 
-	if (m_FileMeta.m_pFormatCtx->nb_streams != 1
-		|| m_FileMeta.m_pFormatCtx->streams[0]->codecpar->codec_type != AVMEDIA_TYPE_AUDIO) {
+	if (pFormatCtx->nb_streams != 1
+		|| pFormatCtx->streams[0]->codecpar->codec_type != AVMEDIA_TYPE_AUDIO) {
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
 	
-	if ((m_FileMeta.m_pCodec = avcodec_find_decoder(m_FileMeta.m_pFormatCtx->streams[0]->codecpar->codec_id)) == NULL) {
+	if ((m_FileMeta.m_pCodec = avcodec_find_decoder(pFormatCtx->streams[0]->codecpar->codec_id)) == NULL) {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, GetErrorString(nRet));
 		goto err;
 	}
@@ -242,8 +245,6 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 		goto err;
 	}
 
-
-
 //	pParserCtx = av_parser_init(pCodec->id);
 
 	if ((m_FileMeta.m_pCodecCtx = avcodec_alloc_context3(m_FileMeta.m_pCodec)) == NULL) {
@@ -251,7 +252,7 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 		goto err;
 	}
 
-	if ((nRet = avcodec_parameters_to_context(m_FileMeta.m_pCodecCtx, m_FileMeta.m_pFormatCtx->streams[0]->codecpar)) < 0) {
+	if ((nRet = avcodec_parameters_to_context(m_FileMeta.m_pCodecCtx, pFormatCtx->streams[0]->codecpar)) < 0) {
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
@@ -262,6 +263,8 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
+
+	m_OptPagePCMFileProperty.m_strPCMProperty = FillInfoStr(pFormatCtx);
 
 	if ((input_frame = av_frame_alloc()) == NULL) {
 		Errors.SetError(CPackErrors::PE_NOMEM);
@@ -274,7 +277,7 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 	}
 
 	// nb_frames has bug..
-	if (!ProbeTotalFrames(m_FileMeta.m_pFormatCtx, m_FileMeta.m_pCodecCtx, szFilePath, m_FileMeta.m_TotalFrames, Errors)) {
+	if (!ProbeTotalFrames(pFormatCtx, m_FileMeta.m_pCodecCtx, szFilePath, m_FileMeta.m_TotalFrames, Errors)) {
 		goto err;
 	}
 
@@ -315,7 +318,7 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 	Progress.Reset(IDS_READ_FILE);
 	Progress.SetFullScale(nTotalFramesSave);
 	while (nTotalFramesSave) {
-		if ((nRet = av_read_frame(m_FileMeta.m_pFormatCtx, input_packet)) == 0) {
+		if ((nRet = av_read_frame(pFormatCtx, input_packet)) == 0) {
 			if ((nRet = avcodec_send_packet(m_FileMeta.m_pCodecCtx, input_packet)) == 0 ) {
 				if ((nRet = avcodec_receive_frame(m_FileMeta.m_pCodecCtx, input_frame)) == 0) {
 					CPCMAudioMedia::SetSample(
@@ -363,6 +366,10 @@ err:
 	}
 	if (input_frame) {
 		av_frame_free(&input_frame);
+	}
+
+	if (pFormatCtx) {
+		avformat_close_input(&pFormatCtx);
 	}
 
 	if (!bRet) {
@@ -474,8 +481,8 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 
 	pOutStream->time_base = pCodecCtx->time_base;
 
-	if (m_FileMeta.m_pFormatCtx->metadata) {
-		av_dict_copy(&pFormatCtx->metadata, m_FileMeta.m_pFormatCtx->metadata, AV_DICT_IGNORE_SUFFIX);
+	if (m_FileMeta.m_pMetaData) {
+		av_dict_copy(&pFormatCtx->metadata, m_FileMeta.m_pMetaData, AV_DICT_IGNORE_SUFFIX);
 	}
 
 	av_dump_format(pFormatCtx, 0, filepath, 1);
@@ -605,7 +612,6 @@ void CMiscAudioMedia::CloseMedia()
 
 void CMiscAudioMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
-	m_OptPagePCMFileProperty.m_strPCMProperty = FillInfoStr();
 	pPropertySheet->AddPage(&m_OptPagePCMFileProperty);
 	CPCMAudioMedia::AddOptPage(pPropertySheet);
 }
