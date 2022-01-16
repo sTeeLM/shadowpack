@@ -140,6 +140,7 @@ BOOL CShadowPackDlg::ShowConfigDlg()
 {
 	CConfigDlg dlgConfig;
 	CConfigManager::CONFIG_VALUE_T val;
+	BOOL bConfigErr = TRUE;
 
 	if (!theApp.m_Config.GetConfig(_T("main"), _T("locale"), val)) {
 		goto err;
@@ -163,6 +164,11 @@ BOOL CShadowPackDlg::ShowConfigDlg()
 	free(val.str);
 
 	dlgConfig.m_strMediaCacheTmpDir = CPackUtils::GetTempPath();
+
+	if (!theApp.m_Config.GetConfig(_T("media"), _T("media_save_backup"), val)) {
+		goto err;
+	}
+	dlgConfig.m_bMediaSaveBackup = val.n8;
 
 
 	if (!theApp.m_Config.GetConfig(_T("pack"), _T("pack_use_hd_cache"), val)) {
@@ -228,7 +234,12 @@ BOOL CShadowPackDlg::ShowConfigDlg()
 
 		return TRUE;
 	}
+	else {
+		bConfigErr = FALSE;
+	}
 err:
+	if(bConfigErr)
+		AfxMessageBox(IDS_CONFIG_ERROR);
 	return FALSE;
 }
 
@@ -357,12 +368,14 @@ void CShadowPackDlg::OnBnClickedBtnMediaClose()
 				OnBnClickedBtnMediaSave();
 			} else {
 				m_ctlFileManager.DettachMedia();
+				m_szMediaPathName = _T("");
 				if (m_bQuitOnClose) {
 					CDialog::OnCancel();
 				}
 			}
 		} else {
 			m_ctlFileManager.DettachMedia();
+			m_szMediaPathName = _T("");
 			if (m_bQuitOnClose) {
 				CDialog::OnCancel();
 			}
@@ -379,11 +392,27 @@ void CShadowPackDlg::OnBnClickedBtnMediaClose()
 void CShadowPackDlg::ThreadSaveMedia()
 {
 	CPackErrors Errors;
+	CString strError;
+	CConfigManager::CONFIG_VALUE_T val;
+
+	if (!theApp.m_Config.GetConfig(_T("media"), _T("media_save_backup"), val)) {
+		AfxMessageBox(IDS_CONFIG_ERROR);
+		return;
+	}
+	if (val.n8) {
+		if (!CPackUtils::BackupFile(m_szMediaPathName, NULL, strError)) {
+			Errors.SetError(CPackErrors::PE_IO, m_szMediaPathName, strError);
+			AfxMessageBox(Errors.ToString());
+			return;
+		}
+	}
+
 	if (!m_ctlFileManager.SaveMedia(m_ctlProgress, Errors)) {
 		AfxMessageBox(Errors.ToString());
 	} else {
 		if (m_bCloseOnSave) {
 			m_ctlFileManager.DettachMedia();
+			m_szMediaPathName = _T("");
 			m_bCloseOnSave = FALSE;
 			if (m_bQuitOnClose) {
 				CDialog::OnCancel();
@@ -487,6 +516,15 @@ void CShadowPackDlg::UpdateUI()
 
 	if((pSysMenu = GetSystemMenu(FALSE)))
 		pSysMenu->EnableMenuItem(SC_CLOSE, m_bInProgress ? MF_DISABLED : MF_ENABLED);
+
+	strTemp = _T("ShadowPack");
+
+	if (m_szMediaPathName.GetLength()) {
+		strTemp.Format(_T("%s [%s]"), _T("ShadowPack"), m_szMediaPathName);
+	}
+		
+	SetWindowText(strTemp);
+	
 }
 
 void CShadowPackDlg::ThreadAddItem()

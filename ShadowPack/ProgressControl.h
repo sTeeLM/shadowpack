@@ -24,6 +24,7 @@ public:
 	void SetScale(ULONGLONG nVal);
 	void Show(BOOL bShow = TRUE);
 
+	afx_msg void OnPaint();
 protected:
 	DECLARE_MESSAGE_MAP()
 
@@ -31,6 +32,14 @@ protected:
 	ULONGLONG m_nFullScale;
 	ULONGLONG m_nCurrent;
 	BOOL m_bCancel;
+
+	COLORREF m_prgsColor; //进度条进度部分颜色
+	COLORREF m_freeColor; //进度条后面空余部分颜色
+	COLORREF m_prgsTextColor; //进度部分字体颜色
+	COLORREF m_freeTextColor; //空白部分字体颜色
+
+	CTime m_StartTime;
+	CTime m_CurrentTime;
 };
 
 

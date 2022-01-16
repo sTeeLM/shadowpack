@@ -10,6 +10,7 @@ private:
 public:
 
 	static void TranslateSize(ULONGLONG nSize, CString & strOut);
+	static BOOL BackupFile(LPCTSTR szPath, LPCTSTR szToDir, CString & strError);
 	static BOOL GetFileSize(LPCTSTR szPath,ULONGLONG & size);
 	static BOOL WalkDir(LPCTSTR szPath, CB_WALK_DIR cb, LPVOID pParam, BOOL bSkipError = TRUE, INT nLevel = -1);
 	static size_t ST2SA(LPCTSTR szSrc, CStringA & szDst);

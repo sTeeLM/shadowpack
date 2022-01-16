@@ -26,6 +26,7 @@ const CConfigManager::CONFIG_ENTRY_T CConfigManager::m_ConfigEntry[] = {
 	{_T("media"), _T("media_use_hd_cache"), CONFIG_VALUE_TYPE_INT8,   {.n8 = 0}},
 	{_T("media"), _T("media_use_system_cache"), CONFIG_VALUE_TYPE_INT8,   {.n8 = 0}},
 	{_T("media"), _T("media_custom_cache_path"), CONFIG_VALUE_TYPE_STRING, {.str = (LPTSTR)_T("C:\\")} },
+	{_T("media"), _T("media_save_backup"), CONFIG_VALUE_TYPE_INT8,   {.n8 = 1}},
 	{_T("pack"), _T("pack_use_hd_cache"), CONFIG_VALUE_TYPE_INT8,   {.n8 = 0}},
 	{_T("pack"), _T("pack_use_system_cache"), CONFIG_VALUE_TYPE_INT8,   {.n8 = 0}},
 	{_T("pack"), _T("pack_custom_cache_path"), CONFIG_VALUE_TYPE_STRING, {.str = (LPTSTR)_T("C:\\")} },

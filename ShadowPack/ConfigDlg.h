@@ -43,6 +43,7 @@ public:
 	CString m_strMediaCacheCustomDir;
 	CString m_strPackCacheTmpDir;
 	CString m_strPackCacheCustomDir;
+	BOOL m_bMediaSaveBackup;
 protected:
 	void UpdateUI();
 };

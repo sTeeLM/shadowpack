@@ -24,6 +24,7 @@ CConfigDlg::CConfigDlg(CWnd* pParent /*=nullptr*/)
 	, m_strMediaCacheCustomDir(_T(""))
 	, m_strPackCacheTmpDir(_T(""))
 	, m_strPackCacheCustomDir(_T(""))
+	, m_bMediaSaveBackup(FALSE)
 {
 
 }
@@ -67,6 +68,7 @@ void CConfigDlg::DoDataExchange(CDataExchange* pDX)
 
 		}
 	}
+	DDX_Check(pDX, IDC_CHECK_SAVE_BACKUP, m_bMediaSaveBackup);
 }
 
 

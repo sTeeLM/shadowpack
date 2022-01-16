@@ -224,7 +224,6 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 
 	av_log_set_callback(CBLogger);
 	av_dump_format(m_FileMeta.m_pFormatCtx, 0, filepath, 0);
-	av_log_set_callback(av_log_default_callback);
 
 	if (m_FileMeta.m_pFormatCtx->nb_streams != 1
 		|| m_FileMeta.m_pFormatCtx->streams[0]->codecpar->codec_type != AVMEDIA_TYPE_AUDIO) {
@@ -256,6 +255,8 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
+
+	m_FileMeta.m_pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
 	if ((nRet = avcodec_open2(m_FileMeta.m_pCodecCtx, m_FileMeta.m_pCodec,NULL)) < 0) {
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
@@ -420,6 +421,9 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 		goto err;
 	}
 
+	av_log_set_callback(CBLogger);
+
+
 	if ((nRet = avformat_alloc_output_context2(&pFormatCtx, NULL, NULL, filepath)) < 0) {
 		Errors.SetError(CPackErrors::PE_NOMEM);
 		goto err;
@@ -449,6 +453,8 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 	pCodecCtx->time_base = m_FileMeta.m_pCodecCtx->time_base;
 	pCodecCtx->bits_per_raw_sample = m_FileMeta.m_pCodecCtx->bits_per_raw_sample;
 
+	pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+
 	if (pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER) {
 		pCodecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 	}
@@ -456,6 +462,7 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 	
 	if ((nRet = avcodec_open2(pCodecCtx, pCodec, NULL)) < 0) {
 		CString str = GetErrorString(nRet);
+		TRACE(_T("%s\n"), m_strLastLog);
 		Errors.SetError(CPackErrors::PE_NOMEM);
 		goto err;
 	}
@@ -471,7 +478,6 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 		av_dict_copy(&pFormatCtx->metadata, m_FileMeta.m_pFormatCtx->metadata, AV_DICT_IGNORE_SUFFIX);
 	}
 
-	av_log_set_callback(CBLogger);
 	av_dump_format(pFormatCtx, 0, filepath, 1);
 
 	if (!(pFormatCtx->oformat->flags & AVFMT_NOFILE)) {

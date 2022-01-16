@@ -46,6 +46,31 @@ void CPackUtils::TranslateSize(ULONGLONG nSize, CString & strOut)
 	}
 }
 
+BOOL CPackUtils::BackupFile(LPCTSTR szPath, LPCTSTR szToDir, CString& strError)
+{
+	CString strPath = GetPathPath(szPath);
+	CString strFileName = GetPathName(szPath);
+
+	if (szToDir) {
+		strPath = szToDir;
+	}
+
+	if (strPath.Right(1).Compare(_T("\\")) != 0)
+		strPath += _T("\\");
+
+	strFileName += _T(".bak");
+
+	strPath += strFileName;
+
+	if (MoveFile(szPath, strPath)) {
+		return TRUE;
+	}
+
+	strError = GetLastError();
+
+	return FALSE;
+}
+
 BOOL CPackUtils::ShowLocationDirDlg(CWnd *pOwner, CString& strDir)
 {
 	// get dir location
@@ -389,7 +414,7 @@ CString CPackUtils::FormatSecond(DOUBLE dSeconds)
 	nMin = (INT)((dSeconds - (nHrs * 3600.0)) / 60.0);
 	dSec = dSeconds - (nHrs * 3600.0) - (nMin * 60.0);
 
-	strRet.Format(_T("%02d[D]:%02d[H]:%02d[M]:%06.3f[S]"), nDay, nHrs, nMin, dSec);
+	strRet.Format(_T("%02d:%02d:%02d:%06.3f"), nDay, nHrs, nMin, dSec);
 
 	return strRet;
 }
