@@ -11,7 +11,13 @@ CMiscAudioMedia::~CMiscAudioMedia()
 {
 }
 
-CString  CMiscAudioMedia::FillInfoStr(AVFormatContext* pFormatCtx)
+CString  CMiscAudioMedia::FillInfoStr(
+	AVFormatContext* pFormatCtx, 
+	AVCodec* pCodec,
+	AVCodecContext *pCodecCtx,
+	AVDictionary* pMetaData,
+	ULONGLONG nTotalFrames,
+	INT nBitsPerSample)
 {
 	CString strRet,strTmp;
 	AVFormatContext* ic = pFormatCtx;
@@ -60,22 +66,26 @@ CString  CMiscAudioMedia::FillInfoStr(AVFormatContext* pFormatCtx)
 	strRet += strTmp;
 
 	strRet += _T("SampleRate:    ");
-	strTmp.Format(_T("%d\r\n"), m_FileMeta.m_pCodecCtx->sample_rate);
+	strTmp.Format(_T("%d\r\n"), pCodecCtx->sample_rate);
 	strRet += strTmp;
 
 	strRet += _T("Frames:       ");
-	strTmp.Format(_T("%I64d\r\n"), m_FileMeta.m_TotalFrames);
+	strTmp.Format(_T("%I64d\r\n"), nTotalFrames);
 	strRet += strTmp;
 
 	strRet += _T("Codec:       ");
-	strTmp.Format(_T("%s\r\n"), (LPCTSTR)CA2CT(m_FileMeta.m_pCodec->long_name));
+	strTmp.Format(_T("%s\r\n"), (LPCTSTR)CA2CT(pCodec->long_name));
+	strRet += strTmp;
+
+	strRet += _T("BitsPerSample:  ");
+	strTmp.Format(_T("%d\r\n"), nBitsPerSample);
 	strRet += strTmp;
 
 	strRet += _T("Meta:       \r\n");
 	strTmp = _T("");
-	if (m_FileMeta.m_pMetaData) {
+	if (pMetaData) {
 		const AVDictionaryEntry* tag = NULL;
-		while ((tag = av_dict_get(m_FileMeta.m_pMetaData, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+		while ((tag = av_dict_get(pMetaData, "", tag, AV_DICT_IGNORE_SUFFIX))) {
 			strTmp.Format(_T("  [%s] : [%s]\r\n"), (LPCTSTR)CA2CT(tag->key), (LPCTSTR)CA2CT(tag->value));
 		}
 	}
@@ -264,8 +274,6 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 		goto err;
 	}
 
-	m_OptPagePCMFileProperty.m_strPCMProperty = FillInfoStr(pFormatCtx);
-
 	if ((input_frame = av_frame_alloc()) == NULL) {
 		Errors.SetError(CPackErrors::PE_NOMEM);
 		goto err;
@@ -277,18 +285,11 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 	}
 
 	// nb_frames has bug..
+	Progress.Reset(IDS_READ_FILE);
 	if (!ProbeTotalFrames(pFormatCtx, m_FileMeta.m_pCodecCtx, szFilePath, m_FileMeta.m_TotalFrames, Errors)) {
 		goto err;
 	}
 
-/*
-	m_FileMeta.m_TotalFrames = m_FileMeta.m_pFormatCtx->streams[0]->nb_frames;
-	if (nTotalFrames == 0) {
-		if (!ProbeTotalFrames(pFormatCtx, pCodecCtx, szFilePath, nTotalFrames, Errors)) {
-			goto err;
-		}
-	}
-*/
 	if (m_FileMeta.m_TotalFrames == 0) {
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
@@ -301,6 +302,10 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 		Errors.SetError(CPackErrors::PE_UNSUPPORT_MEDIA, szFilePath);
 		goto err;
 	}
+
+	m_OptPagePCMFileProperty.m_strPCMProperty = FillInfoStr(pFormatCtx,
+		m_FileMeta.m_pCodec, m_FileMeta.m_pCodecCtx, m_FileMeta.m_pMetaData, m_FileMeta.m_TotalFrames, nBitsPerSample);
+
 
 	// if codec is alac, and bit depth is 20 , DO NOT SUPPORT!
 	if (m_FileMeta.m_pCodec->id == AV_CODEC_ID_ALAC && nBitsPerSample == 20) {
@@ -627,20 +632,22 @@ CMediaBase* CMiscAudioMedia::Factory()
 }
 
 CMiscAudioMedia::MISC_AUDIO_EXT CMiscAudioMedia::m_szExtTable[] = {
-	{_T("wav"),_T("Waveform Audio File Format") },
-	{_T("aif,aiff,aifc"),_T("Audio Interchange File Format")},
+	{_T("wav,wave,w64"),_T("Waveform Audio File Format") },
+	{_T("aif,aiff,aifc,afc"),_T("Audio Interchange File Format")},
 	{_T("au,snd"),_T("NeXT/Sun")},
 	{_T("m4a,m4r"),_T("Apple MPEG - 4 Audio")},
 	{_T("caf"),_T("Core Audio Format")},
 	{_T("flac"),_T("Free Lossless Audio Codec") },
 	{_T("dts"), _T("Digital Theater Systems") },
 	{_T("mlp"), _T("Meridian Lossless Packing") },
-	{_T("ogg,oga"), _T("OGG Container Format") },
+	{_T("ogg,oga,ogx"), _T("OGG Container Format") },
 	{_T("wv"), _T("Wave Pack") },
-	{_T("w64"), _T("Sony Wave64") },
 	{_T("tta"), _T("True Audio") },
 	{_T("oma,aa3"), _T("Sony OpenMG Audio") },
 	{_T("thd"), _T("Muxer truehd") },
+	{_T("wma"), _T("Windows Media Audio") },
+	{_T("asf"), _T("Advanced / Active Streaming Format")},
+	{_T("mka"), _T("Matroska Audio File")},
 };
 
 void CMiscAudioMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)

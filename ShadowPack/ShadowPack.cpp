@@ -52,6 +52,7 @@ BOOL CShadowPackApp::InitInstance()
 	INT_PTR nResponse;
 	CConfigManager::CONFIG_VALUE_T val;
 	CString strIniFilePath;
+	CString strExeFilePath;
 
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	// 将它设置为包括所有要在应用程序中使用的
@@ -59,14 +60,17 @@ BOOL CShadowPackApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	
 	if (!InitCommonControlsEx(&InitCtrls)) {
+		AfxMessageBox(IDS_INTERNAL_ERROR);
 		goto err;
 	}
 
 	if (!CWinApp::InitInstance()) {
+		AfxMessageBox(IDS_INTERNAL_ERROR);
 		goto err;
 	}
 
 	if (!m_Locale.Initialize()) {
+		AfxMessageBox(IDS_INTERNAL_ERROR);
 		goto err;
 	}
 
@@ -79,10 +83,18 @@ BOOL CShadowPackApp::InitInstance()
 	m_Config.CreateDefault();
 	m_Config.DumpConfig();
 
+	strExeFilePath.Preallocate(4096);
+	GetModuleFileName(NULL, strExeFilePath.LockBuffer(), strExeFilePath.GetAllocLength());
+	strExeFilePath.UnlockBuffer();
+	if (!m_FileVersion.Open(strExeFilePath)) {
+		AfxMessageBox(IDS_INTERNAL_ERROR);
+		goto err;
+	}
 
 	if (m_Config.GetConfig(_T("main"), _T("locale"), val)) {
 		m_Locale.SetLocale((CLocaleManager::LOCAL_ID_T)val.n8);
 	} else {
+		AfxMessageBox(IDS_INTERNAL_ERROR);
 		goto err;
 	}
 	
@@ -117,6 +129,7 @@ BOOL CShadowPackApp::InitInstance()
 	}
 
 	CMediaFactory::DestoryMediaInfo();
+	m_FileVersion.Close();
 err:
 	return FALSE;
 }

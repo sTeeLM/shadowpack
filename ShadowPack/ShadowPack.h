@@ -12,6 +12,7 @@
 
 #include "ConfigManager.h"
 #include "LocaleManager.h"
+#include "FileVersion.h"
 
 // CShadowPackApp:
 // 有关此类的实现，请参阅 ShadowPack.cpp
@@ -32,6 +33,7 @@ public:
 public:
 	CConfigManager m_Config;
 	CLocaleManager m_Locale;
+	CFileVersion m_FileVersion;
 	BOOL m_bRestart;
 };
 

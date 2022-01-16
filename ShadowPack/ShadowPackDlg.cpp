@@ -30,19 +30,35 @@ public:
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
-
+	BOOL OnInitDialog();
 // 实现
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	CString m_strVersionInfo;
 };
 
 CAboutDlg::CAboutDlg() : CDialog(IDD_ABOUTBOX)
+, m_strVersionInfo(_T(""))
 {
+
 }
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_STATIC_VERSION, m_strVersionInfo);
+}
+
+BOOL CAboutDlg::OnInitDialog()
+{
+	if (CDialog::OnInitDialog()) {
+		m_strVersionInfo.Format(_T("ShadowPack, Version %s"), 
+			(LPCTSTR)theApp.m_FileVersion.GetFileVersion());
+		UpdateData(FALSE);
+
+	}
+	return FALSE;
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)

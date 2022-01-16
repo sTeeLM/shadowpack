@@ -83,6 +83,8 @@ protected:
 	INT EncodeFrame(AVFormatContext* pEncodeFormatCtx,
 		AVCodecContext* pEncodeCodecCtx, AVCodecContext* pDecodeCodecCtx,
 		AVFrame* pFrame, AVPacket* pPacket);
-	CString FillInfoStr(AVFormatContext* pFormatCtx);
+	CString FillInfoStr(AVFormatContext* pFormatCtx, 
+		AVCodec* pCodec, AVCodecContext* pCodecCtx, AVDictionary* pMetaData, ULONGLONG nTotalFrames, 
+		INT nBitsPerSample);
 };
 

@@ -141,6 +141,9 @@
     <ClInclude Include="OptPagePCMFileProperty.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="FileVersion.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShadowPack.cpp">
@@ -246,6 +249,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="OptPagePCMFileProperty.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileVersion.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
