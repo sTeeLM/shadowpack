@@ -55,7 +55,7 @@ protected:
 
 		}
 		AVCodecContext* m_pCodecCtx;
-		AVCodec* m_pCodec;
+		const AVCodec* m_pCodec;
 		AVDictionary* m_pMetaData;
 		ULONGLONG m_TotalFrames;
 	public:
@@ -84,7 +84,7 @@ protected:
 		AVCodecContext* pEncodeCodecCtx, AVCodecContext* pDecodeCodecCtx,
 		AVFrame* pFrame, AVPacket* pPacket);
 	CString FillInfoStr(AVFormatContext* pFormatCtx, 
-		AVCodec* pCodec, AVCodecContext* pCodecCtx, AVDictionary* pMetaData, ULONGLONG nTotalFrames, 
+		const AVCodec* pCodec, AVCodecContext* pCodecCtx, AVDictionary* pMetaData, ULONGLONG nTotalFrames, 
 		INT nBitsPerSample);
 };
 

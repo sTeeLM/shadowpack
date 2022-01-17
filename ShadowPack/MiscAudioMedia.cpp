@@ -13,7 +13,7 @@ CMiscAudioMedia::~CMiscAudioMedia()
 
 CString  CMiscAudioMedia::FillInfoStr(
 	AVFormatContext* pFormatCtx, 
-	AVCodec* pCodec,
+	const AVCodec* pCodec,
 	AVCodecContext *pCodecCtx,
 	AVDictionary* pMetaData,
 	ULONGLONG nTotalFrames,
@@ -414,7 +414,7 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 	BOOL bRet = FALSE;
 	ULONGLONG nTotalFramesSave;
 	INT nRet;
-	AVCodec* pCodec = NULL;
+	const AVCodec* pCodec = NULL;
 	AVFormatContext* pFormatCtx = NULL;
 	AVStream* pOutStream = NULL;
 	AVCodecContext* pCodecCtx = NULL;

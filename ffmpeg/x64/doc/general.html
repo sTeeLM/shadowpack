@@ -362,7 +362,7 @@ to <samp>./configure</samp>.
 
 <p>FFmpeg can make use of the Scalable Video Technology for AV1 library for AV1 encoding.
 </p>
-<p>Go to <a href="https://github.com/OpenVisualCloud/SVT-AV1/">https://github.com/OpenVisualCloud/SVT-AV1/</a> and follow the instructions
+<p>Go to <a href="https://gitlab.com/AOMediaCodec/SVT-AV1/">https://gitlab.com/AOMediaCodec/SVT-AV1/</a> and follow the instructions
 for installing the library. Then pass <code>--enable-libsvtav1</code> to configure to
 enable it.
 </p>
@@ -630,6 +630,7 @@ library:
 <tr><td width="40%">raw NULL</td><td width="10%">X</td><td width="10%"></td></tr>
 <tr><td width="40%">raw video</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">raw id RoQ</td><td width="10%">X</td><td width="10%"></td></tr>
+<tr><td width="40%">raw OBU</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">raw SBC</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">raw Shorten</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">raw TAK</td><td width="10%"></td><td width="10%">X</td></tr>
@@ -710,7 +711,7 @@ library:
 <tr><td width="40%">WebM</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">Windows Televison (WTV)</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">Wing Commander III movie</td><td width="10%"></td><td width="10%">X</td><td width="40%">Multimedia format used in Origin&rsquo;s Wing Commander III computer game.</td></tr>
-<tr><td width="40%">Westwood Studios audio</td><td width="10%"></td><td width="10%">X</td><td width="40%">Multimedia format used in Westwood Studios games.</td></tr>
+<tr><td width="40%">Westwood Studios audio</td><td width="10%">X</td><td width="10%">X</td><td width="40%">Multimedia format used in Westwood Studios games.</td></tr>
 <tr><td width="40%">Westwood Studios VQA</td><td width="10%"></td><td width="10%">X</td><td width="40%">Multimedia format used in Westwood Studios games.</td></tr>
 <tr><td width="40%">Wideband Single-bit Data (WSD)</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">WVE</td><td width="10%"></td><td width="10%">X</td></tr>
@@ -742,6 +743,7 @@ following image formats are supported:
 <tr><td width="40%">DPX</td><td width="10%">X</td><td width="10%">X</td><td width="40%">Digital Picture Exchange</td></tr>
 <tr><td width="40%">EXR</td><td width="10%"></td><td width="10%">X</td><td width="40%">OpenEXR</td></tr>
 <tr><td width="40%">FITS</td><td width="10%">X</td><td width="10%">X</td><td width="40%">Flexible Image Transport System</td></tr>
+<tr><td width="40%">IMG</td><td width="10%"></td><td width="10%">X</td><td width="40%">GEM Raster image</td></tr>
 <tr><td width="40%">JPEG</td><td width="10%">X</td><td width="10%">X</td><td width="40%">Progressive JPEG is not supported.</td></tr>
 <tr><td width="40%">JPEG 2000</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">JPEG-LS</td><td width="10%">X</td><td width="10%">X</td></tr>
@@ -924,7 +926,7 @@ following image formats are supported:
 <tr><td width="40%">Q-team QPEG</td><td width="10%"></td><td width="10%">X</td><td width="40%">fourccs: QPEG, Q1.0, Q1.1</td></tr>
 <tr><td width="40%">QuickTime 8BPS video</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">QuickTime Animation (RLE) video</td><td width="10%">X</td><td width="10%">X</td><td width="40%">fourcc: &rsquo;rle &rsquo;</td></tr>
-<tr><td width="40%">QuickTime Graphics (SMC)</td><td width="10%"></td><td width="10%">X</td><td width="40%">fourcc: &rsquo;smc &rsquo;</td></tr>
+<tr><td width="40%">QuickTime Graphics (SMC)</td><td width="10%">X</td><td width="10%">X</td><td width="40%">fourcc: &rsquo;smc &rsquo;</td></tr>
 <tr><td width="40%">QuickTime video (RPZA)</td><td width="10%">X</td><td width="10%">X</td><td width="40%">fourcc: rpza</td></tr>
 <tr><td width="40%">R10K AJA Kona 10-bit RGB Codec</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">R210 Quicktime Uncompressed RGB 10-bit</td><td width="10%">X</td><td width="10%">X</td></tr>
@@ -1006,6 +1008,7 @@ following image formats are supported:
 <tr><td width="40%">ADPCM Electronic Arts XAS</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">ADPCM G.722</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">ADPCM G.726</td><td width="10%">X</td><td width="10%">X</td></tr>
+<tr><td width="40%">ADPCM IMA Acorn Replay</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">ADPCM IMA AMV</td><td width="10%">X</td><td width="10%">X</td><td width="40%">Used in AMV files</td></tr>
 <tr><td width="40%">ADPCM IMA Cunning Developments</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">ADPCM IMA Electronic Arts EACS</td><td width="10%"></td><td width="10%">X</td></tr>
@@ -1036,7 +1039,7 @@ following image formats are supported:
 <tr><td width="40%">ADPCM Sound Blaster Pro 2.6-bit</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">ADPCM Sound Blaster Pro 4-bit</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">ADPCM VIMA</td><td width="10%"></td><td width="10%">X</td><td width="40%">Used in LucasArts SMUSH animations.</td></tr>
-<tr><td width="40%">ADPCM Westwood Studios IMA</td><td width="10%"></td><td width="10%">X</td><td width="40%">Used in Westwood Studios games like Command and Conquer.</td></tr>
+<tr><td width="40%">ADPCM Westwood Studios IMA</td><td width="10%">X</td><td width="10%">X</td><td width="40%">Used in Westwood Studios games like Command and Conquer.</td></tr>
 <tr><td width="40%">ADPCM Yamaha</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">ADPCM Zork</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">AMR-NB</td><td width="10%">E</td><td width="10%">X</td><td width="40%">encoding supported through external library libopencore-amrnb</td></tr>
@@ -1082,7 +1085,7 @@ following image formats are supported:
 <tr><td width="40%">GSM</td><td width="10%">E</td><td width="10%">X</td><td width="40%">encoding supported through external library libgsm</td></tr>
 <tr><td width="40%">GSM Microsoft variant</td><td width="10%">E</td><td width="10%">X</td><td width="40%">encoding supported through external library libgsm</td></tr>
 <tr><td width="40%">IAC (Indeo Audio Coder)</td><td width="10%"></td><td width="10%">X</td></tr>
-<tr><td width="40%">iLBC (Internet Low Bitrate Codec)</td><td width="10%">E</td><td width="10%">E</td><td width="40%">encoding and decoding supported through external library libilbc</td></tr>
+<tr><td width="40%">iLBC (Internet Low Bitrate Codec)</td><td width="10%">E</td><td width="10%">EX</td><td width="40%">encoding and decoding supported through external library libilbc</td></tr>
 <tr><td width="40%">IMC (Intel Music Coder)</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">Interplay ACM</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">MACE (Macintosh Audio Compression/Expansion) 3:1</td><td width="10%"></td><td width="10%">X</td></tr>
@@ -1141,7 +1144,7 @@ following image formats are supported:
 <tr><td width="40%">SMPTE 302M AES3 audio</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">Sonic</td><td width="10%">X</td><td width="10%">X</td><td width="40%">experimental codec</td></tr>
 <tr><td width="40%">Sonic lossless</td><td width="10%">X</td><td width="10%">X</td><td width="40%">experimental codec</td></tr>
-<tr><td width="40%">Speex</td><td width="10%">E</td><td width="10%">E</td><td width="40%">supported through external library libspeex</td></tr>
+<tr><td width="40%">Speex</td><td width="10%">E</td><td width="10%">EX</td><td width="40%">supported through external library libspeex</td></tr>
 <tr><td width="40%">TAK (Tom&rsquo;s lossless Audio Kompressor)</td><td width="10%"></td><td width="10%">X</td></tr>
 <tr><td width="40%">True Audio (TTA)</td><td width="10%">X</td><td width="10%">X</td></tr>
 <tr><td width="40%">TrueHD</td><td width="10%">X</td><td width="10%">X</td><td width="40%">Used in HD-DVD and Blu-Ray discs.</td></tr>

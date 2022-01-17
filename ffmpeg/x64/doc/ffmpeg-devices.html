@@ -577,8 +577,22 @@ Defaults to &lsquo;<samp>2</samp>&rsquo;.
 </p>
 </dd>
 <dt><samp>duplex_mode</samp></dt>
-<dd><p>Sets the decklink device duplex mode. Must be &lsquo;<samp>unset</samp>&rsquo;, &lsquo;<samp>half</samp>&rsquo; or &lsquo;<samp>full</samp>&rsquo;.
+<dd><p>Sets the decklink device duplex/profile mode. Must be &lsquo;<samp>unset</samp>&rsquo;, &lsquo;<samp>half</samp>&rsquo;, &lsquo;<samp>full</samp>&rsquo;,
+&lsquo;<samp>one_sub_device_full</samp>&rsquo;, &lsquo;<samp>one_sub_device_half</samp>&rsquo;, &lsquo;<samp>two_sub_device_full</samp>&rsquo;,
+&lsquo;<samp>four_sub_device_half</samp>&rsquo;
 Defaults to &lsquo;<samp>unset</samp>&rsquo;.
+</p>
+<p>Note: DeckLink SDK 11.0 have replaced the duplex property by a profile property.
+For the DeckLink Duo 2 and DeckLink Quad 2, a profile is shared between any 2
+sub-devices that utilize the same connectors. For the DeckLink 8K Pro, a profile
+is shared between all 4 sub-devices. So DeckLink 8K Pro support four profiles.
+</p>
+<p>Valid profile modes for DeckLink 8K Pro(with DeckLink SDK &gt;= 11.0):
+&lsquo;<samp>one_sub_device_full</samp>&rsquo;, &lsquo;<samp>one_sub_device_half</samp>&rsquo;, &lsquo;<samp>two_sub_device_full</samp>&rsquo;,
+&lsquo;<samp>four_sub_device_half</samp>&rsquo;
+</p>
+<p>Valid profile modes for DeckLink Quad 2 and DeckLink Duo 2:
+&lsquo;<samp>half</samp>&rsquo;, &lsquo;<samp>full</samp>&rsquo;
 </p>
 </dd>
 <dt><samp>timecode_format</samp></dt>
@@ -876,6 +890,13 @@ be anything even fake one.
 <dd><p>Save the currently used video capture filter device and its
 parameters (if the filter supports it) to a file.
 If a file with the same name exists it will be overwritten.
+</p>
+</dd>
+<dt><samp>use_video_device_timestamps</samp></dt>
+<dd><p>If set to <samp>false</samp>, the timestamp for video frames will be
+derived from the wallclock instead of the timestamp provided by
+the capture device. This allows working around devices that
+provide unreliable timestamps.
 </p>
 </dd>
 </dl>
@@ -2141,13 +2162,46 @@ Defaults to <samp>0.5</samp>.
 </p>
 </dd>
 <dt><samp>duplex_mode</samp></dt>
-<dd><p>Sets the decklink device duplex mode. Must be &lsquo;<samp>unset</samp>&rsquo;, &lsquo;<samp>half</samp>&rsquo; or &lsquo;<samp>full</samp>&rsquo;.
+<dd><p>Sets the decklink device duplex/profile mode. Must be &lsquo;<samp>unset</samp>&rsquo;, &lsquo;<samp>half</samp>&rsquo;, &lsquo;<samp>full</samp>&rsquo;,
+&lsquo;<samp>one_sub_device_full</samp>&rsquo;, &lsquo;<samp>one_sub_device_half</samp>&rsquo;, &lsquo;<samp>two_sub_device_full</samp>&rsquo;,
+&lsquo;<samp>four_sub_device_half</samp>&rsquo;
 Defaults to &lsquo;<samp>unset</samp>&rsquo;.
+</p>
+<p>Note: DeckLink SDK 11.0 have replaced the duplex property by a profile property.
+For the DeckLink Duo 2 and DeckLink Quad 2, a profile is shared between any 2
+sub-devices that utilize the same connectors. For the DeckLink 8K Pro, a profile
+is shared between all 4 sub-devices. So DeckLink 8K Pro support four profiles.
+</p>
+<p>Valid profile modes for DeckLink 8K Pro(with DeckLink SDK &gt;= 11.0):
+&lsquo;<samp>one_sub_device_full</samp>&rsquo;, &lsquo;<samp>one_sub_device_half</samp>&rsquo;, &lsquo;<samp>two_sub_device_full</samp>&rsquo;,
+&lsquo;<samp>four_sub_device_half</samp>&rsquo;
+</p>
+<p>Valid profile modes for DeckLink Quad 2 and DeckLink Duo 2:
+&lsquo;<samp>half</samp>&rsquo;, &lsquo;<samp>full</samp>&rsquo;
 </p>
 </dd>
 <dt><samp>timing_offset</samp></dt>
 <dd><p>Sets the genlock timing pixel offset on the used output.
 Defaults to &lsquo;<samp>unset</samp>&rsquo;.
+</p>
+</dd>
+<dt><samp>link</samp></dt>
+<dd><p>Sets the SDI video link configuration on the used output. Must be
+&lsquo;<samp>unset</samp>&rsquo;, &lsquo;<samp>single</samp>&rsquo; link SDI, &lsquo;<samp>dual</samp>&rsquo; link SDI or &lsquo;<samp>quad</samp>&rsquo; link
+SDI.
+Defaults to &lsquo;<samp>unset</samp>&rsquo;.
+</p>
+</dd>
+<dt><samp>sqd</samp></dt>
+<dd><p>Enable Square Division Quad Split mode for Quad-link SDI output.
+Must be &lsquo;<samp>unset</samp>&rsquo;, &lsquo;<samp>true</samp>&rsquo; or &lsquo;<samp>false</samp>&rsquo;.
+Defaults to <samp>unset</samp>.
+</p>
+</dd>
+<dt><samp>level_a</samp></dt>
+<dd><p>Enable SMPTE Level A mode on the used output.
+Must be &lsquo;<samp>unset</samp>&rsquo;, &lsquo;<samp>true</samp>&rsquo; or &lsquo;<samp>false</samp>&rsquo;.
+Defaults to <samp>unset</samp>.
 </p>
 </dd>
 </dl>

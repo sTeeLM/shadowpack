@@ -30,7 +30,6 @@ demos/008.mlp filter=lfs diff=lfs merge=lfs -text
 demos/008.ogg filter=lfs diff=lfs merge=lfs -text
 demos/008.tta filter=lfs diff=lfs merge=lfs -text
 demos/008.asf filter=lfs diff=lfs merge=lfs -text
-demos/008.wma.bak filter=lfs diff=lfs merge=lfs -text
 demos/008.wv filter=lfs diff=lfs merge=lfs -text
 demos/008.mka filter=lfs diff=lfs merge=lfs -text
 demos/008.oma filter=lfs diff=lfs merge=lfs -text
@@ -52,3 +51,4 @@ demos/008.ircam filter=lfs diff=lfs merge=lfs -text
 demos/008.sd2 filter=lfs diff=lfs merge=lfs -text
 demos/008.mat4 filter=lfs diff=lfs merge=lfs -text
 demos/008.mat5 filter=lfs diff=lfs merge=lfs -text
+demos/008.thd filter=lfs diff=lfs merge=lfs -text
