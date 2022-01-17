@@ -31,14 +31,10 @@ public:
 	virtual BOOL UpdateOpts(CMFCPropertySheet* pPropertySheet);
 public:
 	// 实现CMediaFactory的接口
-	typedef struct _MISC_AUDIO_EXT {
-		LPCTSTR szExts;
-		LPCTSTR szName;
-	} MISC_AUDIO_EXT;
 	static CMediaBase* Factory();
 	static void GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray);
 protected:
-	static MISC_AUDIO_EXT m_szExtTable[];
+	static CMediaFactory::MEDIA_EXT_TABLE_T m_szExtTable[];
 	static CString m_strLastLog;
 	static void CBLogger(void* avcl, int level, const char* fmt, va_list vl);
 	static CString GetErrorString(INT nErr);

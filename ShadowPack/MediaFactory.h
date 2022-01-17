@@ -28,7 +28,12 @@ public:
 	};
 	
 	typedef void (*FN_MEDIA_GET_MEDIA_INFO)(CArray<CMediaInfo>& InfoArray);
+	typedef struct _MEDIA_EXT_TABLE_T {
+		LPCTSTR szExts;
+		LPCTSTR szName;
+	} MEDIA_EXT_TABLE_T;
 public:
+	static void LoadMediaExt(MEDIA_EXT_TABLE_T * pExtTable, UINT nCnt, FN_MEDIA_FACTORY fnFactory, CArray<CMediaInfo>& InfoArray);
 	static CMediaBase* CreateMediaFromExt(LPCTSTR szExt);
 	static CString CreateExtTable();
 	static void LoadMediaInfo();

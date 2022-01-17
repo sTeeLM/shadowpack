@@ -433,7 +433,7 @@ BOOL CSndfileAudioMedia::UpdateOpts(CMFCPropertySheet* pPropertySheet)
 	return CPCMAudioMedia::UpdateOpts(pPropertySheet);;
 }
 
-CSndfileAudioMedia::SNDFILE_AUDIO_EXT CSndfileAudioMedia::m_szExtTable[] = {
+CMediaFactory::MEDIA_EXT_TABLE_T CSndfileAudioMedia::m_szExtTable[] = {
 	{_T("paf,fap"),_T("Ensoniq PARIS") },
 	{_T("nist,sph"),_T("NIST Sphere") },
 	{_T("voc"),_T("Creative Labs") },
@@ -454,23 +454,5 @@ CMediaBase* CSndfileAudioMedia::Factory()
 
 void CSndfileAudioMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
-	CMediaFactory::CMediaInfo Info;
-	TCHAR szBuffer[1024];
-	TCHAR* context = NULL;
-	TCHAR* token;
-	for (INT i = 0; i < _countof(m_szExtTable); i++) {
-		context = NULL;
-		Info.Exts.RemoveAll();
-		_tcsncpy_s(szBuffer, m_szExtTable[i].szExts, lstrlen(m_szExtTable[i].szExts));
-		szBuffer[_countof(szBuffer) - 1] = 0;
-		token = _tcstok_s(szBuffer, _T(","), &context);
-		while (token) {
-			Info.Exts.Add(token);
-			token = _tcstok_s(NULL, _T(","), &context);
-		}
-		Info.fnFactory = Factory;
-		Info.nCatagory = IDS_MEDIA_AUDIO_FILE;
-		Info.strName = m_szExtTable[i].szName;
-		InfoArray.Add(Info);
-	}
+	CMediaFactory::LoadMediaExt(m_szExtTable, _countof(m_szExtTable), Factory, InfoArray);
 }

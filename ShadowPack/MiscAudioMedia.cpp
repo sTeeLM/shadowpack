@@ -631,7 +631,7 @@ CMediaBase* CMiscAudioMedia::Factory()
 	return new(std::nothrow) CMiscAudioMedia();
 }
 
-CMiscAudioMedia::MISC_AUDIO_EXT CMiscAudioMedia::m_szExtTable[] = {
+CMediaFactory::MEDIA_EXT_TABLE_T CMiscAudioMedia::m_szExtTable[] = {
 	{_T("wav,wave,w64"),_T("Waveform Audio File Format") },
 	{_T("aif,aiff,aifc,afc"),_T("Audio Interchange File Format")},
 	{_T("au,snd"),_T("NeXT/Sun")},
@@ -652,25 +652,7 @@ CMiscAudioMedia::MISC_AUDIO_EXT CMiscAudioMedia::m_szExtTable[] = {
 
 void CMiscAudioMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
-	CMediaFactory::CMediaInfo Info;
-	TCHAR szBuffer[1024];
-	TCHAR* context = NULL;
-	TCHAR* token;
-	for (INT i = 0; i < _countof(m_szExtTable); i++) {
-		context = NULL;
-		Info.Exts.RemoveAll();
-		_tcsncpy_s(szBuffer, m_szExtTable[i].szExts, lstrlen(m_szExtTable[i].szExts));
-		szBuffer[_countof(szBuffer) - 1] = 0;
-		token = _tcstok_s(szBuffer, _T(","), &context);
-		while (token) {
-			Info.Exts.Add(token);
-			token = _tcstok_s(NULL, _T(","), &context);
-		}
-		Info.fnFactory = Factory;
-		Info.nCatagory = IDS_MEDIA_AUDIO_FILE;
-		Info.strName = m_szExtTable[i].szName;
-		InfoArray.Add(Info);
-	}
+	CMediaFactory::LoadMediaExt(m_szExtTable, _countof(m_szExtTable), Factory, InfoArray);
 }
 
 

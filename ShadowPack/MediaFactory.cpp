@@ -130,6 +130,31 @@ void CMediaFactory::LoadMediaInfo()
 	m_strFilter += _T("|");
 }
 
+void CMediaFactory::LoadMediaExt(CMediaFactory::MEDIA_EXT_TABLE_T * pExtTable, UINT nCnt, 
+	CMediaFactory::FN_MEDIA_FACTORY fnFactory,
+	CArray<CMediaFactory::CMediaInfo>& InfoArray)
+{
+	CMediaFactory::CMediaInfo Info;
+	TCHAR szBuffer[1024];
+	TCHAR* context = NULL;
+	TCHAR* token;
+	for (INT i = 0; i < nCnt; i++) {
+		context = NULL;
+		Info.Exts.RemoveAll();
+		_tcsncpy_s(szBuffer, pExtTable[i].szExts, lstrlen(pExtTable[i].szExts));
+		szBuffer[_countof(szBuffer) - 1] = 0;
+		token = _tcstok_s(szBuffer, _T(","), &context);
+		while (token) {
+			Info.Exts.Add(token);
+			token = _tcstok_s(NULL, _T(","), &context);
+		}
+		Info.fnFactory = fnFactory;
+		Info.nCatagory = IDS_MEDIA_AUDIO_FILE;
+		Info.strName = pExtTable[i].szName;
+		InfoArray.Add(Info);
+	}
+}
+
 CMediaBase* CMediaFactory::CreateMediaFromExt(LPCTSTR szExt)
 {
 	CString strKey;
