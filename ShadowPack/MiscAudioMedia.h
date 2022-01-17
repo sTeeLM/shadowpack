@@ -37,8 +37,8 @@ public:
 	} MISC_AUDIO_EXT;
 	static CMediaBase* Factory();
 	static void GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray);
-	static MISC_AUDIO_EXT m_szExtTable[];
 protected:
+	static MISC_AUDIO_EXT m_szExtTable[];
 	static CString m_strLastLog;
 	static void CBLogger(void* avcl, int level, const char* fmt, va_list vl);
 	static CString GetErrorString(INT nErr);
@@ -76,7 +76,7 @@ protected:
 	CAudioMeta m_FileMeta;
 	COptPagePCMFileProperty m_OptPagePCMFileProperty;
 protected:
-#define ONE_PASS_FRAMES 4096
+#define MISC_AUDIO_ONE_PASS_FRAMES 4096
 	static INT CheckCodecID(INT nCodecID);
 	BOOL ProbeTotalFrames(AVFormatContext* pFormatCtx, AVCodecContext* pCodecCtx, LPCTSTR szFilePath,
 		ULONGLONG& nTotalFrames, CPackErrors& Errors);

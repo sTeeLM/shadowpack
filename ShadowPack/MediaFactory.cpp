@@ -8,6 +8,7 @@
 #include "PPMFileMedia.h"
 
 #include "MiscAudioMedia.h"
+#include "SndfileAudioMedia.h"
 
 
 CMediaFactory::FN_MEDIA_GET_MEDIA_INFO CMediaFactory::m_InfoTable[] =
@@ -17,7 +18,8 @@ CMediaFactory::FN_MEDIA_GET_MEDIA_INFO CMediaFactory::m_InfoTable[] =
 	CPNGFileMedia::GetMediaInfo,
 	CTIFFileMedia::GetMediaInfo,
 	CPPMFileMedia::GetMediaInfo,
-	CMiscAudioMedia::GetMediaInfo
+	CMiscAudioMedia::GetMediaInfo,
+	CSndfileAudioMedia::GetMediaInfo
 };
 
 // 所有CMediaInfo的列表
@@ -139,6 +141,7 @@ CMediaBase* CMediaFactory::CreateMediaFromExt(LPCTSTR szExt)
 	m_ExtFactoryMap.Lookup(strKey, pValue);
 	if (pValue) {
 		pArray = dynamic_cast<CObArray*>(pValue);
+		ASSERT(pArray->GetCount() == 1);
 		pMediaInfo = dynamic_cast<CMediaInfo*>(pArray->GetAt(0)); /* 目前只取第一个 */
 		return pMediaInfo->fnFactory();
 	}

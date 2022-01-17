@@ -517,7 +517,7 @@ BOOL CMiscAudioMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPa
 
 	output_frame->nb_samples = pCodecCtx->frame_size;
 	if (output_frame->nb_samples == 0) {
-		output_frame->nb_samples = ONE_PASS_FRAMES;
+		output_frame->nb_samples = MISC_AUDIO_ONE_PASS_FRAMES;
 	}
 	output_frame->format = pCodecCtx->sample_fmt;
 	output_frame->channels = pCodecCtx->channels;
