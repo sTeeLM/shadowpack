@@ -42,10 +42,17 @@ public:
 	}SAMPLE_FORMAT_T;
 	BOOL Alloc(ULONGLONG nFrames, UINT nChannels, UINT nBitsPerSample, CPackErrors& Error);
 	void Free();
+	// for snd file
 	void SetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt); 
 	void GetFrame(LPVOID pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
-	void SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT nSamples, INT nChannels);
-	void GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT& nSamples, INT nChannels);
+
+	// for ffmpeg
+	void SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT nFrameCnt, INT nChannels);
+	void GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT& nFrameCnt, INT nChannels);
+
+	// for monkey audio
+	void SetPackSample(LPBYTE pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
+	void GetPackSample(LPBYTE pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt);
 protected:
 	BYTE GetByteFromBlocks8(ULONGLONG nBlockOffset, UINT nBlockPerByte);
 	BYTE GetByteFromBlocks162024(ULONGLONG nBlockOffset, UINT nBlockPerByte);

@@ -227,7 +227,7 @@ BOOL CSndfileAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Pass
 		goto err;
 	}
 
-	m_OptPagePCMFileProperty.m_strPCMProperty = ReadLog(file, m_FileMeta.snd_info);
+	m_OptPageSndFileProperty.m_strPCMProperty = ReadLog(file, m_FileMeta.snd_info);
 
 	nContainer = ((m_FileMeta.snd_info.format) & SF_FORMAT_TYPEMASK);
 	nCodec     = ((m_FileMeta.snd_info.format) & SF_FORMAT_SUBMASK);
@@ -417,14 +417,14 @@ err:
 void CSndfileAudioMedia::CloseMedia()
 {
 	m_FileMeta.Free();
-	m_OptPagePCMFileProperty.m_strPCMProperty = _T("");
+	m_OptPageSndFileProperty.m_strPCMProperty = _T("");
 	CPCMAudioMedia::Free();
 }
 
 void CSndfileAudioMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
 
-	pPropertySheet->AddPage(&m_OptPagePCMFileProperty);
+	pPropertySheet->AddPage(&m_OptPageSndFileProperty);
 	CPCMAudioMedia::AddOptPage(pPropertySheet);
 }
 
@@ -454,5 +454,5 @@ CMediaBase* CSndfileAudioMedia::Factory()
 
 void CSndfileAudioMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
-	CMediaFactory::LoadMediaExt(m_szExtTable, _countof(m_szExtTable), Factory, InfoArray);
+	CMediaFactory::LoadMediaExt(m_szExtTable, _countof(m_szExtTable), Factory, IDS_MEDIA_AUDIO_FILE, InfoArray);
 }

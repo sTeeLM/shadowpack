@@ -303,7 +303,7 @@ BOOL CMiscAudioMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& Passwor
 		goto err;
 	}
 
-	m_OptPagePCMFileProperty.m_strPCMProperty = FillInfoStr(pFormatCtx,
+	m_OptPageMiscFileProperty.m_strPCMProperty = FillInfoStr(pFormatCtx,
 		m_FileMeta.m_pCodec, m_FileMeta.m_pCodecCtx, m_FileMeta.m_pMetaData, m_FileMeta.m_TotalFrames, nBitsPerSample);
 
 
@@ -611,13 +611,13 @@ err:
 void CMiscAudioMedia::CloseMedia()
 {
 	m_FileMeta.Free();
-	m_OptPagePCMFileProperty.m_strPCMProperty = _T("");
+	m_OptPageMiscFileProperty.m_strPCMProperty = _T("");
 	CPCMAudioMedia::Free();
 }
 
 void CMiscAudioMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 {
-	pPropertySheet->AddPage(&m_OptPagePCMFileProperty);
+	pPropertySheet->AddPage(&m_OptPageMiscFileProperty);
 	CPCMAudioMedia::AddOptPage(pPropertySheet);
 }
 
@@ -652,7 +652,7 @@ CMediaFactory::MEDIA_EXT_TABLE_T CMiscAudioMedia::m_szExtTable[] = {
 
 void CMiscAudioMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
-	CMediaFactory::LoadMediaExt(m_szExtTable, _countof(m_szExtTable), Factory, InfoArray);
+	CMediaFactory::LoadMediaExt(m_szExtTable, _countof(m_szExtTable), Factory, IDS_MEDIA_AUDIO_FILE, InfoArray);
 }
 
 

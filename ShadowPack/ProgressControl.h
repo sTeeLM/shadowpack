@@ -32,6 +32,7 @@ protected:
 	ULONGLONG m_nFullScale;
 	ULONGLONG m_nCurrent;
 	BOOL m_bCancel;
+	BOOL m_bShowETA;
 
 	COLORREF m_prgsColor; //进度条进度部分颜色
 	COLORREF m_freeColor; //进度条后面空余部分颜色

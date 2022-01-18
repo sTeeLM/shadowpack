@@ -187,10 +187,10 @@ BOOL CPCMAudioMedia::SampleFmtMatchBitWidth(UINT nBitsPerSample, SAMPLE_FORMAT_T
 	return FALSE;
 }
 
-void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT nSamples, INT nChannels)
+void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT nFrameCnt, INT nChannels)
 {
-	if (nFrameOffset + nSamples > m_nFrameCnt) {
-		nSamples = (INT)(m_nFrameCnt - nFrameOffset);
+	if (nFrameOffset + nFrameCnt > m_nFrameCnt) {
+		nFrameCnt = (INT)(m_nFrameCnt - nFrameOffset);
 	}
 
 	ASSERT(nChannels == m_nChannels);
@@ -203,26 +203,26 @@ void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 		return;
 	}
 
-	TRACE(_T("nFrameOffset = %I64u, nLineSize = %d, Format = %d, nSamples = %d, nChannels = %d\n"),
-		nFrameOffset, nLineSize, Format, nSamples, nChannels);
+	TRACE(_T("nFrameOffset = %I64u, nLineSize = %d, Format = %d, nFrameCnt = %d, nChannels = %d\n"),
+		nFrameOffset, nLineSize, Format, nFrameCnt, nChannels);
 	if (m_pSampleBuffer) {
 		switch (Format) {
 		case SAMPLE_FMT_U8:          ///< unsigned 8 bits
 			// 3 7 11 15
-			for (INT i = 0; i < nSamples * nChannels; i++) {
+			for (INT i = 0; i < nFrameCnt * nChannels; i++) {
 				m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 3] = pBuffer[0][i];
 			}
 			break;
 		case SAMPLE_FMT_S16:         ///< signed 16 bits
 			// 2-3 6-7 10-11 14-15
-			for (INT i = 0; i < nSamples * nChannels; i++) {
+			for (INT i = 0; i < nFrameCnt * nChannels; i++) {
 				m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 2] = pBuffer[0][i * 2];
 				m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 3] = pBuffer[0][i * 2 + 1];
 			}
 			break;
 		case SAMPLE_FMT_S32:         ///< signed 32 bits
 		case SAMPLE_FMT_FLT:         ///< float
-			for (INT i = 0; i < nSamples * nChannels; i++) {
+			for (INT i = 0; i < nFrameCnt * nChannels; i++) {
 				DWORD* p  = (DWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4];
 				DWORD* p1 = (DWORD*)&pBuffer[0][i * 4];
 				*p = *p1;
@@ -230,7 +230,7 @@ void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 			break;
 		case SAMPLE_FMT_DBL:         ///< double
 		case SAMPLE_FMT_S64:         ///< signed 64 bits
-			for (INT i = 0; i < nSamples * nChannels; i++) {
+			for (INT i = 0; i < nFrameCnt * nChannels; i++) {
 				QWORD* p = (QWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 8 + i * 8];
 				QWORD* p1 = (QWORD*)&pBuffer[0][i * 8];
 				*p = *p1;
@@ -238,14 +238,14 @@ void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 			break;
 		case SAMPLE_FMT_U8P:         ///< unsigned 8 bits, planar
 			for (int j = 0; j < nChannels; j++) {
-				for (INT i = 0; i < nSamples; i++) {
+				for (INT i = 0; i < nFrameCnt; i++) {
 					m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 3] = pBuffer[j][i];
 				}
 			}
 			break;
 		case SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
 			for (int j = 0; j < nChannels; j++) {
-				for (INT i = 0; i < nSamples; i++) {
+				for (INT i = 0; i < nFrameCnt; i++) {
 					m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 2] = pBuffer[j][i * 2];
 					m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 3] = pBuffer[j][i * 2 + 1];
 				}
@@ -254,7 +254,7 @@ void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 		case SAMPLE_FMT_S32P:        ///< signed 32 bits, planar
 		case SAMPLE_FMT_FLTP:        ///< float, planar
 			for (int j = 0; j < nChannels; j++) {
-				for (INT i = 0; i < nSamples; i++) {
+				for (INT i = 0; i < nFrameCnt; i++) {
 					DWORD* p = (DWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4];
 					DWORD* p1 = (DWORD*)&pBuffer[j][i * 4];
 					*p = *p1;
@@ -263,7 +263,7 @@ void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 		case SAMPLE_FMT_DBLP:        ///< double, planar
 		case SAMPLE_FMT_S64P:        ///< signed 64 bits, planar
 			for (int j = 0; j < nChannels; j++) {
-				for (INT i = 0; i < nSamples; i++) {
+				for (INT i = 0; i < nFrameCnt; i++) {
 					QWORD* p = (QWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 8 + j * nChannels * 8 + i * 8];
 					QWORD* p1 = (QWORD*)&pBuffer[j][i * 8];
 					*p = *p1;
@@ -277,10 +277,10 @@ void CPCMAudioMedia::SetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 
 }
 
-void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT& nSamples, INT nChannels)
+void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLineSize, SAMPLE_FORMAT_T Format, INT& nFrameCnt, INT nChannels)
 {
-	if (nFrameOffset + nSamples > m_nFrameCnt) {
-		nSamples = (INT)(m_nFrameCnt - nFrameOffset);
+	if (nFrameOffset + nFrameCnt > m_nFrameCnt) {
+		nFrameCnt = (INT)(m_nFrameCnt - nFrameOffset);
 	}
 
 	ASSERT(nChannels == m_nChannels);
@@ -297,20 +297,20 @@ void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 		switch (Format) {
 		case SAMPLE_FMT_U8:          ///< unsigned 8 bits
 			// 3 7 11 15
-			for (INT i = 0; i < nSamples * nChannels; i++) {
+			for (INT i = 0; i < nFrameCnt * nChannels; i++) {
 				pBuffer[0][i] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 3];
 			}
 			break;
 		case SAMPLE_FMT_S16:         ///< signed 16 bits
 			// 2-3 6-7 10-11 14-15
-			for (INT i = 0; i < nSamples * nChannels; i++) {
+			for (INT i = 0; i < nFrameCnt * nChannels; i++) {
 				pBuffer[0][i * 2] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 2];
 				pBuffer[0][i * 2 + 1] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4 + 3];
 			}
 			break;
 		case SAMPLE_FMT_S32:         ///< signed 32 bits
 		case SAMPLE_FMT_FLT:         ///< float
-			for (INT i = 0; i < nSamples * nChannels; i++) {
+			for (INT i = 0; i < nFrameCnt * nChannels; i++) {
 				DWORD* p = (DWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 4 + i * 4];
 				DWORD* p1 = (DWORD*)&pBuffer[0][i * 4];
 				*p1 = *p;
@@ -318,7 +318,7 @@ void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 			break;
 		case SAMPLE_FMT_DBL:         ///< double
 		case SAMPLE_FMT_S64:         ///< signed 64 bits
-			for (INT i = 0; i < nSamples * nChannels; i++) {
+			for (INT i = 0; i < nFrameCnt * nChannels; i++) {
 				QWORD* p = (QWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 8 + i * 8];
 				QWORD* p1 = (QWORD*)&pBuffer[0][i * 8];
 				*p1 = *p;
@@ -326,14 +326,14 @@ void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 			break;
 		case SAMPLE_FMT_U8P:         ///< unsigned 8 bits, planar
 			for (int j = 0; j < nChannels; j++) {
-				for (INT i = 0; i < nSamples; i++) {
+				for (INT i = 0; i < nFrameCnt; i++) {
 					pBuffer[j][i] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 3];
 				}
 			}
 			break;
 		case SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
 			for (int j = 0; j < nChannels; j++) {
-				for (INT i = 0; i < nSamples; i++) {
+				for (INT i = 0; i < nFrameCnt; i++) {
 					pBuffer[j][i * 2] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 2];
 					pBuffer[j][i * 2 + 1] = m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4 + 3];
 				}
@@ -342,7 +342,7 @@ void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 		case SAMPLE_FMT_S32P:        ///< signed 32 bits, planar
 		case SAMPLE_FMT_FLTP:        ///< float, planar
 			for (int j = 0; j < nChannels; j++) {
-				for (INT i = 0; i < nSamples; i++) {
+				for (INT i = 0; i < nFrameCnt; i++) {
 					DWORD* p = (DWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 4 + j * nChannels * 4 + i * 4];
 					DWORD* p1 = (DWORD*)&pBuffer[j][i * 4];
 					*p1 = *p;
@@ -351,7 +351,7 @@ void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 		case SAMPLE_FMT_DBLP:        ///< double, planar
 		case SAMPLE_FMT_S64P:        ///< signed 64 bits, planar
 			for (int j = 0; j < nChannels; j++) {
-				for (INT i = 0; i < nSamples; i++) {
+				for (INT i = 0; i < nFrameCnt; i++) {
 					QWORD* p = (QWORD*)&m_pSampleBuffer[nFrameOffset * nChannels * 8 + j * nChannels * 8 + i * 8];
 					QWORD* p1 = (QWORD*)&pBuffer[j][i * 8];
 					*p1 = *p;
@@ -362,8 +362,66 @@ void CPCMAudioMedia::GetSample(LPBYTE* pBuffer, ULONGLONG nFrameOffset, INT nLin
 			break;
 		}
 	}
-	TRACE(_T("nFrameOffset = %I64u, nLineSize = %d, Format = %d, nSamples = %d, nChannels = %d\n"),
-		nFrameOffset, nLineSize, Format, nSamples, nChannels);
+	TRACE(_T("nFrameOffset = %I64u, nLineSize = %d, Format = %d, nFrameCnt = %d, nChannels = %d\n"),
+		nFrameOffset, nLineSize, Format, nFrameCnt, nChannels);
+}
+
+void CPCMAudioMedia::SetPackSample(LPBYTE pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt)
+{
+	switch (m_nBitsPerSample) {
+	case 8:
+		// 3 7 11 15
+		for (UINT i = 0; i < nFrameCnt * m_nChannels; i++) {
+			m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 3] = pBuffer[i];
+		}
+		break;
+	case 16:
+		// 2-3 6-7 10-11 14-15
+		for (UINT i = 0; i < nFrameCnt * m_nChannels; i++) {
+			m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 2] = pBuffer[i * 2 + 0];
+			m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 3] = pBuffer[i * 2 + 1];
+		}
+		break;
+	case 24:
+		// 1-3 5-7 9-11 13-15
+		for (UINT i = 0; i < nFrameCnt * m_nChannels; i++) {
+			m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 1] = pBuffer[i * 3 + 0];
+			m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 2] = pBuffer[i * 3 + 1];
+			m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 3] = pBuffer[i * 3 + 2];
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void CPCMAudioMedia::GetPackSample(LPBYTE pBuffer, ULONGLONG nFrameOffset, UINT nFrameCnt)
+{
+	switch (m_nBitsPerSample) {
+	case 8:
+		// 3 7 11 15
+		for (UINT i = 0; i < nFrameCnt * m_nChannels; i++) {
+			pBuffer[i] = m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 3];
+		}
+		break;
+	case 16:
+		// 2-3 6-7 10-11 14-15
+		for (UINT i = 0; i < nFrameCnt * m_nChannels; i++) {
+			pBuffer[i * 2 + 0] = m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 2];
+			pBuffer[i * 2 + 1] = m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 3];
+		}
+		break;
+	case 24:
+		// 1-3 5-7 9-11 13-15
+		for (UINT i = 0; i < nFrameCnt * m_nChannels; i++) {
+			pBuffer[i * 3 + 0] = m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 1];
+			pBuffer[i * 3 + 1] = m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 2];
+			pBuffer[i * 3 + 2] = m_pSampleBuffer[nFrameOffset * m_nChannels * 4 + i * 4 + 3];
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 /*

@@ -33,7 +33,8 @@ public:
 		LPCTSTR szName;
 	} MEDIA_EXT_TABLE_T;
 public:
-	static void LoadMediaExt(MEDIA_EXT_TABLE_T * pExtTable, UINT nCnt, FN_MEDIA_FACTORY fnFactory, CArray<CMediaInfo>& InfoArray);
+	static void LoadMediaExt(MEDIA_EXT_TABLE_T * pExtTable, UINT nCnt, FN_MEDIA_FACTORY fnFactory, 
+		UINT nCatagory, CArray<CMediaInfo>& InfoArray);
 	static CMediaBase* CreateMediaFromExt(LPCTSTR szExt);
 	static CString CreateExtTable();
 	static void LoadMediaInfo();

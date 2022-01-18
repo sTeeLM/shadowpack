@@ -70,7 +70,7 @@ protected:
 	};
 
 	CAudioMeta m_FileMeta;
-	COptPagePCMFileProperty m_OptPagePCMFileProperty;
+	COptPagePCMFileProperty m_OptPageMiscFileProperty;
 protected:
 #define MISC_AUDIO_ONE_PASS_FRAMES 4096
 	static INT CheckCodecID(INT nCodecID);

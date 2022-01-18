@@ -9,6 +9,7 @@
 
 #include "MiscAudioMedia.h"
 #include "SndfileAudioMedia.h"
+#include "ApeFileMedia.h"
 
 
 CMediaFactory::FN_MEDIA_GET_MEDIA_INFO CMediaFactory::m_InfoTable[] =
@@ -19,7 +20,8 @@ CMediaFactory::FN_MEDIA_GET_MEDIA_INFO CMediaFactory::m_InfoTable[] =
 	CTIFFileMedia::GetMediaInfo,
 	CPPMFileMedia::GetMediaInfo,
 	CMiscAudioMedia::GetMediaInfo,
-	CSndfileAudioMedia::GetMediaInfo
+	CSndfileAudioMedia::GetMediaInfo,
+	CApeFileMedia::GetMediaInfo
 };
 
 // 所有CMediaInfo的列表
@@ -131,7 +133,7 @@ void CMediaFactory::LoadMediaInfo()
 }
 
 void CMediaFactory::LoadMediaExt(CMediaFactory::MEDIA_EXT_TABLE_T * pExtTable, UINT nCnt, 
-	CMediaFactory::FN_MEDIA_FACTORY fnFactory,
+	CMediaFactory::FN_MEDIA_FACTORY fnFactory, UINT nCatagory,
 	CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
 	CMediaFactory::CMediaInfo Info;
@@ -149,7 +151,7 @@ void CMediaFactory::LoadMediaExt(CMediaFactory::MEDIA_EXT_TABLE_T * pExtTable, U
 			token = _tcstok_s(NULL, _T(","), &context);
 		}
 		Info.fnFactory = fnFactory;
-		Info.nCatagory = IDS_MEDIA_AUDIO_FILE;
+		Info.nCatagory = nCatagory;
 		Info.strName = pExtTable[i].szName;
 		InfoArray.Add(Info);
 	}

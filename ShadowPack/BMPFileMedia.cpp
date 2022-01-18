@@ -258,7 +258,7 @@ void CBMPFileMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 	Info.Exts.Add(_T("dib"));
 	Info.fnFactory = Factory;
 	Info.nCatagory = IDS_MEDIA_IMAGE_FILE;
-	Info.strName = _T("Bitmap Image");
+	Info.strName = _T("Bitmap Image File");
 	InfoArray.Add(Info);
 }
 
