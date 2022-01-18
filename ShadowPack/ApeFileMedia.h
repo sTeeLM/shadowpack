@@ -34,6 +34,10 @@ protected:
 	UINT m_nMacFlags;
 	UINT m_nCompressLevel;
 	ULONGLONG m_nTotalBlocks;
+	LPBYTE m_pWavHeaderData;
+	UINT m_nWavHeaderDataLen;
+	LPBYTE m_pTerminatingData;
+	UINT m_nTerminatingDataLen;
 	CMap<INT, const INT&, CString, const CString&> m_ErrorString;
 
 	void LoadErrorString();

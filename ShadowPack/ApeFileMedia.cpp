@@ -5,7 +5,11 @@
 CApeFileMedia::CApeFileMedia() :
 	m_nMacFlags(0),
 	m_nTotalBlocks(0),
-	m_nCompressLevel(0)
+	m_nCompressLevel(0),
+	m_pWavHeaderData(NULL),
+	m_nWavHeaderDataLen(0),
+	m_pTerminatingData(NULL),
+	m_nTerminatingDataLen(0)
 {
 }
 
@@ -116,6 +120,44 @@ BOOL CApeFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		goto err;
 	}
 
+	if ((nRet = pAPEDecompress->GetInfo(APE::APE_INFO_WAV_HEADER_BYTES)) < 0) {
+		Errors.SetError(CPackErrors::PE_INTERNAL);
+		goto err;
+	}
+	m_nWavHeaderDataLen = (UINT)nRet;
+
+	if (m_nWavHeaderDataLen) {
+		if ((m_pWavHeaderData = (LPBYTE)malloc(m_nWavHeaderDataLen)) == NULL) {
+			Errors.SetError(CPackErrors::PE_NOMEM);
+			goto err;
+		}
+	}
+
+	if ((nRet = pAPEDecompress->GetInfo(APE::APE_INFO_WAV_HEADER_DATA, (APE::int64)m_pWavHeaderData, 
+		(APE::int64)m_nWavHeaderDataLen)) < 0) {
+		Errors.SetError(CPackErrors::PE_INTERNAL);
+		goto err;
+	}
+
+	if ((nRet = pAPEDecompress->GetInfo(APE::APE_INFO_WAV_TERMINATING_BYTES)) < 0) {
+		Errors.SetError(CPackErrors::PE_INTERNAL);
+		goto err;
+	}
+	m_nTerminatingDataLen = (UINT)nRet;
+
+	if (m_nTerminatingDataLen) {
+		if ((m_pTerminatingData = (LPBYTE)malloc(m_nTerminatingDataLen)) == NULL) {
+			Errors.SetError(CPackErrors::PE_NOMEM);
+			goto err;
+		}
+	}
+
+	if ((nRet = pAPEDecompress->GetInfo(APE::APE_INFO_WAV_TERMINATING_DATA, (APE::int64)m_pTerminatingData,
+		(APE::int64)m_nTerminatingDataLen)) < 0) {
+		Errors.SetError(CPackErrors::PE_INTERNAL);
+		goto err;
+	}
+
 	if ((nRet = pAPEDecompress->GetInfo(APE::APE_INFO_FORMAT_FLAGS)) < 0) {
 		Errors.SetError(CPackErrors::PE_INTERNAL);
 		goto err;
@@ -157,6 +199,9 @@ BOOL CApeFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 		CPCMAudioMedia::SetPackSample(pBlockBuffer, m_nTotalBlocks - nBlockLeft, (UINT)nRet);
 		Progress.Increase(nRet);
 		nBlockLeft -= nRet;
+		if (Progress.IsCanceled(Errors)) {
+			goto err;
+		}
 	}
 	
 	// test format
@@ -200,8 +245,8 @@ BOOL CApeFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto err;
 	}
 
-	if ((nRetVal = pAPECompress->Start(szFilePath, &m_WaveFormatEx, MAX_AUDIO_BYTES_UNKNOWN, m_nCompressLevel,
-		NULL, CREATE_WAV_HEADER_ON_DECOMPRESSION, m_nMacFlags)) != 0) {
+	if ((nRetVal = pAPECompress->Start(szFilePath, &m_WaveFormatEx, m_nTotalBlocks * m_WaveFormatEx.nBlockAlign, m_nCompressLevel,
+		m_pWavHeaderData, m_nWavHeaderDataLen, m_nMacFlags)) != 0) {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, GetErrorString(nRetVal));
 		goto err;
 	}
@@ -226,9 +271,12 @@ BOOL CApeFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		}
 		Progress.Increase(nByteWrite / m_WaveFormatEx.nBlockAlign);
 		nBlockLeft -= nByteWrite / m_WaveFormatEx.nBlockAlign;
+		if (Progress.IsCanceled(Errors)) {
+			goto err;
+		}
 	}
-
-	if ((nRetVal = pAPECompress->Finish(NULL, 0, 0)) != 0) {
+	 
+	if ((nRetVal = pAPECompress->Finish(m_pTerminatingData, m_nTerminatingDataLen, m_nTerminatingDataLen)) != 0) {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, GetErrorString(nRetVal));
 		goto err;
 	}
@@ -253,6 +301,16 @@ void CApeFileMedia::CloseMedia()
 	m_nMacFlags = 0;
 	m_nTotalBlocks = 0;
 	m_nCompressLevel = 0;
+	if ( m_pWavHeaderData) {
+		free(m_pWavHeaderData);
+		m_pWavHeaderData = NULL;
+	}
+	m_nWavHeaderDataLen = 0;
+	if (m_pTerminatingData) {
+		free(m_pTerminatingData);
+		m_pTerminatingData = NULL;
+	}
+	m_nTerminatingDataLen = 0;
 	m_OptPageApeFileProperty.m_strPCMProperty = _T("");
 	m_ErrorString.RemoveAll();
 }
@@ -324,6 +382,7 @@ CString CApeFileMedia::Flag2String(UINT nFlag)
 	if (nFlag & MAC_FORMAT_FLAG_BIG_ENDIAN) {
 		strRet += _T("    MAC_FORMAT_FLAG_BIG_ENDIAN\r\n");
 	}
+	
 	return strRet;
 }
 void CApeFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
@@ -336,7 +395,8 @@ void CApeFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 		(LPCTSTR)CompressLevel2String(m_nCompressLevel)
 	);
 	m_OptPageApeFileProperty.m_strPCMProperty += strTemp;
-	strTemp.Format(_T("SamplesPerSec:  %d\r\n"), m_WaveFormatEx.nSamplesPerSec);
+	strTemp.Format(_T("SamplesPerSec:  %d\r\nWavHeaderDataLen:   %d\r\nTerminatingDataLen: %d\r\n"), 
+		m_WaveFormatEx.nSamplesPerSec, m_nWavHeaderDataLen, m_nTerminatingDataLen);
 	m_OptPageApeFileProperty.m_strPCMProperty += strTemp;
 	pPropertySheet->AddPage(&m_OptPageApeFileProperty);
 	CPCMAudioMedia::AddOptPage(pPropertySheet);
