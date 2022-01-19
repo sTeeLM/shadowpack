@@ -4,6 +4,8 @@
 #include "OptPagePCMFileProperty.h"
 #include "All.h"
 #include "MACLib.h"
+#include "APETag.h"
+
 class CApeFileMedia :
     public CPCMAudioMedia
 {
@@ -39,6 +41,7 @@ protected:
 	LPBYTE m_pTerminatingData;
 	UINT m_nTerminatingDataLen;
 	CMap<INT, const INT&, CString, const CString&> m_ErrorString;
+	APE::CAPETag * m_pTag;
 
 	void LoadErrorString();
 	const CString & GetErrorString(INT nErrorCode);

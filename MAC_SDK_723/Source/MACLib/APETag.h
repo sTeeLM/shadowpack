@@ -172,6 +172,12 @@ public:
     // destructor
     ~CAPETagField();
 
+    // copy construct
+    CAPETagField(const CAPETagField& src);
+
+    // copy
+    const CAPETagField& operator=(const CAPETagField&);
+
     // gets the size of the entire field in bytes (name, value, and metadata)
     int GetFieldSize();
     
@@ -219,10 +225,14 @@ public:
     // be careful with multiple threads / file pointer movement if you don't analyze immediately
     CAPETag(CIO * pIO, bool bAnalyze = true);
     CAPETag(const str_utfn * pFilename, bool bAnalyze = true);
-    
+    // copy construct
+    CAPETag(const CAPETag & src);
     // destructor
     ~CAPETag();
 
+    // copy
+    const CAPETag& operator=(const CAPETag& src);
+    
     // save the tag to the I/O source (bUseOldID3 forces it to save as an ID3v1.1 tag instead of an APE tag)
     int Save(bool bUseOldID3 = false);
     
@@ -243,6 +253,9 @@ public:
     // remove a specific field
     int RemoveField(const str_utfn * pFieldName);
     int RemoveField(int nIndex);
+
+    // get field count
+    int GetFieldCount();
 
     // clear all the fields
     int ClearFields();

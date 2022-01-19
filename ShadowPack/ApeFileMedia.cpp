@@ -9,7 +9,8 @@ CApeFileMedia::CApeFileMedia() :
 	m_pWavHeaderData(NULL),
 	m_nWavHeaderDataLen(0),
 	m_pTerminatingData(NULL),
-	m_nTerminatingDataLen(0)
+	m_nTerminatingDataLen(0),
+	m_pTag(NULL)
 {
 }
 
@@ -109,6 +110,7 @@ BOOL CApeFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	ULONGLONG nBlockLeft;
 	APE::IAPEDecompress* pAPEDecompress = NULL;
 	LPBYTE pBlockBuffer = NULL;
+	APE::CAPETag* pTag = NULL;
 
 	if ((pAPEDecompress = CreateIAPEDecompress(szFilePath, &nRetVal, TRUE, TRUE, FALSE)) == NULL) {
 		Errors.SetError(CPackErrors::PE_IO, szFilePath, GetErrorString(nRetVal));
@@ -118,6 +120,16 @@ BOOL CApeFileMedia::LoadMedia(LPCTSTR szFilePath, CPasswordGetterBase& PasswordG
 	if ((pAPEDecompress->GetInfo(APE::APE_INFO_WAVEFORMATEX, (APE::int64)&m_WaveFormatEx)) < 0) {
 		Errors.SetError(CPackErrors::PE_INTERNAL);
 		goto err;
+	}
+
+	if ((nRet = pAPEDecompress->GetInfo(APE::APE_INFO_TAG)) < 0) {
+		Errors.SetError(CPackErrors::PE_INTERNAL);
+		goto err;
+	}
+
+	pTag = (APE::CAPETag*)nRet;
+	if (pTag && pTag->GetFieldCount()) {
+		m_pTag = new APE::CAPETag(*pTag);
 	}
 
 	if ((nRet = pAPEDecompress->GetInfo(APE::APE_INFO_WAV_HEADER_BYTES)) < 0) {
@@ -281,6 +293,14 @@ BOOL CApeFileMedia::SaveMedia(LPCTSTR szFilePath, CProgressBase& Progress, CPack
 		goto err;
 	}
 
+	SAFE_DELETE(pAPECompress);
+
+	if (m_pTag) {
+		APE::CAPETag TempTags(szFilePath, false);
+		TempTags = *m_pTag;
+		TempTags.Save();
+	}
+
 	// done!
 	ClearMediaDirty();
 
@@ -312,6 +332,10 @@ void CApeFileMedia::CloseMedia()
 	}
 	m_nTerminatingDataLen = 0;
 	m_OptPageApeFileProperty.m_strPCMProperty = _T("");
+	if (m_pTag) {
+		delete m_pTag;
+		m_pTag = NULL;
+	}
 	m_ErrorString.RemoveAll();
 }
 
@@ -392,12 +416,23 @@ void CApeFileMedia::AddOptPage(CMFCPropertySheet* pPropertySheet)
 	strTemp.Format(
 	_T("MacFlags:\r\n    %sChannels:    %d\r\nBitsPerSample   %d\r\nBlockAlign:    %d\r\nTotalBlocks:    %I64d\r\nCompressLevel:   %s\r\n"),
 		(LPCTSTR)Flag2String(m_nMacFlags), m_WaveFormatEx.nChannels, m_WaveFormatEx.wBitsPerSample, m_WaveFormatEx.nBlockAlign, m_nTotalBlocks,
-		(LPCTSTR)CompressLevel2String(m_nCompressLevel)
-	);
+		(LPCTSTR)CompressLevel2String(m_nCompressLevel));
 	m_OptPageApeFileProperty.m_strPCMProperty += strTemp;
+
 	strTemp.Format(_T("SamplesPerSec:  %d\r\nWavHeaderDataLen:   %d\r\nTerminatingDataLen: %d\r\n"), 
 		m_WaveFormatEx.nSamplesPerSec, m_nWavHeaderDataLen, m_nTerminatingDataLen);
 	m_OptPageApeFileProperty.m_strPCMProperty += strTemp;
+
+	if (m_pTag) {
+		m_OptPageApeFileProperty.m_strPCMProperty += _T("Tags:\r\n");
+		for (INT i = 0; i < m_pTag->GetFieldCount(); i++) {
+			strTemp.Format(_T("  [%s]:[%s]\r\n"),
+				m_pTag->GetTagField(i)->GetFieldName(),
+				(LPCTSTR)(CA2CT(m_pTag->GetTagField(i)->GetFieldValue())));
+			m_OptPageApeFileProperty.m_strPCMProperty += strTemp;
+		}
+	}
+
 	pPropertySheet->AddPage(&m_OptPageApeFileProperty);
 	CPCMAudioMedia::AddOptPage(pPropertySheet);
 }
@@ -419,6 +454,7 @@ void CApeFileMedia::GetMediaInfo(CArray<CMediaFactory::CMediaInfo>& InfoArray)
 {
 	CMediaFactory::CMediaInfo Info;
 	Info.Exts.Add(_T("ape"));
+	Info.Exts.Add(_T("mac"));
 	Info.fnFactory = Factory;
 	Info.nCatagory = IDS_MEDIA_AUDIO_FILE;
 	Info.strName = _T("Monkey's Audio File");

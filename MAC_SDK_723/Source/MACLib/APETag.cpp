@@ -31,6 +31,29 @@ CAPETagField::CAPETagField(const str_utfn * pFieldName, const void * pFieldValue
 CAPETagField::~CAPETagField()
 {
 }
+
+CAPETagField::CAPETagField(const CAPETagField& src)
+{
+    *this = src;
+}
+
+const CAPETagField& CAPETagField::operator=(const CAPETagField& src)
+{
+    // field name
+    m_spFieldNameUTF16.Assign(new str_utfn[wcslen(src.m_spFieldNameUTF16.GetPtr()) + 1], true);
+    memcpy(m_spFieldNameUTF16, src.m_spFieldNameUTF16, (wcslen(src.m_spFieldNameUTF16.GetPtr()) + 1) * sizeof(str_utfn));
+
+    // data (we'll always allocate two extra bytes and memset to 0 so we're safely NULL terminated)
+    m_nFieldValueBytes = ape_max(src.m_nFieldValueBytes, 0);
+    m_spFieldValue.Assign(new char[m_nFieldValueBytes + 2], true);
+    memset(m_spFieldValue, 0, m_nFieldValueBytes + 2);
+    if (m_nFieldValueBytes > 0)
+        memcpy(m_spFieldValue, src.m_spFieldValue.GetPtr(), m_nFieldValueBytes);
+
+    // flags
+    m_nFieldFlags = src.m_nFieldFlags;
+    return *this;
+}
     
 int CAPETagField::GetFieldSize()
 {
@@ -121,6 +144,38 @@ CAPETag::CAPETag(const str_utfn * pFilename, bool bAnalyze)
     
     if (bAnalyze)
         Analyze();
+}
+
+CAPETag::CAPETag(const CAPETag& src)
+{
+    m_bAnalyzed = false;
+    m_nFields = 0;
+    m_nAllocatedFields = 0;
+    m_aryFields = NULL;
+    m_nTagBytes = 0;
+    m_bIgnoreReadOnly = false;
+    *this = src;
+}
+
+const CAPETag& CAPETag::operator=(const CAPETag& src)
+{
+    ClearFields();
+    SAFE_ARRAY_DELETE(m_aryFields);
+
+    m_bAnalyzed = src.m_bAnalyzed;
+    m_nFields = src.m_nFields;
+    m_nTagBytes = src.m_nTagBytes;
+    m_bIgnoreReadOnly = src.m_bIgnoreReadOnly;
+    m_nAllocatedFields = src.m_nAllocatedFields;
+
+    if (m_nAllocatedFields) {
+        m_aryFields = new CAPETagField * [m_nAllocatedFields];
+        memset(m_aryFields, 0, m_nAllocatedFields * sizeof(CAPETagField*));
+        for (INT i = 0; i < m_nFields; i++) {
+            m_aryFields[i] = new CAPETagField(*src.m_aryFields[i]);
+        }
+    }
+    return *this;
 }
 
 CAPETag::CAPETag(CIO * pIO, bool bAnalyze)
@@ -781,6 +836,11 @@ int CAPETag::RemoveField(int nIndex)
     }
 
     return ERROR_UNDEFINED;
+}
+
+int CAPETag::GetFieldCount()
+{
+    return m_nFields;
 }
 
 int CAPETag::RemoveField(const str_utfn * pFieldName)
