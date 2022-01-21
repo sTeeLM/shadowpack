@@ -16,6 +16,7 @@ CProgressControl::CProgressControl() :
 	m_nCurrent(0),
 	m_bCancel(FALSE),
 	m_bShowETA(FALSE),
+	m_bFirstSet(FALSE),
 	m_prgsColor(RGB(0,0,255)),
 	m_freeColor(RGB(255,255,255)),
 	m_prgsTextColor(RGB(255,255,255)),
@@ -45,6 +46,7 @@ void CProgressControl::Reset(UINT nIDS /* = 0*/)
 	m_StartTime = CTime::GetCurrentTime();
 	m_CurrentTime = CTime::GetCurrentTime();
 	m_bShowETA = FALSE;
+	m_bFirstSet = FALSE;
 }
 
 void CProgressControl::Show(BOOL bShow)
@@ -83,6 +85,10 @@ void CProgressControl::Increase(ULONGLONG nVal)
 	}
 
 	if (nProgressNew != nProgressOld) {
+		if (!m_bFirstSet) {
+			m_bFirstSet = TRUE;
+			m_StartTime = CTime::GetCurrentTime();
+		}
 		m_CurrentTime = CTime::GetCurrentTime();
 		CProgressCtrl::SetPos(nProgressNew);
 		CProgressCtrl::RedrawWindow();
@@ -105,6 +111,10 @@ void CProgressControl::SetScale(ULONGLONG nVal)
 	}
 
 	if (nProgressNew != nProgressOld) {
+		if (!m_bFirstSet) {
+			m_bFirstSet = TRUE;
+			m_StartTime = CTime::GetCurrentTime();
+		}
 		m_CurrentTime = CTime::GetCurrentTime();
 		CProgressCtrl::SetPos(nProgressNew);
 		CProgressCtrl::RedrawWindow();
@@ -168,7 +178,7 @@ void CProgressControl::OnPaint()
 	CTimeSpan  DiffTime = m_CurrentTime - m_StartTime;
 	CString str;
 	if ((nPos - nLower) != 0) {
-		LONGLONG nTotalSec = DiffTime.GetTotalSeconds() * (nUpper - nLower)  / (nPos - nLower);
+		LONGLONG nTotalSec = DiffTime.GetTotalSeconds() * (double)(nUpper - nLower)  / (double)(nPos - nLower);
 		LONGLONG nLeftSec = nTotalSec - DiffTime.GetTotalSeconds();
 		TRACE(_T("Left %I64d sec\n"), nLeftSec);
 		if (nTotalSec > 60 && !m_bShowETA) {
