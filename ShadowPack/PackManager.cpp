@@ -7,7 +7,7 @@
 #include "PackManager.h"
 #include "PackUtils.h"
 #include "ShadowPack.h"
-
+#include "ShadowPackDlg.h"
 // CPackManager
 
 IMPLEMENT_DYNAMIC(CPackManager, CListCtrl)
@@ -17,7 +17,9 @@ CPackManager::CPackManager():
 	m_nTotalSize(0),
 	m_bDirty(FALSE),
 	m_bUseDiskCache(FALSE),
-	m_strCachePath(_T(""))
+	m_strCachePath(_T("")),
+	m_pParent(NULL),
+	m_DragDropTarget(this)
 {
 
 }
@@ -34,6 +36,8 @@ void CPackManager::Initialize(CWnd* pParent, UINT nID)
 	DWORD dwStyle;
 	CConfigManager::CONFIG_VALUE_T val;
 	BOOL bUseSystemCache = FALSE;
+
+	m_pParent = pParent;
 
 	if (theApp.m_Config.GetConfig(_T("pack"), _T("pack_use_hd_cache"), val)) {
 		m_bUseDiskCache = val.n8;
@@ -66,6 +70,8 @@ void CPackManager::Initialize(CWnd* pParent, UINT nID)
 	dwStyle = GetExtendedStyle();
 	dwStyle |= LVS_EX_FULLROWSELECT;
 	SetExtendedStyle(dwStyle);
+	m_DragDropTarget.Register(this);
+	m_DragDropTarget.SetParent(pParent);
 }
 
 BOOL CPackManager::MediaAttached()
@@ -270,17 +276,49 @@ BOOL CPackManager::ExportSelectedItemsToDir(LPCTSTR szItemPath, CProgressBase& P
 	return TRUE;
 }
 
+BOOL CPackManager::AddItemFromFileMulti(const CArray<CString> & aryFileNames, CProgressBase& Progress, CPackErrors& Errors)
+{
+	ULONGLONG nSize, nTotalDataSize = 0;;
+	for (INT i = 0; i < aryFileNames.GetCount(); i++) {
+		if (!CPackUtils::IsFile(aryFileNames[i])) {
+			Errors.SetError(CPackErrors::PE_NOT_FILE, CPackUtils::GetPathName(aryFileNames[i]));
+			return FALSE;
+		}
+		else if (ItemExist(CPackUtils::GetPathName(aryFileNames[i]))) {
+			Errors.SetError(CPackErrors::PE_EXISTED, CPackUtils::GetPathName(aryFileNames[i]));
+			return FALSE;
+		}
+		else if (!CPackUtils::GetFileSize(aryFileNames[i], nSize)) {
+			Errors.SetError(CPackErrors::PE_IO, aryFileNames[i], CPackUtils::GetLastError());
+		}
+		else {
+			nTotalDataSize += nSize;
+		}
+	}
+
+	if (nTotalDataSize > m_pMedia->GetMediaTotalBytes() - m_pMedia->GetMediaUsedBytes()) {
+		Errors.SetError(CPackErrors::PE_OVER_CAPICITY);
+		return FALSE;
+	}
+
+	Progress.Reset(IDS_READ_FILE);
+	Progress.SetFullScale(nTotalDataSize);
+	for (INT i = 0; i < aryFileNames.GetCount(); i++) {
+		if (!AddItemFromFile(aryFileNames[i], Progress, Errors)) {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
 BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, CPackErrors& Errors)
 {
 	CPackItem* pPackItem = NULL;
 	ULONGLONG nSize;
-	Progress.Reset(IDS_READ_FILE);
-
 	if (ItemExist(CPackUtils::GetPathName(szItemPath))) {
 		Errors.SetError(CPackErrors::PE_EXISTED, CPackUtils::GetPathName(szItemPath));
 	} else if (CPackUtils::GetFileSize(szItemPath, nSize)) {
 		if (nSize <= m_pMedia->GetMediaTotalBytes() - m_pMedia->GetMediaUsedBytes()) {
-			Progress.SetFullScale(nSize);
 			pPackItem = CPackItem::CreateItemFromFile(szItemPath, m_strCachePath, m_bUseDiskCache, Progress, Errors);
 			if (pPackItem) {
 				if (pPackItem->GetTotalSize() > (m_pMedia->GetMediaTotalBytes() - m_nTotalSize)) {
@@ -307,10 +345,13 @@ BOOL CPackManager::AddItemFromFile(LPCTSTR szItemPath, CProgressBase& Progress, 
 
 void CPackManager::DeleteSelectedItems()
 {
-	POSITION pos = CListCtrl::GetFirstSelectedItemPosition();
+	POSITION pos = NULL;
 	CPackItem* pItem = NULL;
 	INT nItem;
 	CPackErrors Errors;
+
+again:
+	pos = CListCtrl::GetFirstSelectedItemPosition();
 
 	while (pos != NULL) {
 		nItem = CListCtrl::GetNextSelectedItem(pos);
@@ -324,6 +365,7 @@ void CPackManager::DeleteSelectedItems()
 		m_bDirty = TRUE;
 		m_pMedia->SetMediaUsedBytes(m_nTotalSize, Errors);
 		CListCtrl::DeleteItem(nItem);
+		goto again;
 	}
 
 }
@@ -559,8 +601,8 @@ BOOL CPackManager::CPackItem::WriteItemToStream(CStreamBase* pStream, CProgressB
 	Header.nNameSize = (UINT)strlen((LPSTR)sza);
 	Header.nTime = mktime(m_Time.GetLocalTm(&Tm));
 	if (pStream->Write(&Header, sizeof(Header), Progress, Errors)) {
-		if (m_nSize) {
-			if (pStream->Write((LPSTR)sza, Header.nNameSize, Progress, Errors)) {
+		if (pStream->Write((LPSTR)sza, Header.nNameSize, Progress, Errors)) {
+			if (m_nSize) {
 				if (m_hFile != INVALID_HANDLE_VALUE) {
 					if (INVALID_SET_FILE_POINTER != ::SetFilePointer(m_hFile, 0, NULL, FILE_BEGIN)) {
 						return Handle2Stream(m_hFile, m_strFileName, pStream, Header.nDataSize, Progress, Errors);
@@ -573,8 +615,9 @@ BOOL CPackManager::CPackItem::WriteItemToStream(CStreamBase* pStream, CProgressB
 					return TRUE;
 				}
 			}
-		} else {
-			return TRUE;
+			else {
+				return TRUE;
+			}
 		}
 	}
 	return FALSE;
@@ -781,3 +824,107 @@ END_MESSAGE_MAP()
 
 // CPackManager 消息处理程序
 
+DROPEFFECT CPackManager::CPackItemDropTarget::OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
+{
+	TRACE(_T("OnDragEnter\n"));
+	m_bCanDrop = TestDropOK(pDataObject);
+	return m_bCanDrop ? DROPEFFECT_COPY : DROPEFFECT_NONE;;
+}
+
+BOOL CPackManager::CPackItemDropTarget::TestDropOK(COleDataObject* pDataObject)
+{
+	HGLOBAL hGlobal = NULL;
+	HDROP   hDrop = NULL;
+	UINT nDropCount;
+	TCHAR szFullFileName[MAX_PATH];
+	BOOL bOK = TRUE;
+
+	if (!pDataObject) {
+		bOK = FALSE;
+		goto finish;
+	}
+
+	hGlobal = pDataObject->GetGlobalData(CF_HDROP);
+	TRACE(_T("TestDropOK hGlobal = %p\n"), hGlobal);
+	if (hGlobal == NULL) {
+		bOK = FALSE;
+		goto finish;
+	}
+
+	hDrop = (HDROP)GlobalLock(hGlobal);
+	TRACE(_T("TestDropOK hDrop = %p\n"), hDrop);
+	if (hDrop == NULL) {
+		bOK = FALSE;
+		goto finish;
+	}
+
+	nDropCount = DragQueryFile(hDrop, -1, NULL, 0);
+	for (int i = 0; i < nDropCount; i++)
+	{
+		DragQueryFile(hDrop, i, szFullFileName, MAX_PATH);
+		TRACE(_T("TestDropOK %s\n"), szFullFileName);
+		if (!CPackUtils::IsFile(szFullFileName)) {
+			bOK = FALSE;
+			break;
+		}
+	}
+finish:
+	if (hDrop) {
+		DragFinish(hDrop);
+	}
+	if (hGlobal) {
+		GlobalUnlock(hGlobal);
+	}
+	return bOK;
+}
+
+DROPEFFECT CPackManager::CPackItemDropTarget::OnDragOver(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
+{
+	TRACE(_T("OnDragOver\n"));
+	return m_bCanDrop ? DROPEFFECT_COPY : DROPEFFECT_NONE;
+}
+
+BOOL CPackManager::CPackItemDropTarget::OnDrop(CWnd* pWnd, COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
+{
+	TRACE(_T("OnDrop\n"));
+	HGLOBAL hGlobal;
+	HDROP   hDrop;
+	UINT nDropCount;
+	TCHAR szFullFileName[MAX_PATH];
+
+	hGlobal = pDataObject->GetGlobalData(CF_HDROP);
+	TRACE(_T("OnDrop hGlobal = %p\n"), hGlobal);
+	if (hGlobal == NULL) {
+		return FALSE;
+	}
+
+	hDrop = (HDROP)GlobalLock(hGlobal);
+	TRACE(_T("OnDrop hDrop = %p\n"), hDrop);
+	if (hDrop == NULL) {
+		GlobalUnlock(hGlobal);
+		return FALSE;
+	}
+
+	nDropCount = DragQueryFile(hDrop, -1, NULL, 0);
+	dynamic_cast<CShadowPackDlg*>(m_pParent)->m_aryItemPathNames.RemoveAll();
+	for (int i = 0; i < nDropCount; i++)
+	{
+		DragQueryFile(hDrop, i, szFullFileName, MAX_PATH);
+		TRACE(_T("Drop %s\n"), szFullFileName);
+		dynamic_cast<CShadowPackDlg*>(m_pParent)->m_aryItemPathNames.Add(szFullFileName);
+	}
+	DragFinish(hDrop);
+
+	if (dynamic_cast<CShadowPackDlg*>(m_pParent)->m_aryItemPathNames.GetCount()) {
+		dynamic_cast<CShadowPackDlg*>(m_pParent)->StartThread(&CShadowPackDlg::ThreadAddItem);
+	}
+
+	GlobalUnlock(hGlobal);
+	return TRUE;
+}
+
+void CPackManager::CPackItemDropTarget::OnDragLeave(CWnd* pWnd)
+{
+	TRACE(_T("OnDragLeave\n"));
+	m_bCanDrop = FALSE;
+}

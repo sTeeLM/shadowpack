@@ -99,6 +99,7 @@ BEGIN_MESSAGE_MAP(CShadowPackDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_CANCEL, &CShadowPackDlg::OnBnClickedBtnCancel)
 	ON_BN_CLICKED(IDC_BTN_ITEM_DELETE, &CShadowPackDlg::OnBnClickedBtnItemDelete)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_DATA, &CShadowPackDlg::OnLvnItemChangedListData)
+	ON_NOTIFY(LVN_BEGINDRAG, IDC_LIST_DATA, &CShadowPackDlg::OnLvnBeginDrag)
 END_MESSAGE_MAP()
 
 
@@ -511,6 +512,8 @@ void CShadowPackDlg::UpdateUI()
 	GetDlgItem(IDC_BTN_ITEM_CLEAR_ALL)->EnableWindow(!m_bInProgress && m_ctlFileManager.MediaAttached()
 		&& m_ctlFileManager.GetItemCount() > 0);
 
+	GetDlgItem(IDC_LIST_DATA)->EnableWindow(!m_bInProgress && m_ctlFileManager.MediaAttached());
+
 	GetDlgItem(IDC_BTN_CANCEL)->EnableWindow(m_bInProgress);
 
 	if (m_ctlFileManager.GetMedia() && m_ctlFileManager.GetMedia()->GetMediaTotalBytes() > 0) {
@@ -530,8 +533,10 @@ void CShadowPackDlg::UpdateUI()
 
 	m_ctlProgress.Show(m_bInProgress);
 
-	if((pSysMenu = GetSystemMenu(FALSE)))
+	if ((pSysMenu = GetSystemMenu(FALSE))) {
 		pSysMenu->EnableMenuItem(SC_CLOSE, m_bInProgress ? MF_DISABLED : MF_ENABLED);
+		pSysMenu->EnableMenuItem(IDM_CONFIGBOX, m_bInProgress ? MF_DISABLED : MF_ENABLED);
+	}
 
 	strTemp = _T("ShadowPack");
 
@@ -546,7 +551,7 @@ void CShadowPackDlg::UpdateUI()
 void CShadowPackDlg::ThreadAddItem()
 {
 	CPackErrors Errors;
-	if (!m_ctlFileManager.AddItemFromFile(m_szItemPathName, m_ctlProgress, Errors)) {
+	if (!m_ctlFileManager.AddItemFromFileMulti(m_aryItemPathNames, m_ctlProgress, Errors)) {
 		AfxMessageBox(Errors.ToString());
 	}
 }
@@ -555,10 +560,27 @@ void CShadowPackDlg::OnBnClickedBtnItemAdd()
 {
 	static TCHAR BASED_CODE szFilter[] =
 		_T("All Files (*.*)|*.*||");
-	CFileDialog dlg(TRUE, NULL, NULL, OFN_EXPLORER, szFilter, NULL, 0, TRUE);
-	if (dlg.DoModal() == IDOK) {
-		m_szItemPathName = dlg.GetPathName();
-		StartThread(&CShadowPackDlg::ThreadAddItem);
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_EXPLORER | OFN_ALLOWMULTISELECT, szFilter, NULL, 0, TRUE);
+	INT nMaxFiles = 1000;
+	INT nMaxPathBuffer = (nMaxFiles * (MAX_PATH + 1)) + 1;
+	LPTSTR pc = (LPTSTR)malloc(nMaxPathBuffer * sizeof(TCHAR));
+	m_aryItemPathNames.RemoveAll();
+	if (pc != NULL) {
+		dlg.GetOFN().lpstrFile = pc;
+		dlg.GetOFN().lpstrFile[0] = NULL;
+		dlg.GetOFN().nMaxFile = nMaxPathBuffer;
+		if (dlg.DoModal() == IDOK) {
+
+			POSITION posStart = dlg.GetStartPosition();
+			while (posStart)
+			{
+				//从pc所指向的内存中解析出每个文件的名字,这里的fileName所占的内存不能和pc所占的内存发生冲突
+				CString fileName = dlg.GetNextPathName(posStart);
+				m_aryItemPathNames.Add(fileName);
+			}
+			StartThread(&CShadowPackDlg::ThreadAddItem);
+		}
+		free(pc);
 	}
 }
 
@@ -589,4 +611,11 @@ void CShadowPackDlg::OnLvnItemChangedListData(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 	TRACE(_T("OnLvnItemChangedListData\n"));
 	UpdateUI();
+}
+
+void CShadowPackDlg::OnLvnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	*pResult = 0;
+	TRACE(_T("OnLvnBeginDrag\n"));
+	
 }

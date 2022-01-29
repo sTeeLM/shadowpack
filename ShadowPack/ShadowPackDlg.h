@@ -9,6 +9,7 @@
 #include "PackManager.h"
 #include "PasswordDlg.h"
 
+class CPackManager;
 // CShadowPackDlg 对话框
 class CShadowPackDlg : public CDialog
 {
@@ -47,6 +48,7 @@ public:
 	afx_msg void OnBnClickedBtnCancel();
 	afx_msg void OnBnClickedBtnItemDelete();
 	afx_msg void OnLvnItemChangedListData(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnLvnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
 public:
 	CChartControl m_ctlCapicityChart;
 	CStatic m_ctlCapicityInfo;
@@ -56,12 +58,12 @@ public:
 
 public:
 	CString m_szMediaPathName;
+	CArray<CString> m_aryItemPathNames;
 	CString m_szItemPathName;
 	BOOL m_bCloseOnSave;
 	BOOL m_bInProgress;
 	BOOL m_bQuitOnClose;
 
-protected:
 	typedef void (CShadowPackDlg::* FN_PACK_THREAD) ();
 	class CPackThreadParam
 	{
@@ -77,7 +79,6 @@ protected:
 	};
 	void StartThread(FN_PACK_THREAD fn);
 	static UINT __cdecl fnThread(LPVOID p);
-protected:
 	void UpdateUI();
 	void ThreadOpenMedia();
 	void ThreadSaveMedia();

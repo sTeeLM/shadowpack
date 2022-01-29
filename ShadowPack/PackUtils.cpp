@@ -71,6 +71,12 @@ BOOL CPackUtils::BackupFile(LPCTSTR szPath, LPCTSTR szToDir, CString& strError)
 	return FALSE;
 }
 
+BOOL CPackUtils::IsFile(LPCTSTR szPathName)
+{
+	DWORD dwRet = ::GetFileAttributes(szPathName);
+	return (!(dwRet & FILE_ATTRIBUTE_DIRECTORY))  && (!(dwRet & FILE_ATTRIBUTE_DEVICE));
+}
+
 BOOL CPackUtils::ShowLocationDirDlg(CWnd *pOwner, CString& strDir)
 {
 	// get dir location

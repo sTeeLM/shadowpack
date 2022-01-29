@@ -54,6 +54,11 @@ BOOL CShadowPackApp::InitInstance()
 	CString strIniFilePath;
 	CString strExeFilePath;
 
+	if (OleInitialize(NULL) != S_OK) {
+		AfxMessageBox(IDS_INTERNAL_ERROR);
+		goto err;
+	}
+
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	// 将它设置为包括所有要在应用程序中使用的
 	// 公共控件类。
@@ -131,6 +136,7 @@ BOOL CShadowPackApp::InitInstance()
 	CMediaFactory::DestoryMediaInfo();
 	m_FileVersion.Close();
 err:
+	OleUninitialize();
 	return FALSE;
 }
 

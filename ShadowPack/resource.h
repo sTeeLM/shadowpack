@@ -69,6 +69,7 @@
 #define IDS_PE_INTERNAL                 409
 #define IDS_TOO_LARGE_FILE              410
 #define IDS_PE_TOO_LARGE_FILE           410
+#define IDS_PE_NOT_FILE                 411
 #define IDS_LOCALE_UNKNOWN              599
 #define IDS_LOCALE_CHINESE_SC           600
 #define IDS_LOCALE_ENGLISH_US           601

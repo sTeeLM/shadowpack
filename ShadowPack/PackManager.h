@@ -14,10 +14,37 @@ public:
 	virtual ~CPackManager();
 public:
 	void Initialize(CWnd* pParent, UINT nID);
+	
 protected:
 	DECLARE_MESSAGE_MAP()
 
 protected:
+	class CPackItemDropTarget :  public COleDropTarget
+	{
+	public:
+		CPackItemDropTarget(CPackManager* pOwner) { m_pOwner = pOwner; m_pParent = NULL; m_bCanDrop = FALSE; }
+		virtual ~CPackItemDropTarget() {};
+	public:
+		DROPEFFECT OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject,
+			DWORD dwKeyState, CPoint point);
+
+		BOOL TestDropOK(COleDataObject* pDataObject);
+
+		DROPEFFECT OnDragOver(CWnd* pWnd, COleDataObject* pDataObject,
+			DWORD dwKeyState, CPoint point);
+
+		BOOL OnDrop(CWnd* pWnd, COleDataObject* pDataObject,
+			DROPEFFECT dropEffect, CPoint point);
+
+		void OnDragLeave(CWnd* pWnd);
+
+		void SetParent(CWnd* pParent) { m_pParent = pParent; }
+	protected:
+		CPackManager* m_pOwner;
+		CWnd* m_pParent;
+		BOOL m_bCanDrop;
+	};
+
 	class CPackItem {
 		CPackItem() : 
 			m_nSize(0), 
@@ -77,6 +104,8 @@ public:
 		CProgressBase& Progress, CPackErrors& Errors);
 	virtual BOOL AddItemFromFile(LPCTSTR szMediaPath,
 		CProgressBase& Progress, CPackErrors& Errors);
+	virtual BOOL AddItemFromFileMulti(const CArray<CString>& aryFileNames,
+		CProgressBase& Progress, CPackErrors& Errors);
 	virtual void DeleteSelectedItems();
 	virtual void ClearAllItems();
 
@@ -97,7 +126,8 @@ private:
 	BOOL m_bDirty;
 	BOOL m_bUseDiskCache;
 	CString m_strCachePath;
-	
+	CWnd* m_pParent;
+	CPackItemDropTarget m_DragDropTarget;
 };
 
 

@@ -28,6 +28,7 @@ public:
 	static CString GetLastStdError(int err);
 	static CString GetWorkingPath();
 	static CString GetTempFileName(LPCTSTR szPathName, LPCTSTR szPrefix);
+	static BOOL IsFile(LPCTSTR szPathName);
 	static BOOL ShowLocationDirDlg(CWnd* pOwner, CString& strDir);
 	static void FillBufferRand(LPBYTE pBuffer, ULONGLONG nSize);
 	static BOOL SetWindowTop(CWnd* pWnd);

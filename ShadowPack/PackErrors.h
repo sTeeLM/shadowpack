@@ -14,6 +14,7 @@ public:
 			PE_OVER_CAPICITY,  // over capcity
 			PE_UNSUPPORT_MEDIA, // unsupport file
 			PE_EXISTED,        // item exist
+			PE_NOT_FILE,       // item not file
 			PE_NOMEM,          // no memory
 			PE_EOF,            // end of file
 			PE_INTERNAL,       // other error, bug??

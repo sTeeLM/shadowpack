@@ -42,6 +42,9 @@ void  CPackErrors::SetError( CPackErrors::PACK_ERROR_T eErrorCode, LPCTSTR szPat
 	case PE_EXISTED:        // item exist
 		m_eString.Format(IDS_PE_EXISTED, szPath);
 		break;
+	case PE_NOT_FILE:
+		m_eString.Format(IDS_PE_NOT_FILE, szPath);
+		break;
 	case PE_NOMEM:          // no memory
 		m_eString.Format(IDS_PE_NOMEM);
 		break;
