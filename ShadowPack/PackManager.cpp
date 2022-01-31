@@ -19,9 +19,12 @@ CPackManager::CPackManager():
 	m_bUseDiskCache(FALSE),
 	m_strCachePath(_T("")),
 	m_pParent(NULL),
-	m_DragDropTarget(this)
+	m_DragDropTarget(this),
+	m_nSortColumnIndex(0)
 {
-
+	m_nSortOrder[0] = 1;
+	m_nSortOrder[1] = 1;
+	m_nSortOrder[2] = 1;
 }
 
 CPackManager::~CPackManager()
@@ -401,6 +404,46 @@ BOOL CPackManager::IsDirty()
 ULONGLONG CPackManager::GetTotalSize()
 {
 	return m_nTotalSize;
+}
+
+BOOL CPackManager::SortItems(PFNLVCOMPARE pfnCompare, INT nColumnIndex)
+{
+	m_nSortColumnIndex = nColumnIndex;
+
+	return CListCtrl::SortItems(pfnCompare, (DWORD_PTR)this);
+}
+
+INT CPackManager::SortItemCB(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	
+	CPackItem* pItem1 = reinterpret_cast<CPackItem*>(lParam1);
+	CPackItem* pItem2 = reinterpret_cast<CPackItem*>(lParam2);
+	CPackManager *pThis = reinterpret_cast<CPackManager*>(lParamSort);
+
+	TRACE(_T("SortItemCB %d %d %d\n"), lParam1, lParam2, pThis->m_nSortColumnIndex);
+
+	if (pThis->m_nSortColumnIndex == 0) { // name
+		return pItem1->GetName().Compare(pItem2->GetName()) 
+			* pThis->m_nSortOrder[pThis->m_nSortColumnIndex];
+	} else if (pThis->m_nSortColumnIndex == 1) { // time
+		if (pItem1->GetTime() > pItem2->GetTime()) {
+			return 1 * pThis->m_nSortOrder[pThis->m_nSortColumnIndex];
+		} else if (pItem1->GetTime() == pItem2->GetTime()) {
+			return 0 * pThis->m_nSortOrder[pThis->m_nSortColumnIndex];
+		} else {
+			return -1 * pThis->m_nSortOrder[pThis->m_nSortColumnIndex];
+		}
+			
+	} else { // size
+		if (pItem1->GetTotalSize() > pItem2->GetTotalSize()) {
+			return 1 * pThis->m_nSortOrder[pThis->m_nSortColumnIndex];
+		} else if (pItem1->GetTotalSize() == pItem2->GetTotalSize()) {
+			return 0 * pThis->m_nSortOrder[pThis->m_nSortColumnIndex];
+		} else {
+			return -1 * pThis->m_nSortOrder[pThis->m_nSortColumnIndex];
+		}
+	} 
+	return 0;
 }
 
 BOOL CPackManager::InsertPackItem(CPackItem* pItem, CPackErrors& Errors)

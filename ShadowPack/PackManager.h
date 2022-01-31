@@ -83,6 +83,7 @@ protected:
 		ULONGLONG GetDataSize();
 		ULONGLONG GetTotalSize();
 		CString FormatDateItme();
+		const CTime& GetTime() { return m_Time; }
 	private:
 		static BYTE ReadWriteBuffer[READ_WRITE_BUFFER_SIZE];
 	};
@@ -116,6 +117,13 @@ public:
 
 	virtual ULONGLONG GetTotalSize();
 
+	virtual BOOL SortItems(PFNLVCOMPARE pfnCompare, INT nColumnIndex);
+
+	static INT CALLBACK SortItemCB(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
+
+public:
+	INT m_nSortOrder[3];
+
 private:
 	BOOL InsertPackItem(CPackItem * pItem, CPackErrors& Errors);
 	BOOL ItemExist(LPCTSTR szItemName);
@@ -128,6 +136,8 @@ private:
 	CString m_strCachePath;
 	CWnd* m_pParent;
 	CPackItemDropTarget m_DragDropTarget;
+	INT m_nSortColumnIndex;
+	
 };
 
 

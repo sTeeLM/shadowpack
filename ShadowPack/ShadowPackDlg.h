@@ -49,6 +49,12 @@ public:
 	afx_msg void OnBnClickedBtnItemDelete();
 	afx_msg void OnLvnItemChangedListData(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnLvnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnNMRClickListData(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnLvnColumnClick(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnItemOption();
+	afx_msg void OnItemDelete();
+	afx_msg void OnItemExport();
+	afx_msg void OnItemClear();
 public:
 	CChartControl m_ctlCapicityChart;
 	CStatic m_ctlCapicityInfo;
@@ -85,5 +91,6 @@ public:
 	void ThreadExportItem();
 	void ThreadAddItem();
 	BOOL ShowConfigDlg();
+
 
 };

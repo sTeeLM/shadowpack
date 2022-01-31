@@ -93,6 +93,11 @@ BEGIN_MESSAGE_MAP(CShadowPackDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_MEDIA_CLOSE, &CShadowPackDlg::OnBnClickedBtnMediaClose)
 	ON_BN_CLICKED(IDC_BTN_MEDIA_SAVE, &CShadowPackDlg::OnBnClickedBtnMediaSave)
 	ON_BN_CLICKED(IDC_BTN_MEDIA_OPTION, &CShadowPackDlg::OnBnClickedBtnMediaOption)
+	ON_COMMAND(ID_ITEM_CLEAR, &CShadowPackDlg::OnItemClear)
+	ON_COMMAND(ID_ITEM_EXPORT, &CShadowPackDlg::OnItemExport)
+	ON_COMMAND(ID_ITEM_DELETE, &CShadowPackDlg::OnItemDelete)
+	ON_COMMAND(ID_ITEM_OPTION, &CShadowPackDlg::OnItemOption)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_DATA, &CShadowPackDlg::OnNMRClickListData)
 	ON_BN_CLICKED(IDC_BTN_ITEM_EXPORT, &CShadowPackDlg::OnBnClickedBtnItemExport)
 	ON_BN_CLICKED(IDC_BTN_ITEM_ADD, &CShadowPackDlg::OnBnClickedBtnItemAdd)
 	ON_BN_CLICKED(IDC_BTN_ITEM_CLEAR_ALL, &CShadowPackDlg::OnBnClickedBtnItemClearAll)
@@ -100,6 +105,7 @@ BEGIN_MESSAGE_MAP(CShadowPackDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_ITEM_DELETE, &CShadowPackDlg::OnBnClickedBtnItemDelete)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_DATA, &CShadowPackDlg::OnLvnItemChangedListData)
 	ON_NOTIFY(LVN_BEGINDRAG, IDC_LIST_DATA, &CShadowPackDlg::OnLvnBeginDrag)
+	ON_NOTIFY(LVN_COLUMNCLICK, IDC_LIST_DATA, &CShadowPackDlg::OnLvnColumnClick)
 END_MESSAGE_MAP()
 
 
@@ -602,6 +608,28 @@ void CShadowPackDlg::OnBnClickedBtnCancel()
 	m_ctlProgress.Cancel();
 }
 
+void CShadowPackDlg::OnItemOption()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CShadowPackDlg::OnItemDelete()
+{
+	OnBnClickedBtnItemDelete();
+}
+
+
+void CShadowPackDlg::OnItemExport()
+{
+	OnBnClickedBtnItemExport();
+}
+
+
+void CShadowPackDlg::OnItemClear()
+{
+	OnBnClickedBtnItemClearAll();
+}
 
 
 void CShadowPackDlg::OnLvnItemChangedListData(NMHDR* pNMHDR, LRESULT* pResult)
@@ -619,3 +647,46 @@ void CShadowPackDlg::OnLvnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 	TRACE(_T("OnLvnBeginDrag\n"));
 	
 }
+
+void CShadowPackDlg::OnNMRClickListData(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	TRACE(_T("OnNMRClickListData %d %d\n"), pNMItemActivate->ptAction.x, pNMItemActivate->ptAction.y);
+	CMenu menuPop;
+	CRect rect;
+	GetDlgItem(IDC_LIST_DATA)->GetWindowRect(&rect);
+	menuPop.LoadMenu(IDR_MENU_ITEM_POP);
+
+	if (m_ctlFileManager.GetSelectedCount() <= 0) {
+		menuPop.GetSubMenu(0)->EnableMenuItem(ID_ITEM_OPTION, MF_BYCOMMAND | MF_DISABLED);
+		menuPop.GetSubMenu(0)->EnableMenuItem(ID_ITEM_DELETE, MF_BYCOMMAND | MF_DISABLED);
+		menuPop.GetSubMenu(0)->EnableMenuItem(ID_ITEM_EXPORT, MF_BYCOMMAND | MF_DISABLED);
+	}
+	else if (m_ctlFileManager.GetSelectedCount() > 1) {
+		menuPop.GetSubMenu(0)->EnableMenuItem(ID_ITEM_OPTION, MF_BYCOMMAND | MF_DISABLED);
+	}
+
+	if (m_ctlFileManager.GetItemCount() <= 0) {
+		menuPop.GetSubMenu(0)->EnableMenuItem(ID_ITEM_CLEAR, MF_BYCOMMAND | MF_DISABLED);
+	}
+
+	menuPop.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pNMItemActivate->ptAction.x + rect.left,
+		pNMItemActivate->ptAction.y + rect.top,this);
+
+
+	*pResult = 0;
+}
+
+void CShadowPackDlg::OnLvnColumnClick(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMLISTVIEW pNMListView = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+
+	TRACE(_T("OnLvnColumnClick %d\n"), pNMListView->iSubItem);
+
+	m_ctlFileManager.m_nSortOrder[pNMListView->iSubItem] 
+		= -1 * m_ctlFileManager.m_nSortOrder[pNMListView->iSubItem];
+	m_ctlFileManager.SortItems(CPackManager::SortItemCB, pNMListView->iSubItem);
+
+	*pResult = 0;
+}
+

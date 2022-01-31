@@ -57,6 +57,7 @@
 #define IDD_CONFIGBOX                   138
 #define IDS_INTERNAL_ERROR              138
 #define IDD_PROPPAGE_PCM_FILE           139
+#define IDR_MENU_ITEM_POP               141
 #define IDS_PE_CANCELED                 400
 #define IDS_PE_IO                       401
 #define IDS_PE_CORRUPT_DATA             402
@@ -154,13 +155,22 @@
 #define IDC_CHECK_SAVE_BACKUP           1072
 #define IDC_STATIC_VERSION              1073
 #define IDC_STATIC_MEDIA_CUSTOM_TEMP_DIR 1078
+#define ID_MAIN_ITEM                    32771
+#define ID_MAIN_DELETE                  32772
+#define ID_MAIN_32773                   32773
+#define ID_ITEM_OPTION                  32774
+#define ID_ITEM_DELETE                  32775
+#define ID_ITEM_32776                   32776
+#define ID_ITEM_EXPORT                  32777
+#define ID_ITEM_32778                   32778
+#define ID_ITEM_CLEAR                   32779
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         32771
+#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_COMMAND_VALUE         32780
 #define _APS_NEXT_CONTROL_VALUE         1074
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
