@@ -683,9 +683,8 @@ void CShadowPackDlg::OnLvnColumnClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 	TRACE(_T("OnLvnColumnClick %d\n"), pNMListView->iSubItem);
 
-	m_ctlFileManager.m_nSortOrder[pNMListView->iSubItem] 
-		= -1 * m_ctlFileManager.m_nSortOrder[pNMListView->iSubItem];
-	m_ctlFileManager.SortItems(CPackManager::SortItemCB, pNMListView->iSubItem);
+
+	m_ctlFileManager.SortItems(pNMListView->iSubItem);
 
 	*pResult = 0;
 }

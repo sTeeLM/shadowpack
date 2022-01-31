@@ -406,11 +406,13 @@ ULONGLONG CPackManager::GetTotalSize()
 	return m_nTotalSize;
 }
 
-BOOL CPackManager::SortItems(PFNLVCOMPARE pfnCompare, INT nColumnIndex)
+BOOL CPackManager::SortItems(INT nColumnIndex)
 {
 	m_nSortColumnIndex = nColumnIndex;
 
-	return CListCtrl::SortItems(pfnCompare, (DWORD_PTR)this);
+	m_nSortOrder[nColumnIndex] = -1 * m_nSortOrder[nColumnIndex];
+
+	return CListCtrl::SortItems(SortItemCB, (DWORD_PTR)this);
 }
 
 INT CPackManager::SortItemCB(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)

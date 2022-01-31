@@ -117,12 +117,9 @@ public:
 
 	virtual ULONGLONG GetTotalSize();
 
-	virtual BOOL SortItems(PFNLVCOMPARE pfnCompare, INT nColumnIndex);
+	virtual BOOL SortItems(INT nColumnIndex);
 
 	static INT CALLBACK SortItemCB(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-
-public:
-	INT m_nSortOrder[3];
 
 private:
 	BOOL InsertPackItem(CPackItem * pItem, CPackErrors& Errors);
@@ -137,7 +134,7 @@ private:
 	CWnd* m_pParent;
 	CPackItemDropTarget m_DragDropTarget;
 	INT m_nSortColumnIndex;
-	
+	INT m_nSortOrder[3];
 };
 
 
