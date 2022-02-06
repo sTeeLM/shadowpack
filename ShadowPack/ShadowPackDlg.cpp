@@ -610,7 +610,24 @@ void CShadowPackDlg::OnBnClickedBtnCancel()
 
 void CShadowPackDlg::OnItemOption()
 {
-	// TODO: 在此添加命令处理程序代码
+	CString strDis, strName, strTime, strSize, strTemp;
+	strName.LoadString(IDS_COLUMN_NAME);
+	strTime.LoadString(IDS_COLUMN_TIME);
+	strSize.LoadString(IDS_COLUMN_SIZE);
+	if (m_ctlFileManager.GetSelectedCount() == 1) {
+		POSITION pos = m_ctlFileManager.GetFirstSelectedItemPosition();
+		INT nIndex = m_ctlFileManager.GetNextSelectedItem(pos);
+		CPackManager::CPackItem* pItem = (CPackManager::CPackItem *)(m_ctlFileManager.GetItemData(nIndex));
+		CPackUtils::TranslateSize(pItem->GetTotalSize(),strTemp);
+		strDis.Format(_T("%s: %s\r\n%s: %s\r\n%s: %s\r\n"),
+			strName,
+			pItem->GetName(),
+			strTime,
+			pItem->FormatDateItme(),
+			strSize,
+			strTemp);
+		AfxMessageBox(strDis, MB_ICONINFORMATION);
+	}
 }
 
 

@@ -45,6 +45,7 @@ protected:
 		BOOL m_bCanDrop;
 	};
 
+public:
 	class CPackItem {
 		CPackItem() : 
 			m_nSize(0), 
