@@ -1,7 +1,7 @@
 # A tool for general steganography #
 ##  What it can do: ##
 - Photo Image Files: BMP/PNG/TIFF/PPM/JPEG
-- Audio Files: (still working)
+- Audio Files: PCM based lossess
 - Vidio Files: (still working)
 - Big file support: use disk cache (4G limit on win32)
 - Encryption: AES/SEED/CAMELLIA/BLOWFISH/CAST/IDEA/RC4/3DES
